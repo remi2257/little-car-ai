@@ -5,14 +5,12 @@ import random
 
 
 class Track:
-    def __init__(self, track_path, background):
+    def __init__(self, track_path):
         self.track_grid, self.grid_h, self.grid_w = parse_track_file(track_path)
         self.grid_size = size_haut // self.grid_h
 
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
         self.start_spots = []
-
-        self.gen_background(background)
 
     def gen_background(self, background):
         for i in range(self.grid_h):

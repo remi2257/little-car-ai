@@ -13,13 +13,25 @@ car_max_len = max(size_larg, size_haut) // grid_under_sample
 FPS_MAX = 30
 list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
-nbr_bots = 1
+nbr_bots = 3
+
+# -- CAR PARAMETERS -- #
+
+speed_max = 30.0
+n0_speed = 15.0
+
+step_dir = 6.0
+
+step_angle = 5.0
 
 # -- DIRECTION -- #
 
-DOWN, RIGHT, UP, LEFT = 0, 1, 2, 3
+# BOT
+bot_DOWN, bot_RIGHT, bot_UP, bot_LEFT = 0, 1, 2, 3
 
-step_dir = 6
+# HUMAN / IA
+gas_ON, gas_BRAKE, gas_OFF = 0, 1, 2
+dir_LEFT, dir_RIGHT, dir_NONE = 3, 4, 6
 
 # -- TRACK -- #
 road_path = "images/road/"
@@ -40,14 +52,14 @@ track_part = {
 }
 
 bot_possible_moves = {
-    "ud": [UP, DOWN],
-    "lr": [LEFT, RIGHT],
-    "dr": [RIGHT, DOWN],
-    "dl": [LEFT, DOWN],
-    "ur": [UP, RIGHT],
-    "ul": [UP, LEFT],
-    "ulr": [UP, LEFT, RIGHT],
-    "udr": [UP, DOWN, RIGHT],
-    "udl": [UP, LEFT, DOWN],
-    "dlr": [DOWN, LEFT, RIGHT],
+    "ud": [bot_UP, bot_DOWN],
+    "lr": [bot_LEFT, bot_RIGHT],
+    "dr": [bot_RIGHT, bot_DOWN],
+    "dl": [bot_LEFT, bot_DOWN],
+    "ur": [bot_UP, bot_RIGHT],
+    "ul": [bot_UP, bot_LEFT],
+    "ulr": [bot_UP, bot_LEFT, bot_RIGHT],
+    "udr": [bot_UP, bot_DOWN, bot_RIGHT],
+    "udl": [bot_UP, bot_LEFT, bot_DOWN],
+    "dlr": [bot_DOWN, bot_LEFT, bot_RIGHT],
 }

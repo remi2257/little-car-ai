@@ -11,7 +11,7 @@ stop = False
 
 # --- INIT PYGAME--- #
 
-game = Game()
+game = Game(track_path="track/track1.tra")
 
 # Boucle infinie
 while not stop:
@@ -20,16 +20,24 @@ while not stop:
                 event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
             stop = True  # On arrête la boucle
 
-        if event.type == pygame_const.KEYDOWN:
-            if event.key == pygame_const.K_DOWN:  # Si "flèche bas"
-                game.car.actualize_direction(DOWN)
-            elif event.key == pygame_const.K_UP:
-                game.car.actualize_direction(UP)
-            elif event.key == pygame_const.K_LEFT:
-                game.car.actualize_direction(LEFT)
-            elif event.key == pygame_const.K_RIGHT:
-                game.car.actualize_direction(RIGHT)
-
+        # if event.type == pygame_const.KEYDOWN:
+        #     if event.key == pygame_const.K_DOWN:  # Si "flèche bas"
+        #         game.car.actualize_direction(gas_BRAKE)
+        #     if event.key == pygame_const.K_UP:
+        #         game.car.actualize_direction(gas_ON)
+        #     if event.key == pygame_const.K_LEFT:
+        #         game.car.actualize_direction(dir_LEFT)
+        #     if event.key == pygame_const.K_RIGHT:
+        #         game.car.actualize_direction(dir_RIGHT)
+    keys = pygame.key.get_pressed()
+    if keys[pygame_const.K_DOWN]:  # Si "flèche bas"
+        game.car.actualize_direction(gas_BRAKE)
+    if keys[pygame_const.K_UP]:
+        game.car.actualize_direction(gas_ON)
+    if keys[pygame_const.K_LEFT]:
+        game.car.actualize_direction(dir_LEFT)
+    if keys[pygame_const.K_RIGHT]:
+        game.car.actualize_direction(dir_RIGHT)
     # Refresh
     game.actualize()
 
