@@ -3,6 +3,9 @@ Hi, my name is Remi LUX. I'm currently in my final year of Computer Vision Degre
 
 My algorithm aims to teach a car to drive through AI.
 
+<p align="center">
+<img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_LIDAR.png" width="500"/>
+</p>
 
 ### TODO LIST
 #### Firstly
