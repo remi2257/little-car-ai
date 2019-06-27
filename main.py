@@ -8,36 +8,33 @@ from src.const import *
 # --- INIT Variable--- #
 
 stop = False
-
+human_player = True
 # --- INIT PYGAME--- #
 
-game = Game(track_path="track/track1.tra")
+# game = Game(track_path="track/track1.tra")
+game = Game(track_path="track/track_tiny.tra")
 
 # Boucle infinie
 while not stop:
-    for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
-        if event.type == pygame_const.QUIT or (
-                event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
-            stop = True  # On arrête la boucle
+    if human_player:
+        for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
+            if event.type == pygame_const.QUIT or (
+                    event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
+                stop = True  # On arrête la boucle
 
-        # if event.type == pygame_const.KEYDOWN:
-        #     if event.key == pygame_const.K_DOWN:  # Si "flèche bas"
-        #         game.car.actualize_direction(gas_BRAKE)
-        #     if event.key == pygame_const.K_UP:
-        #         game.car.actualize_direction(gas_ON)
-        #     if event.key == pygame_const.K_LEFT:
-        #         game.car.actualize_direction(dir_LEFT)
-        #     if event.key == pygame_const.K_RIGHT:
-        #         game.car.actualize_direction(dir_RIGHT)
-    keys = pygame.key.get_pressed()
-    if keys[pygame_const.K_DOWN]:  # Si "flèche bas"
-        game.car.actualize_direction(gas_BRAKE)
-    if keys[pygame_const.K_UP]:
-        game.car.actualize_direction(gas_ON)
-    if keys[pygame_const.K_LEFT]:
-        game.car.actualize_direction(dir_LEFT)
-    if keys[pygame_const.K_RIGHT]:
-        game.car.actualize_direction(dir_RIGHT)
+        keys = pygame.key.get_pressed()
+        if keys[pygame_const.K_DOWN]:  # Si "flèche bas"
+            game.car.actualize_direction(gas_BRAKE)
+        if keys[pygame_const.K_UP]:
+            game.car.actualize_direction(gas_ON)
+        if keys[pygame_const.K_LEFT]:
+            game.car.actualize_direction(dir_LEFT)
+        if keys[pygame_const.K_RIGHT]:
+            game.car.actualize_direction(dir_RIGHT)
+
+    else:
+        keys = game.predict_next_move()
+
     # Refresh
     game.actualize()
 

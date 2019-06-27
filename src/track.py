@@ -5,9 +5,13 @@ import random
 
 
 class Track:
-    def __init__(self, track_path):
+    def __init__(self, track_path, double_road=True):
         self.track_grid, self.grid_h, self.grid_w = parse_track_file(track_path)
+        self.double_road = double_road
+
         self.grid_size = size_haut // self.grid_h
+
+        self.car_size = self.grid_size//(1+int(self.double_road))
 
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
         self.start_spots = []
@@ -15,7 +19,7 @@ class Track:
     def gen_background(self, background):
         for i in range(self.grid_h):
             for j in range(self.grid_w):
-                im_name = track_part[self.track_grid[i][j]]
+                im_name = track_part_1w[self.track_grid[i][j]]
                 if im_name is None:
                     continue
                 self.start_spots.append([i, j])

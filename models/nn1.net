@@ -1,0 +1,16 @@
+# Input
+
+input_dim = 5
+
+# Hidden layers
+
+[Hidden1]
+neurons = 5
+activation = ReLu
+
+[Hidden2]
+neurons = 5
+activation = ReLu
+
+[Softmax]
+classes = 3

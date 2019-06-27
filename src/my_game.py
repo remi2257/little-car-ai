@@ -21,7 +21,7 @@ class Game:
         # self.background = pygame.transform.scale(self.background, (size_larg, size_haut))
 
         # RESIZABLE
-        self.car = Car(self.track.grid_size)
+        self.car = Car(self.track)
         self.cars_bot = []
         for _ in range(nbr_bots):
             self.cars_bot.append(CarBot(self.track))
@@ -42,7 +42,7 @@ class Game:
         self.window.blit(self.background, (0, 0))
 
         # CAR PLAYER
-        self.car.move_car()
+        self.car.move_car(self.window)
         self.window.blit(self.car.actual_img, self.car.get_position_left_top())
 
         # BOTS CAR
@@ -54,5 +54,10 @@ class Game:
             # car.position_car.w, car.position_car.h)
             #              , 3)
 
+
         # REFRESH
         pygame.display.flip()
+
+
+    def predict_next_move(self):
+        pass
