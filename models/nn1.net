@@ -1,6 +1,8 @@
-# Input
+## Input
+# Velocity + LIDAR (height_LIDAR = 7 *
+#                   width_LIDAR = 5)
 
-input_dim = 5
+#input_dim = 36
 
 # Hidden layers
 

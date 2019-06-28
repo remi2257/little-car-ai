@@ -1,41 +1,34 @@
 from src.const import *
 import numpy as np
 import pygame
-import random
 
 
 class Track:
     def __init__(self, track_path, double_road=True):
-        self.track_grid, self.grid_h, self.grid_w = parse_track_file(track_path)
+        self.grid, self.grid_h, self.grid_w = parse_track_file(track_path)
         self.double_road = double_road
 
-        self.grid_size = size_haut // self.grid_h
+        self.grid_size = min(size_haut // self.grid_h, size_larg // self.grid_w)
 
-        self.car_size = self.grid_size//(1+int(self.double_road))
+        self.im_w = self.grid_size * self.grid_w
+        self.im_h = self.grid_size * self.grid_h
+
+        self.car_size = self.grid_size // (1 + int(self.double_road))
 
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
         self.start_spots = []
 
-    def gen_background(self, background):
-        for i in range(self.grid_h):
-            for j in range(self.grid_w):
-                im_name = track_part_1w[self.track_grid[i][j]]
-                if im_name is None:
-                    continue
-                self.start_spots.append([i, j])
-                self.grid_practicable[i][j] = True
-                im = pygame.image.load(im_name).convert_alpha()
-                im = pygame.transform.scale(im, (self.grid_size, self.grid_size))
-
-                background.blit(im, (self.grid_size * j, self.grid_size * i))
-        random.shuffle(self.start_spots)
-
 
 def parse_track_file(track_path):
-    with open(track_path) as f:
-        lines_raw = f.readlines()
-        lines = [line.strip() for line in lines_raw if line != "\n"]
-        grid = [line.split(" ") for line in lines]
+    try:
+        with open(track_path) as f:
+            lines_raw = f.readlines()
+            lines = [line.strip() for line in lines_raw if line != "\n"]
+            grid = [line.split(" ") for line in lines]
+    except FileNotFoundError as e:
+        import sys
+        print(e, "Bye bye")
+        sys.exit(3)
     return grid, len(grid), len(grid[0])
 
 
@@ -64,7 +57,7 @@ if __name__ == '__main__':
     background_im = pygame.image.load(background_path).convert()
 
     track = Track("track/track1.tra", background_im)
-    print(track.track_grid)
+    print(track.grid)
 
     window.blit(background_im, (0, 0))
 
