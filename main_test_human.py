@@ -1,6 +1,6 @@
 import pygame
 
-from src.my_game import Game
+from src.GameSolo import GameSolo
 from src.const import *
 
 # --- INIT Variable--- #
@@ -8,8 +8,7 @@ from src.const import *
 stop = False
 # --- INIT PYGAME--- #
 
-game = Game(track_path="track/track1.tra")
-# game = Game(track_path="track/track_tiny.tra")
+game = GameSolo(track_path="track/track1.tra")
 
 # Boucle infinie
 while not stop:

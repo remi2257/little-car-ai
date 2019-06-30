@@ -1,4 +1,4 @@
-from src.my_game import Game
+from src.GameSolo import GameSolo
 from src.const import *
 import pygame
 
@@ -14,7 +14,7 @@ stop = False
 
 # --- INIT PYGAME--- #
 
-game = Game(nn_file_path="models/nn1.net", track_path="track/track1.tra")
+game = GameSolo(nn_file_path="models/nn1.net", track_path="track/track1.tra")
 # game = Game(track_path="track/track_tiny.tra")
 
 # Boucle infinie
@@ -24,8 +24,7 @@ while not stop:
                 event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
             stop = True  # On arrête la boucle
 
-    commands = game.predict_next_move()
-    game.car.actualize_direction_and_gas(commands)
+
 
     # Refresh
     game.actualize()

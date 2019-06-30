@@ -1,17 +1,29 @@
 import pygame.locals as pygame_const
-
 # -----ENV---- #
-
 size_larg = 1600  # 1280
 # size_haut = size_larg
 size_haut = 900  # 720
 
+init_car_x = 200.0
+init_car_y = 140.0
+
 FPS_MAX = 30
 list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
-nbr_bots = 0
+font_size = 20
+
+# TRAINING
+nbr_AI_per_gen = 30
+rate_survivors = 0.2
+
+nbr_survivors = int(nbr_AI_per_gen*rate_survivors)
+
+weight_on_road = 10
 
 # -- CAR PARAMETERS -- #
+nbr_bots = 0
+path_audi = "images/vehicles/Audi.png"
+path_viper = "images/vehicles/Black_viper.png"
 
 # SPEED/MOVEMENT
 speed_max = 30.0

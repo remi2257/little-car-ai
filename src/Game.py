@@ -1,19 +1,20 @@
 from src.CarBot import *
 from src.CarAI import *
-from src.track import *
+from src.Track import *
+from pygame.font import Font
 
 background_path = "images/background.jpg"
 
 
 class Game:
-    def __init__(self, nn_file_path=None, track_path="track/track1.tra"):
-        self.is_human = nn_file_path is None
+    def __init__(self, track_path="track/track1.tra"):
+
         pygame.init()
 
         pygame.time.Clock().tick(FPS_MAX)  # Fixe le nbr max de FPS
         # pygame.key.set_repeat(30, 30)
 
-        pygame.display.set_caption("My Game")
+        pygame.display.set_caption("Little Car AI")
         self.track = Track(track_path)
 
         self.lidar_w, self.lidar_h = self.find_LIDAR_img_size(self.track.im_h)
@@ -39,43 +40,15 @@ class Game:
 
         self.gen_background()
 
-        if self.is_human:
-            self.car = CarHuman(self.track, self.lidar_w, self.lidar_h)
-        else:
-            self.car = CarAI(nn_file_path, self.track, self.lidar_w, self.lidar_h)
-
         self.cars_bot = []
         for _ in range(nbr_bots):
             self.cars_bot.append(CarBot(self.track))
 
-        self.actualize()
+        # Font
+        self.font = Font('freesansbold.ttf', font_size)
 
     def actualize(self):
-        pygame.time.Clock().tick(FPS_MAX)  # Fixe le nbr max de FPS
-
-        # BACKGROUND
-        self.window.blit(self.background, (0, 0))
-        self.refresh_arrow_pedal()
-
-        # CAR PLAYER
-        self.car.move_car_and_refresh_window(self.window)
-
-        self.window.blit(self.car.actual_img, self.car.get_position_left_top())
-
-        # BOTS CAR
-        for car in self.cars_bot:
-            car.move_car_bot(self.track)
-            self.window.blit(car.actual_img, car.get_position_left_top())
-            # pygame.draw.rect(self.window, (0, 0, 255), (
-            # car.position_car.x, car.position_car.y,
-            # car.position_car.w, car.position_car.h)
-            #              , 3)
-
-        # REFRESH
-        pygame.display.flip()
-
-    def predict_next_move(self):
-        return self.car.predict_next_move()
+        raise NotImplementedError
 
     def find_LIDAR_img_size(self, track_height):
         ratio = float(height_LIDAR) / width_LIDAR
@@ -90,6 +63,9 @@ class Game:
             return round(possible_height / ratio), possible_height
 
     def gen_background(self):
+        raise NotImplementedError
+
+    def gen_track_background(self):
         # Generate Track
         for i in range(self.track.grid_h):
             for j in range(self.track.grid_w):
@@ -105,27 +81,9 @@ class Game:
 
         random.shuffle(self.track.start_spots)
 
+    def gen_LIDAR_background(self):
         # Generate LIDAR background
         rect_pos = tuple([self.track.im_w, offset_LIDAR_grid_y,
                           self.lidar_w, self.lidar_h])
         pygame.draw.rect(self.background, (0, 0, 0), rect_pos)
 
-        # Generate Arrows & Pedals
-
-        # self.gen_arrows_pedals(dir_NONE, gas_OFF)
-
-    def refresh_arrow_pedal(self):
-        self.gen_arrows_pedals(self.car.last_dir_cmd, self.car.last_gas_cmd)
-
-    def gen_arrows_pedals(self, dir_cmd, gas_cmd):
-        self.gen_arrow(dir_cmd)
-        self.gen_pedals(gas_cmd)
-
-    def gen_arrow(self, dir_cmd):
-        self.window.blit(self.actions_imgs[dir_cmd], (self.window_w - width_arrows_pedals - offset_arrows_pedals,
-                                                      self.lidar_h + 5 * offset_arrows_pedals))
-
-    def gen_pedals(self, gas_cmd):
-
-        self.window.blit(self.actions_imgs[gas_cmd], (self.window_w - width_arrows_pedals - offset_arrows_pedals,
-                                                      self.lidar_h + 6 * offset_arrows_pedals))

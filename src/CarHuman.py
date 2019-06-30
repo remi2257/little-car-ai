@@ -1,16 +1,16 @@
-import random
 from src.const import *
 import pygame
 from math import cos, sin, radians, exp
-import numpy as np
 
 
 class CarHuman:
-    def __init__(self, track, lidar_w, lidar_h, path_img="images/vehicles/Audi.png"):
+    def __init__(self, track, lidar_w, lidar_h, train=False):
         # INIT VARIABLES
         self.theta = 0.0
         self.speed = 0.0
         self.n_speed = 0.0
+        self.fitness = 0
+        self.time_outside_road = 0
 
         self.last_dir_cmd = dir_NONE
         self.last_gas_cmd = gas_OFF
@@ -22,26 +22,16 @@ class CarHuman:
             self.lidar_filtered.append(width_LIDAR * [False])
 
         # GEN CAR IMAGE
-        img = pygame.image.load(path_img).convert_alpha()
-        width = img.get_width()
-        height = img.get_height()
-        ratio = float(width / height)
-        car_len = track.car_size
-        if ratio < 1:
-            width = car_len
-            height = int(car_len * ratio)
-        else:
-            height = car_len
-            width = int(car_len / ratio)
+        self.img = pygame.transform.rotate(gen_car_img(track, path_audi), 270.0)
+        if train:
+            self.img_leader = pygame.transform.rotate(gen_car_img(track, path_viper), 270.0)
 
-        img_resize = pygame.transform.scale(img, (height, width))
-        self.img = pygame.transform.rotate(img_resize, 270.0)
         self.actual_img = self.img
 
         # SET POSITION
         self.position_car = self.actual_img.get_rect()
 
-        self.position_car = self.position_car.move(150.0, 150.0)
+        self.position_car = self.position_car.move(init_car_x, init_car_y)
 
         # GEN LIDAR
         self.track = track
@@ -73,7 +63,7 @@ class CarHuman:
 
             self.actual_img = pygame.transform.rotate(self.img, self.theta)
             new_rect = self.actual_img.get_rect()
-            self.position_car = new_rect.move(self.new_pos(new_rect))
+            self.position_car = new_rect.move(self.new_pos_after_turn(new_rect))
             self.last_dir_cmd = new_command
 
     def calculate_new_speed(self, accelerate=True):
@@ -93,11 +83,13 @@ class CarHuman:
         else:
             self.theta -= step_angle
 
-    def move_car_and_refresh_window(self, window=None):
-        # Car
+    def move_car(self):
         self.position_car = self.position_car.move(round(self.speed * cos(radians(self.theta))),
                                                    round(- self.speed * sin(radians(self.theta))))
 
+    def move_car_and_refresh_LIDAR(self, window=None):
+        # Car
+        self.move_car()
         # Window
         self.refresh_LIDAR(window)
 
@@ -109,9 +101,20 @@ class CarHuman:
         return tuple([self.position_car.centerx,
                       self.position_car.centery])
 
-    def new_pos(self, new_rect):
+    def new_pos_after_turn(self, new_rect):
         return tuple([self.position_car.centerx - new_rect.w // 2,
                       self.position_car.centery - new_rect.h // 2])
+
+    def reset_position(self):
+        x, y = self.get_position_left_top()
+        self.position_car = self.position_car.move(init_car_x - x,
+                                                   init_car_y - y)
+
+        self.theta = 0.0
+        self.speed = 0.0
+        self.n_speed = 0.0
+        self.fitness = 0
+        self.time_outside_road = 0
 
     def refresh_LIDAR(self, window=None):
         car_x, car_y = self.get_position_center()
@@ -164,3 +167,29 @@ class CarHuman:
                                offset_LIDAR_grid_y + round((self.lidar_grid_car_y + 0.5) * self.lidar_h_rect)])
 
             pygame.draw.circle(window, COLOR_BLUE, point_pos, 4, 2)
+
+    def refresh_fitness(self):
+        on_road = self.lidar_filtered[self.lidar_grid_car_y][self.lidar_grid_car_x]
+        if on_road:
+            self.time_outside_road = max(0, self.time_outside_road - 2)
+            self.fitness += (max(self.speed, 0) / FPS_MAX) * weight_on_road - 10 * self.time_outside_road
+        else:
+            self.time_outside_road += 1
+            self.fitness -= (2 * weight_on_road + 10 + self.time_outside_road) / FPS_MAX
+
+
+def gen_car_img(track, path_img):
+    img = pygame.image.load(path_img).convert_alpha()
+    width = img.get_width()
+    height = img.get_height()
+    ratio = float(width / height)
+    car_len = track.car_size
+    if ratio < 1:
+        width = car_len
+        height = int(car_len * ratio)
+    else:
+        height = car_len
+        width = int(car_len / ratio)
+
+    img_resize = pygame.transform.scale(img, (height, width))
+    return img_resize

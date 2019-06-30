@@ -1,18 +1,13 @@
 ## Input
-# Velocity + LIDAR (height_LIDAR = 7 *
-#                   width_LIDAR = 5)
-
-#input_dim = 36
+# Velocity + LIDAR (height_LIDAR *
+#                   width_LIDAR)
 
 # Hidden layers
 
 [Hidden1]
-neurons = 5
+neurons = 10
 activation = ReLu
 
 [Hidden2]
-neurons = 5
+neurons = 7
 activation = ReLu
-
-[Softmax]
-classes = 3
