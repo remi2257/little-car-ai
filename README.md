@@ -48,9 +48,11 @@ to generate the next generation, thanks to mutation
 
 | Version | Game Render |
 :-------------------------:|:-------------------------:
-0.6 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_True_Mutation.png" width="400"/>
+0.6 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_Mutation.png" width="400"/>
 0.3 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_True_Design.png" width="400"/>
 0.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_LIDAR.png" width="400"/> |
+
+### Versions List
 
 - v1.0 : First working version | ? Mi-July 2019 ?
 - v0.6 : AI & Evolution Algorithm | 30/06/19
