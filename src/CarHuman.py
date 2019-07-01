@@ -1,6 +1,7 @@
 from src.const import *
 import pygame
 from math import cos, sin, radians, exp
+import math
 
 
 class CarHuman:
@@ -8,18 +9,14 @@ class CarHuman:
         # INIT VARIABLES
         self.theta = 0.0
         self.speed = 0.0
+        self.x_speed = 0.0
+        self.y_speed = 0.0
         self.n_speed = 0.0
         self.fitness = 0
         self.time_outside_road = 0
 
         self.last_dir_cmd = dir_NONE
         self.last_gas_cmd = gas_OFF
-        # self.lidar_mat = np.zeros((height_LIDAR, width_LIDAR), dtype=str)
-        self.lidar_mat = []
-        self.lidar_filtered = []
-        for _ in range(height_LIDAR):
-            self.lidar_mat.append(width_LIDAR * [""])
-            self.lidar_filtered.append(width_LIDAR * [False])
 
         # GEN CAR IMAGE
         self.img = pygame.transform.rotate(gen_car_img(track, path_audi), 270.0)
@@ -37,10 +34,17 @@ class CarHuman:
         self.track = track
         self.lidar_grid_size = track.grid_size // (1 + int(track.double_road))
         self.lidar_grid_car_x = width_LIDAR // 2
-        self.lidar_grid_car_y = height_LIDAR - offset_LIDAR - 1
+        self.lidar_grid_car_y = height_LIDAR - offset_y_LIDAR - 1
 
         self.lidar_w_img, self.lidar_h_img = lidar_w, lidar_h
         self.lidar_w_rect, self.lidar_h_rect = lidar_w // width_LIDAR, lidar_h // height_LIDAR
+
+        self.lidar_mat = []
+        self.lidar_filtered = []
+        for _ in range(height_LIDAR):
+            self.lidar_mat.append(width_LIDAR * [""])
+            self.lidar_filtered.append(width_LIDAR * [False])
+
         self.refresh_LIDAR()
 
     def actualize_direction_and_gas(self, new_commands):
@@ -49,43 +53,50 @@ class CarHuman:
 
     def actualize_direction_or_gas(self, new_command):
         if new_command in [gas_OFF, gas_BRAKE, gas_ON]:
-            if new_command == gas_ON:
-                self.calculate_new_speed()
-            elif new_command == gas_BRAKE:
-                self.calculate_new_speed(accelerate=False)
+            self.calculate_new_speed(new_command)
             self.last_gas_cmd = new_command
 
         else:
-            if new_command == dir_LEFT:
-                self.calculate_new_angle(left=True)
-            elif new_command == dir_RIGHT:
-                self.calculate_new_angle(left=False)
+            self.calculate_new_angle(new_command)
 
             self.actual_img = pygame.transform.rotate(self.img, self.theta)
             new_rect = self.actual_img.get_rect()
             self.position_car = new_rect.move(self.new_pos_after_turn(new_rect))
             self.last_dir_cmd = new_command
 
-    def calculate_new_speed(self, accelerate=True):
-        if accelerate:
-            self.n_speed += 1.0
-        else:
-            self.n_speed = max(self.n_speed - 2.0, -10)
+    def calculate_new_speed(self, command):
 
-        if self.n_speed > 0:
-            self.speed = speed_max * (1 - exp(-self.n_speed / n0_speed))
-        else:
-            self.speed = - 0.25 * speed_max * (1 - exp(self.n_speed / n0_speed))
+        if command == gas_BRAKE and self.speed > 0:
+            self.speed = max(self.speed - 2.0, 0)
+            self.n_speed = -n0_speed * math.log2(1 - (self.speed / speed_max))
 
-    def calculate_new_angle(self, left=True):
-        if left:
+        else:
+            if command == gas_BRAKE:
+                self.n_speed = max(self.n_speed - 2.0, -10)
+
+            elif command == gas_ON:
+                self.n_speed = min(self.n_speed + 1.0, 40)
+
+            else:
+                self.n_speed = max(self.n_speed - 0.4, 0)
+
+            if self.n_speed > 0:
+                self.speed = speed_max * (1 - exp(-self.n_speed / n0_speed))
+            else:
+                self.speed = - 0.25 * speed_max * (1 - exp(self.n_speed / n0_speed))
+
+    def calculate_new_angle(self, command):
+        if command == dir_LEFT:
             self.theta += step_angle
-        else:
+        elif command == dir_RIGHT:
             self.theta -= step_angle
 
+        self.x_speed = drift_factor * self.x_speed + (1 - drift_factor) * round(self.speed * cos(radians(self.theta)))
+        self.y_speed = drift_factor * self.y_speed + (1 - drift_factor) * round(-self.speed * sin(radians(self.theta)))
+
     def move_car(self):
-        self.position_car = self.position_car.move(round(self.speed * cos(radians(self.theta))),
-                                                   round(- self.speed * sin(radians(self.theta))))
+        self.position_car = self.position_car.move(self.x_speed,
+                                                   self.y_speed)
 
     def move_car_and_refresh_LIDAR(self, window=None):
         # Car
@@ -115,6 +126,8 @@ class CarHuman:
         self.n_speed = 0.0
         self.fitness = 0
         self.time_outside_road = 0
+
+        self.refresh_LIDAR()
 
     def refresh_LIDAR(self, window=None):
         car_x, car_y = self.get_position_center()
@@ -172,7 +185,7 @@ class CarHuman:
         on_road = self.lidar_filtered[self.lidar_grid_car_y][self.lidar_grid_car_x]
         if on_road:
             self.time_outside_road = max(0, self.time_outside_road - 2)
-            self.fitness += (max(self.speed, 0) / FPS_MAX) * weight_on_road - 10 * self.time_outside_road
+            self.fitness += (max(self.speed, 0) / FPS_MAX) * weight_on_road
         else:
             self.time_outside_road += 1
             self.fitness -= (2 * weight_on_road + 10 + self.time_outside_road) / FPS_MAX

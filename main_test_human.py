@@ -8,7 +8,7 @@ from src.const import *
 stop = False
 # --- INIT PYGAME--- #
 
-game = GameSolo(track_path="track/track1.tra")
+game = GameSolo(track_path="track/track_race_izi.tra")
 
 # Boucle infinie
 while not stop:

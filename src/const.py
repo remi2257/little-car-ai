@@ -13,12 +13,21 @@ list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 font_size = 20
 
 # TRAINING
-nbr_AI_per_gen = 30
+nbr_AI_per_gen = 50
 rate_survivors = 0.2
 
 nbr_survivors = int(nbr_AI_per_gen*rate_survivors)
 
 weight_on_road = 10
+
+init_mutation_rate = 0.3
+decay_mutation_rate = 0.95
+
+generation_duration_in_sec = 5
+generation_duration_increase = 1
+
+path_train_save = "results/"
+
 
 # -- CAR PARAMETERS -- #
 nbr_bots = 0
@@ -33,11 +42,13 @@ step_dir = 6.0
 
 step_angle = 7.0
 
+drift_factor = 0.91
+
 # LIDAR
 
 height_LIDAR = 7
 width_LIDAR = 5
-offset_LIDAR = 1
+offset_y_LIDAR = 0
 
 LIDAR_width_img = 150
 erode_LIDAR_grid = 2
