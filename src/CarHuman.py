@@ -5,7 +5,7 @@ import math
 
 
 class CarHuman:
-    def __init__(self, track, lidar_w, lidar_h, train=False):
+    def __init__(self, track, lidar_w, lidar_h):
         # INIT VARIABLES
         self.theta = 0.0
         self.speed = 0.0
@@ -20,8 +20,6 @@ class CarHuman:
 
         # GEN CAR IMAGE
         self.img = pygame.transform.rotate(gen_car_img(track, path_audi), 270.0)
-        if train:
-            self.img_leader = pygame.transform.rotate(gen_car_img(track, path_viper), 270.0)
 
         self.actual_img = self.img
 
@@ -70,15 +68,15 @@ class CarHuman:
             self.speed = max(self.speed - 2.0, 0)
             self.n_speed = -n0_speed * math.log2(1 - (self.speed / speed_max))
 
+        elif command == gas_OFF:
+            self.speed = max(self.speed * 0.97, 0)
+            self.n_speed = -n0_speed * math.log2(1 - (self.speed / speed_max))
         else:
             if command == gas_BRAKE:
                 self.n_speed = max(self.n_speed - 2.0, -10)
 
             elif command == gas_ON:
                 self.n_speed = min(self.n_speed + 1.0, 40)
-
-            else:
-                self.n_speed = max(self.n_speed - 0.4, 0)
 
             if self.n_speed > 0:
                 self.speed = speed_max * (1 - exp(-self.n_speed / n0_speed))
@@ -91,8 +89,9 @@ class CarHuman:
         elif command == dir_RIGHT:
             self.theta -= step_angle
 
-        self.x_speed = drift_factor * self.x_speed + (1 - drift_factor) * round(self.speed * cos(radians(self.theta)))
-        self.y_speed = drift_factor * self.y_speed + (1 - drift_factor) * round(-self.speed * sin(radians(self.theta)))
+        drift_fact = min(drift_factor_cst * math.pow(self.speed / speed_max, 2), drift_factor_max)
+        self.x_speed = drift_fact * self.x_speed + (1 - drift_fact) * round(self.speed * cos(radians(self.theta)))
+        self.y_speed = drift_fact * self.y_speed + (1 - drift_fact) * round(-self.speed * sin(radians(self.theta)))
 
     def move_car(self):
         self.position_car = self.position_car.move(self.x_speed,
@@ -116,7 +115,7 @@ class CarHuman:
         return tuple([self.position_car.centerx - new_rect.w // 2,
                       self.position_car.centery - new_rect.h // 2])
 
-    def reset_position(self):
+    def reset_car(self):
         x, y = self.get_position_left_top()
         self.position_car = self.position_car.move(init_car_x - x,
                                                    init_car_y - y)
@@ -125,7 +124,6 @@ class CarHuman:
         self.speed = 0.0
         self.n_speed = 0.0
         self.fitness = 0
-        self.time_outside_road = 0
 
         self.refresh_LIDAR()
 
@@ -184,11 +182,12 @@ class CarHuman:
     def refresh_fitness(self):
         on_road = self.lidar_filtered[self.lidar_grid_car_y][self.lidar_grid_car_x]
         if on_road:
-            self.time_outside_road = max(0, self.time_outside_road - 2)
             self.fitness += (max(self.speed, 0) / FPS_MAX) * weight_on_road
+
+            self.time_outside_road = max(0, self.time_outside_road - 0.1)
         else:
             self.time_outside_road += 1
-            self.fitness -= (2 * weight_on_road + 10 + self.time_outside_road) / FPS_MAX
+            self.fitness -= 10 * (weight_on_road + self.time_outside_road) / FPS_MAX
 
 
 def gen_car_img(track, path_img):

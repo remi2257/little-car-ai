@@ -1,23 +1,23 @@
 from src.const import *
 
-from keras.models import Sequential, Model, load_model
-from keras.layers import Dense, Dropout, Flatten, Input
+from keras.models import Model, load_model
+from keras.layers import Dense, Input
 import random
 
 
 class NeuralNet:
-    def __init__(self, nn_file_path="models/nn1.net"):
-        self.input_dim = height_LIDAR * width_LIDAR + 1
-        generate = nn_file_path.endswith(".net")
-        if generate:
+    def __init__(self, nn_file_path=None):
+        if nn_file_path is None:
+            self.model = None
+        elif nn_file_path.endswith(".net"):
             self.model = self.gen_nn_model(nn_file_path)
-        else:
+        elif nn_file_path.endswith(".h5"):
             self.model = load_model(nn_file_path)
 
     def gen_nn_model(self, nn_file_path):
         model_struc = []
         softmax_classes = 3
-        # input_dim = -1
+        input_dim = height_LIDAR * width_LIDAR + 1
         with open(nn_file_path) as f:
             lines_raw = f.readlines()
             lines = [line.strip() for line in lines_raw if line != "\n"]
@@ -38,7 +38,7 @@ class NeuralNet:
             if line[0] == "classes":
                 softmax_classes = int(line[-1])
 
-        inp = Input((self.input_dim,), name='main_input')
+        inp = Input((input_dim,), name='main_input')
 
         neurons, activ_func = model_struc.pop(0)
         model = Dense(neurons, activation=activ_func, name='dense_1')(inp)
@@ -52,17 +52,28 @@ class NeuralNet:
 
         return Model(inputs=inp, outputs=[out1, out2])
 
-        # neurons, activ_func = model_struc.pop(0)
-        # self.model.add(Dense(neurons, input_dim=input_dim,
-        #                      activation=activ_func))
-        # for neurons, activ_func in model_struc:
-        #     self.model.add(Dense(neurons, activation=activ_func))
-        #
-        # self.model.add(Dense(softmax_classes, activation="softmax"))
-
-    def mutate_model(self, target_nn, mutate_rate):
+    def mutate_model_from_query(self, target_nn, mutate_rate):
 
         for j, layer in enumerate(target_nn.model.layers):
+            new_weights_for_layer = []
+
+            for weight_array in layer.get_weights():
+                save_shape = weight_array.shape
+                one_dim_weight = weight_array.reshape(-1)
+
+                for i, weight in enumerate(one_dim_weight):
+                    if random.random() <= mutate_rate:
+                        # one_dim_weight[i] = random.uniform(0, 2) - 1
+                        one_dim_weight[i] = random.gauss(0, 0.4)
+
+                new_weight_array = one_dim_weight.reshape(save_shape)
+                new_weights_for_layer.append(new_weight_array)
+
+            self.model.layers[j].set_weights(new_weights_for_layer)
+
+    def mutate_model(self, mutate_rate):
+
+        for j, layer in enumerate(self.model.layers):
             new_weights_for_layer = []
 
             for weight_array in layer.get_weights():
@@ -82,9 +93,11 @@ class NeuralNet:
 if __name__ == '__main__':
     from keras.utils.vis_utils import plot_model
 
-    nn = NeuralNet()
-    nn2 = NeuralNet()
-    nn2.mutate_model(nn, 0.1)
+    nn = NeuralNet("models/nn_tiny.net")
+    print(nn.model.get_weights())
+
+    nn2 = NeuralNet("models/nn_tiny.net")
+    nn2.mutate_model_from_query(nn, 0.9)
     # print(nn.model.summary())
     print(nn.model.get_weights())
     print(nn2.model.get_weights())

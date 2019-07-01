@@ -1,10 +1,11 @@
 import pygame.locals as pygame_const
+
 # -----ENV---- #
 size_larg = 1600  # 1280
 # size_haut = size_larg
 size_haut = 900  # 720
 
-init_car_x = 200.0
+init_car_x = 260.0
 init_car_y = 140.0
 
 FPS_MAX = 30
@@ -13,26 +14,30 @@ list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 font_size = 20
 
 # TRAINING
-nbr_AI_per_gen = 50
+nbr_AI_per_gen = 20
 rate_survivors = 0.2
 
-nbr_survivors = int(nbr_AI_per_gen*rate_survivors)
+nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
 
 weight_on_road = 10
+lower_bound_fitness = -1000
 
-init_mutation_rate = 0.3
+max_mutation_rate = 1.0
 decay_mutation_rate = 0.95
 
-generation_duration_in_sec = 5
+copy_mutation_rate = 0.08
+
+generation_duration_max = 30
+generation_duration_in_sec = 1
 generation_duration_increase = 1
 
 path_train_save = "results/"
-
 
 # -- CAR PARAMETERS -- #
 nbr_bots = 0
 path_audi = "images/vehicles/Audi.png"
 path_viper = "images/vehicles/Black_viper.png"
+path_car_survivor = "images/vehicles/Car.png"
 
 # SPEED/MOVEMENT
 speed_max = 30.0
@@ -42,7 +47,8 @@ step_dir = 6.0
 
 step_angle = 7.0
 
-drift_factor = 0.91
+drift_factor_cst = 1.3
+drift_factor_max = 0.93
 
 # LIDAR
 

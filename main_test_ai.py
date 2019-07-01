@@ -13,9 +13,12 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 stop = False
 
 # --- INIT PYGAME--- #
-
-game = GameSolo(nn_file_path="models/nn1.net", track_path="track/track1.tra")
-# game = Game(track_path="track/track_tiny.tra")
+# model_path = "models/nn1.net"
+# model_path = "results/first_result_race.h5"
+model_path = "results/tiny_track.h5"
+game = GameSolo(nn_file_path=model_path,
+                # track_path="track/track_race1.tra")
+                track_path="track/track_race_izi.tra")
 
 # Boucle infinie
 while not stop:
@@ -23,7 +26,9 @@ while not stop:
         if event.type == pygame_const.QUIT or (
                 event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
             stop = True  # On arrête la boucle
-
+        keys = pygame.key.get_pressed()
+        if keys[pygame_const.K_r]:
+            game.car.reset_car()
 
 
     # Refresh

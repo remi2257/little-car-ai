@@ -25,6 +25,9 @@ while not stop:
     else:
         game.car.actualize_direction_or_gas(gas_OFF)
 
+    if keys[pygame_const.K_r]:
+        game.car.reset_car()
+
     if keys[pygame_const.K_LEFT]:
         game.car.actualize_direction_or_gas(dir_LEFT)
     elif keys[pygame_const.K_RIGHT]:
