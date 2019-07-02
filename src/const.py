@@ -8,12 +8,12 @@ size_haut = 900  # 720
 init_car_x = 260.0
 init_car_y = 140.0
 
-FPS_MAX = 30
+FPS_MAX_init = 30
 list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
 font_size = 20
 
-theta_0 = 270.0
+theta_0 = -90.0
 # TRAINING
 nbr_AI_per_gen = 50
 rate_survivors = 0.2
@@ -29,14 +29,14 @@ decay_mutation_rate = 0.95
 copy_mutation_rate = 0.08
 
 generation_duration_max_sec = 30
-generation_duration_max_frame = generation_duration_max_sec * FPS_MAX
+generation_duration_max_frame = generation_duration_max_sec * FPS_MAX_init
 
 generation_duration_init_sec = 1
-generation_duration_init_frame = generation_duration_init_sec * FPS_MAX
+generation_duration_init_frame = generation_duration_init_sec * FPS_MAX_init
 
 gen_dur_incr_ratio_max = 1.2
 generation_duration_incr_sec = 1
-generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX
+generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
 
 path_train_save = "results/"
 
@@ -112,6 +112,7 @@ track_part_1w = {
     "udl": road_path + "road_udl.png",
     "dlr": road_path + "road_dlr.png",
     "udlr": road_path + "road_udlr.png",
+    "sr": road_path + "start_right.png",
 
 }
 
@@ -127,6 +128,8 @@ bot_possible_moves_1w = {
     "udl": [bot_UP, bot_LEFT, bot_DOWN],
     "dlr": [bot_DOWN, bot_LEFT, bot_RIGHT],
     "udlr": [bot_DOWN, bot_UP, bot_LEFT, bot_RIGHT],
+    "sr": [bot_RIGHT],
+
 }
 
 track_part_1w_practicable = {
@@ -144,6 +147,7 @@ track_part_1w_practicable = {
     "udl": True,
     "dlr": True,
     "udlr": True,
+    "sr": True,
 
 }
 # COLORS

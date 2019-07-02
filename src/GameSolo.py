@@ -15,7 +15,7 @@ class GameSolo(Game):
         self.actualize()
 
     def actualize(self):
-        pygame.time.Clock().tick(FPS_MAX)  # Fixe le nbr max de FPS
+        pygame.time.Clock().tick(FPS_MAX_init)  # Fixe le nbr max de FPS
 
         # BACKGROUND
         self.window.blit(self.background, (0, 0))

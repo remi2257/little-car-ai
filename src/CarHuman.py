@@ -14,6 +14,9 @@ class CarHuman:
         self.n_speed = 0.0
         self.fitness = 0
 
+        self.x_init = track.init_car_x
+        self.y_init = track.init_car_y
+
         self.time_outside_road = 0
         self.on_road = True
 
@@ -28,7 +31,7 @@ class CarHuman:
         # SET POSITION
         self.position_car = self.actual_img.get_rect()
 
-        self.position_car = self.position_car.move(init_car_x, init_car_y)
+        self.position_car = self.position_car.move(self.x_init, self.y_init)
 
         # GEN LIDAR
         self.track = track
@@ -66,8 +69,9 @@ class CarHuman:
 
     def calculate_new_speed(self, command):
         if not self.on_road:
-            if (1 - exp(-self.n_speed / n0_speed)) > 0.5:
-                self.n_speed = max(self.n_speed - 4, max_n_speed / 4)
+            if (1 - exp(-self.n_speed / n0_speed)) > 0.3:
+                # self.n_speed = max(self.n_speed - 5, max_n_speed / 5)
+                self.n_speed = self.n_speed - 4
 
         if command == gas_BRAKE and self.speed > 0:
             self.speed = max(self.speed - 2, 0)
@@ -138,8 +142,8 @@ class CarHuman:
 
         self.actual_img = pygame.transform.rotate(self.img, self.theta)
         new_rect = self.actual_img.get_rect()
-        self.position_car = new_rect.move(init_car_x,
-                                          init_car_y)
+        self.position_car = new_rect.move(self.x_init,
+                                          self.y_init)
 
         self.refresh_LIDAR()
 
@@ -152,14 +156,14 @@ class CarHuman:
                 dy_rel_grid = (i - self.lidar_grid_car_y) * self.lidar_grid_size
 
                 # /!\ I took theta = 0° when pointing left but the lidar map is pointing top
-                dx_rel = dx_rel_grid * cos(radians(self.theta - 90)) + dy_rel_grid * sin(radians(self.theta - 90))
-                dy_rel = -dx_rel_grid * sin(radians(self.theta - 90)) + dy_rel_grid * cos(radians(self.theta - 90))
+                dx_rel = dx_rel_grid * cos(radians(self.theta - 90.0)) + dy_rel_grid * sin(radians(self.theta - 90.0))
+                dy_rel = -dx_rel_grid * sin(radians(self.theta - 90.0)) + dy_rel_grid * cos(radians(self.theta - 90.0))
 
-                true_dx = dx_rel + car_x
-                true_dy = dy_rel + car_y
+                true_dx = round(dx_rel + car_x)
+                true_dy = round(dy_rel + car_y)
 
-                true_x_grid = int(true_dx // self.track.grid_size)
-                true_y_grid = int(true_dy // self.track.grid_size)
+                true_x_grid = true_dx // self.track.grid_size
+                true_y_grid = true_dy // self.track.grid_size
 
                 if 0 < true_x_grid < self.track.grid_w and 0 < true_y_grid < self.track.grid_h:
                     corresponding_square = self.track.grid[true_y_grid][true_x_grid]
@@ -175,7 +179,7 @@ class CarHuman:
 
                 if window is not None:
                     # Print Points & Result
-                    point_pos = tuple([int(true_dx), int(true_dy)])
+                    point_pos = tuple([true_dx, true_dy])
                     rect_pos = tuple([self.track.im_w + j * self.lidar_w_rect + erode_LIDAR_grid,
                                       offset_LIDAR_grid_y + i * self.lidar_h_rect + erode_LIDAR_grid,
                                       self.lidar_w_rect - 2 * erode_LIDAR_grid,
@@ -186,7 +190,7 @@ class CarHuman:
                     else:
                         color = COLOR_RED
 
-                    pygame.draw.circle(window, color, point_pos, 4, 2)
+                    pygame.draw.circle(window, color, point_pos, 3)
                     pygame.draw.rect(window, color, rect_pos)
 
         if window is not None:
@@ -197,12 +201,12 @@ class CarHuman:
 
     def refresh_fitness(self):
         if self.on_road:
-            self.fitness += (max(self.speed, 0) / FPS_MAX) * weight_on_road
+            self.fitness += max(self.speed, 0) * weight_on_road / FPS_MAX_init
 
             self.time_outside_road = max(0, self.time_outside_road - 0.1)
         else:
             self.time_outside_road += 1
-            self.fitness -= 10 * (weight_on_road + self.time_outside_road) / FPS_MAX
+            self.fitness -= 40 * (max(self.speed, 0) + weight_on_road + self.time_outside_road)/ FPS_MAX_init
 
 
 def get_forward_speed(n_speed):

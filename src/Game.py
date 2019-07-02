@@ -7,11 +7,12 @@ background_path = "images/background.jpg"
 
 
 class Game:
-    def __init__(self, track_path="track/track1.tra"):
+    def __init__(self, track_path="track/track1.tra", fps_max=FPS_MAX_init):
 
         pygame.init()
 
-        pygame.time.Clock().tick(FPS_MAX)  # Fixe le nbr max de FPS
+        self.FPS_MAX = fps_max
+        pygame.time.Clock().tick(self.FPS_MAX)  # Fixe le nbr max de FPS
         # pygame.key.set_repeat(30, 30)
 
         pygame.display.set_caption("Little Car AI")
@@ -66,24 +67,30 @@ class Game:
         raise NotImplementedError
 
     def gen_track_background(self):
+        start_points = []
         # Generate Track
         for i in range(self.track.grid_h):
             for j in range(self.track.grid_w):
                 im_name = track_part_1w[self.track.grid[i][j]]
                 if im_name is None:
                     continue
-                self.track.start_spots.append([i, j])
+                if self.track.grid[i][j].startswith("s"):
+                    start_points.append(tuple([i, j]))
+                self.track.start_spots_bot.append([i, j])
                 self.track.grid_practicable[i][j] = True
                 im = pygame.image.load(im_name).convert_alpha()
                 im = pygame.transform.scale(im, (self.track.grid_size, self.track.grid_size))
 
                 self.background.blit(im, (self.track.grid_size * j, self.track.grid_size * i))
 
-        random.shuffle(self.track.start_spots)
+        random.shuffle(self.track.start_spots_bot)
+        if start_points:
+            init_car_y_grid, init_car_x_grid = random.choice(start_points)
+            self.track.init_car_y = self.track.grid_size * (init_car_y_grid + 2 / 5)
+            self.track.init_car_x = self.track.grid_size * (init_car_x_grid + 2 / 5)
 
     def gen_LIDAR_background(self):
         # Generate LIDAR background
         rect_pos = tuple([self.track.im_w, offset_LIDAR_grid_y,
                           self.lidar_w, self.lidar_h])
         pygame.draw.rect(self.background, (0, 0, 0), rect_pos)
-

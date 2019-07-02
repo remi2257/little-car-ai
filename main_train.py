@@ -16,13 +16,15 @@ stop = False
 
 game = GameTrain(
     nn_file_path="models/nn1.net",
-    # nn_file_path="results/tiny_track.h5",
+    # nn_file_path="results/first_tiny.h5",
 
-    # track_path="track/track_race1.tra",
-    track_path="track/track_race_izi.tra",
+    track_path="track/track_race2.tra",
+    # track_path="track/track_race_izi.tra",
 
     save=True,
     # save=False,
+
+    fps_max=240
 )
 
 # Boucle infinie
@@ -31,6 +33,10 @@ while not stop:
         if event.type == pygame_const.QUIT or (
                 event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
             stop = True  # On arrête la boucle
+        if event.type == pygame_const.KEYDOWN and event.key == pygame_const.K_DOWN:
+            game.decrease_FPS()
+        if event.type == pygame_const.KEYDOWN and event.key == pygame_const.K_UP:
+            game.increase_FPS()
 
     # Refresh
     game.actualize()

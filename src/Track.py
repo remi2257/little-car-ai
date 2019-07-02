@@ -16,7 +16,10 @@ class Track:
         self.car_size = self.grid_size // (1 + int(self.double_road))
 
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
-        self.start_spots = []
+        self.start_spots_bot = []
+
+        self.init_car_x = init_car_x
+        self.init_car_y = init_car_y
 
 
 def parse_track_file(track_path):

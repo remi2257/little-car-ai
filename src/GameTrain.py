@@ -13,14 +13,14 @@ matplotlib.use("Agg")
 
 
 class GameTrain(Game):
-    def __init__(self, nn_file_path="models/nn1.net", track_path="track/track1.tra", save=True):
+    def __init__(self, nn_file_path="models/nn1.net", track_path="track/track1.tra", save=True, fps_max=FPS_MAX_init):
         self.save = save
         if self.save:
             self.save_folder_model = path_train_save + datetime.now().strftime("%d_%m__%H_%M_%S") + "/"
             if not os.path.exists(self.save_folder_model):
                 os.makedirs(self.save_folder_model)
 
-        Game.__init__(self, track_path=track_path)
+        Game.__init__(self, track_path=track_path, fps_max=fps_max)
 
         self.carsAI = []
         self.best_actual_fitness = 0
@@ -56,7 +56,7 @@ class GameTrain(Game):
         self.actualize()
 
     def actualize(self):
-        self.clock.tick(FPS_MAX)  # Fixe le nbr max de FPS
+        self.clock.tick(self.FPS_MAX)  # Fixe le nbr max de FPS
         if self.gen_duration >= self.gen_duration_limit_frame:
             self.start_new_gen()
         self.gen_duration += 1
@@ -165,8 +165,9 @@ class GameTrain(Game):
         self.window.blit(text_max_fitness, (self.track.im_w - 50, 340))
 
     def display_infos_frame(self):
-        fps = self.font.render("FPS: " + str(int(self.clock.get_fps())), True, pygame.Color('white'))
-        self.window.blit(fps, (self.track.im_w, 700))
+        fps = self.font.render("FPS (max): {} ({})".format(int(self.clock.get_fps()), self.FPS_MAX), True,
+                               pygame.Color('white'))
+        self.window.blit(fps, (self.track.im_w - 50, 700))
         limit_frame = self.font.render("Lim. Frames: " + str(self.gen_duration_limit_frame), True,
                                        pygame.Color('white'))
         self.window.blit(limit_frame, (self.track.im_w - 50, 750))
@@ -200,15 +201,6 @@ class GameTrain(Game):
         pickle.dump(self, open(self.save_folder_model + '_game.p', "wb"))
 
     def get_mutation_rate(self, fitness):
-        # new_mute_rate = min(0.5, 4.68 * math.exp(-7.8 * ratio))
-        # new_mute_rate = min(0.75, -1.85 * ratio ** 3 + 5.03 * ratio ** 2 - 4.68 * ratio + 1.5)
-        # if new_mute_rate < 0.2 and self.max_fitness_possible < 300:
-        #     new_mute_rate = 0.2
-        # elif new_mute_rate < 0.15 and self.max_fitness_possible < 600:
-        #     new_mute_rate = 0.15
-        # elif new_mute_rate < 0.1 and self.max_fitness_possible < 1000:
-        #     new_mute_rate = 0.1
-
         if fitness < 3000:
             return min(0.75, max(5.1844 * math.pow(fitness, -0.4584), 0.005))
         else:
@@ -224,14 +216,20 @@ class GameTrain(Game):
 
     def get_max_possible_fitness(self):
         lost_fitness = 0
-        max_fitness = (get_forward_speed(max_n_speed) / FPS_MAX) * weight_on_road
+        max_fitness = get_forward_speed(max_n_speed) * weight_on_road / FPS_MAX_init
 
         for n in range(1, min(max_n_speed, self.gen_duration_limit_frame)):
-            lost_fitness += max_fitness - (get_forward_speed(n) / FPS_MAX) * weight_on_road
+            lost_fitness += max_fitness - get_forward_speed(n) / FPS_MAX_init * weight_on_road
 
         max_sum_fitness = self.gen_duration_limit_frame * max_fitness
 
         return max_sum_fitness - lost_fitness
+
+    def increase_FPS(self):
+        self.FPS_MAX += 10
+
+    def decrease_FPS(self):
+        self.FPS_MAX = max(FPS_MAX_init, self.FPS_MAX - 10)
 
 
 def load_game(path_game):
