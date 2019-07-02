@@ -17,11 +17,11 @@ stop = False
 game = GameTrain(
     nn_file_path="models/nn1.net",
     track_path="track/track_race1.tra",
-    save=True,
+    # save=True,
 
     # nn_file_path="results/tiny_track.h5",
     # track_path="track/track_race_izi.tra",
-    # save=False,
+    save=False,
 )
 
 # Boucle infinie

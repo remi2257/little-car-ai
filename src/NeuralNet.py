@@ -53,7 +53,6 @@ class NeuralNet:
         return Model(inputs=inp, outputs=[out1, out2])
 
     def mutate_model_from_query(self, target_nn, mutate_rate):
-
         for j, layer in enumerate(target_nn.model.layers):
             new_weights_for_layer = []
 
@@ -72,7 +71,6 @@ class NeuralNet:
             self.model.layers[j].set_weights(new_weights_for_layer)
 
     def mutate_model(self, mutate_rate):
-
         for j, layer in enumerate(self.model.layers):
             new_weights_for_layer = []
 

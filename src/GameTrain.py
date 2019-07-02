@@ -30,19 +30,21 @@ class GameTrain(Game):
 
         self.gen_id = 1
         self.gen_duration = 0
-        self.gen_duration_limit = generation_duration_in_sec * FPS_MAX
+        self.gen_duration_limit_frame = generation_duration_init_frame
+
+        self.max_fitness_possible = self.get_max_possible_fitness()
 
         if nn_file_path.endswith(".net"):
-            self.mutation_rate = max_mutation_rate
+            self.mutation_rate_best = max_mutation_rate
         elif nn_file_path.endswith(".h5"):
-            self.mutation_rate = copy_mutation_rate
+            self.mutation_rate_best = copy_mutation_rate
         else:
             print("NO MODEL")
 
         for i in range(nbr_AI_per_gen):
             self.carsAI.append(CarAI(nn_file_path, self.track, self.lidar_w, self.lidar_h))
             if nn_file_path.endswith(".h5") and i > 0:
-                self.carsAI[-1].neural_net.mutate_model(self.mutation_rate)
+                self.carsAI[-1].neural_net.mutate_model(self.mutation_rate_best)
 
         self.fig = pylab.figure(figsize=[4, 4],  # Inches
                                 dpi=50,  # 100 dots per inch, so the resulting buffer is 400x400 pixels
@@ -55,7 +57,7 @@ class GameTrain(Game):
 
     def actualize(self):
         self.clock.tick(FPS_MAX)  # Fixe le nbr max de FPS
-        if self.gen_duration >= self.gen_duration_limit:
+        if self.gen_duration >= self.gen_duration_limit_frame:
             self.start_new_gen()
         self.gen_duration += 1
 
@@ -73,7 +75,7 @@ class GameTrain(Game):
 
         list_fitness = [c.fitness for c in self.carsAI if c.is_viable]
         if not list_fitness:
-            self.gen_duration = self.gen_duration_limit
+            self.gen_duration = self.gen_duration_limit_frame
 
         self.mean_fitness = np.mean(list_fitness)
         self.best_actual_fitness = max(list_fitness)
@@ -101,7 +103,7 @@ class GameTrain(Game):
 
         # REFRESH
         self.display_fitness()
-        self.display_fps()
+        self.display_infos_frame()
         pygame.display.flip()
 
     def start_new_gen(self):
@@ -111,11 +113,14 @@ class GameTrain(Game):
         if self.save:
             self.save_best_model()
 
-        best_fitness = np.array([max(car.fitness ** 2, 1) for car in self.carsAI[0:nbr_survivors]])
-        weight_best_fitness = best_fitness / np.sum(best_fitness)
+        best_cars_fitness = [max(car.fitness, 1) for car in self.carsAI[0:nbr_survivors]]
+        best_fitness_square = np.array(best_cars_fitness) ** 2
+        weight_best_fitness = best_fitness_square / np.sum(best_fitness_square)
 
         # self.mutation_rate *= decay_mutation_rate
-        self.mutation_rate = self.get_mutation_rate(self.carsAI[0].fitness)
+        ratio_fitness = self.carsAI[0].fitness / self.max_fitness_possible
+        self.mutation_rate_best = self.get_mutation_rate(ratio_fitness)
+        self.update_duration_limit(ratio_fitness)
 
         for i, car in enumerate(self.carsAI):
             car.reset_car()
@@ -124,13 +129,14 @@ class GameTrain(Game):
             else:
                 car.is_survivor = False
                 chosen_parent = np.random.choice(nbr_survivors, p=weight_best_fitness)
+                mutation_rate = self.get_mutation_rate(best_cars_fitness[chosen_parent] / self.max_fitness_possible)
+                # print(chosen_parent, mutation_rate)
                 car.neural_net.mutate_model_from_query(self.carsAI[chosen_parent].neural_net,
-                                                       self.get_mutation_rate(
-                                                           self.carsAI[chosen_parent].fitness))
+                                                       mutation_rate)
         # Incr values
-        self.gen_duration_limit = min(
-            self.gen_duration_limit + max(0, (generation_duration_increase - 2 * self.mutation_rate)) * FPS_MAX,
-            generation_duration_max * FPS_MAX)
+
+        self.max_fitness_possible = self.get_max_possible_fitness()
+
         self.best_fitness_list.append(0)
         self.gen_id += 1
         self.gen_duration = 0
@@ -149,13 +155,19 @@ class GameTrain(Game):
         text_mean = self.font.render("Mean Gen {:.0f}".format(self.mean_fitness), True,
                                      COLOR_GREEN)
         self.window.blit(text_mean, (self.track.im_w - 50, 220))
-        text_mutation = self.font.render("Min. Mut. Rate  {:.1f}%".format(self.mutation_rate * 100), True,
+        text_mutation = self.font.render("Min. Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
                                          COLOR_GREEN)
         self.window.blit(text_mutation, (self.track.im_w - 50, 280))
+        text_max_fitness = self.font.render("Up Bound Fit. {:.1f}".format(self.max_fitness_possible), True,
+                                            COLOR_GREEN)
+        self.window.blit(text_max_fitness, (self.track.im_w - 50, 340))
 
-    def display_fps(self):
+    def display_infos_frame(self):
         fps = self.font.render("FPS: " + str(int(self.clock.get_fps())), True, pygame.Color('white'))
         self.window.blit(fps, (self.track.im_w, 700))
+        limit_frame = self.font.render("Lim. Frames: " + str(self.gen_duration_limit_frame), True,
+                                       pygame.Color('white'))
+        self.window.blit(limit_frame, (self.track.im_w - 50, 750))
 
     def refresh_fitness_plot(self):
         self.fig_ax.clear()
@@ -185,10 +197,31 @@ class GameTrain(Game):
 
         pickle.dump(self, open(self.save_folder_model + '_game.p', "wb"))
 
-    def get_mutation_rate(self, fitness):
-        mr = min(248.7388 * math.pow(max(fitness, 10), -1.2420), max_mutation_rate)
+    def get_mutation_rate(self, ratio):
+        val = 4.68 * math.exp(-7.8 * ratio)
+        return val
 
-        return mr * (min(self.gen_duration_limit, 10)) / 10
+    def update_duration_limit(self, ratio):
+        delta_duration_pol = (2.5 * ratio - 1.5) * FPS_MAX
+        delta_duration = max(delta_duration_pol, -generation_duration_incr_frame)
+        new_duration = self.gen_duration_limit_frame + delta_duration
+        if new_duration > generation_duration_max_frame:
+            self.gen_duration_limit_frame = generation_duration_max_frame
+        elif new_duration < generation_duration_init_frame:
+            self.gen_duration_limit_frame = generation_duration_init_frame
+        else:
+            self.gen_duration_limit_frame = int(new_duration)
+
+    def get_max_possible_fitness(self):
+        lost_fitness = 0
+        max_fitness = (get_forward_speed(max_n_speed) / FPS_MAX) * weight_on_road
+
+        for n in range(1, min(max_n_speed, self.gen_duration_limit_frame)):
+            lost_fitness += max_fitness - (get_forward_speed(n) / FPS_MAX) * weight_on_road
+
+        max_sum_fitness = self.gen_duration_limit_frame * max_fitness
+
+        return max_sum_fitness - lost_fitness
 
 
 def load_game(path_game):

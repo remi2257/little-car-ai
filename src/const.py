@@ -27,9 +27,14 @@ decay_mutation_rate = 0.95
 
 copy_mutation_rate = 0.08
 
-generation_duration_max = 30
-generation_duration_in_sec = 1
-generation_duration_increase = 1
+generation_duration_max_sec = 30
+generation_duration_max_frame = generation_duration_max_sec * FPS_MAX
+
+generation_duration_init_sec = 1
+generation_duration_init_frame = generation_duration_init_sec * FPS_MAX
+
+generation_duration_incr_sec = 1
+generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX
 
 path_train_save = "results/"
 
@@ -42,6 +47,7 @@ path_car_survivor = "images/vehicles/Car.png"
 # SPEED/MOVEMENT
 speed_max = 30.0
 n0_speed = 15.0
+max_n_speed = 40
 
 step_dir = 6.0
 

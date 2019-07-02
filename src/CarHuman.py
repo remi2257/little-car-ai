@@ -76,7 +76,7 @@ class CarHuman:
                 self.n_speed = max(self.n_speed - 2.0, -10)
 
             elif command == gas_ON:
-                self.n_speed = min(self.n_speed + 1.0, 40)
+                self.n_speed = min(self.n_speed + 1.0, max_n_speed)
 
             if self.n_speed > 0:
                 self.speed = speed_max * (1 - exp(-self.n_speed / n0_speed))
@@ -123,7 +123,6 @@ class CarHuman:
         self.theta = 0.0
         self.speed = 0.0
         self.n_speed = 0.0
-        self.fitness = 0
 
         self.refresh_LIDAR()
 
@@ -188,6 +187,10 @@ class CarHuman:
         else:
             self.time_outside_road += 1
             self.fitness -= 10 * (weight_on_road + self.time_outside_road) / FPS_MAX
+
+
+def get_forward_speed(n_speed):
+    return speed_max * (1 - exp(-n_speed / n0_speed))
 
 
 def gen_car_img(track, path_img):
