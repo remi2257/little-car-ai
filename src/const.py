@@ -13,8 +13,9 @@ list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
 font_size = 20
 
+theta_0 = 270.0
 # TRAINING
-nbr_AI_per_gen = 20
+nbr_AI_per_gen = 50
 rate_survivors = 0.2
 
 nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
@@ -33,6 +34,7 @@ generation_duration_max_frame = generation_duration_max_sec * FPS_MAX
 generation_duration_init_sec = 1
 generation_duration_init_frame = generation_duration_init_sec * FPS_MAX
 
+gen_dur_incr_ratio_max = 1.2
 generation_duration_incr_sec = 1
 generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX
 

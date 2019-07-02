@@ -65,15 +65,21 @@ class GameTrain(Game):
         self.window.blit(self.background, (0, 0))
 
         for carAI in self.carsAI:
-            if not carAI.is_viable:
+            if not carAI.is_alive:
                 continue
+
             # Get Next Move
             carAI.actualize_direction_and_gas(carAI.predict_next_move())
-            carAI.refresh_fitness()
             if carAI.fitness < lower_bound_fitness:
-                carAI.is_viable = False
+                carAI.is_alive = False
 
-        list_fitness = [c.fitness for c in self.carsAI if c.is_viable]
+            # move_car
+            carAI.move_car_and_refresh_LIDAR()
+
+            # refresh fitness
+            carAI.refresh_fitness()
+
+        list_fitness = [c.fitness for c in self.carsAI if c.is_alive]
         if not list_fitness:
             self.gen_duration = self.gen_duration_limit_frame
 
@@ -85,14 +91,12 @@ class GameTrain(Game):
         # -- DISPLAY--#
         # CAR PLAYER
         for carAI in self.carsAI:
-            if not carAI.is_viable:
+            if not carAI.is_alive:
                 continue
             if carAI.fitness == self.best_actual_fitness:
                 carAI.change_to_leader_img()
             elif carAI.is_survivor:
                 carAI.change_to_survivor_img()
-
-            carAI.move_car_and_refresh_LIDAR()
 
             self.window.blit(carAI.actual_img, carAI.get_position_left_top())
 
@@ -118,21 +122,19 @@ class GameTrain(Game):
         weight_best_fitness = best_fitness_square / np.sum(best_fitness_square)
 
         # self.mutation_rate *= decay_mutation_rate
-        ratio_fitness = self.carsAI[0].fitness / self.max_fitness_possible
-        self.mutation_rate_best = self.get_mutation_rate(ratio_fitness)
+        ratio_fitness = max(0, self.carsAI[0].fitness) / self.max_fitness_possible
+        self.mutation_rate_best = self.get_mutation_rate(self.carsAI[0].fitness)
         self.update_duration_limit(ratio_fitness)
 
         for i, car in enumerate(self.carsAI):
-            car.reset_car()
+            car.reset_car_ai()
             if i < nbr_survivors:
                 car.is_survivor = True
             else:
                 car.is_survivor = False
                 chosen_parent = np.random.choice(nbr_survivors, p=weight_best_fitness)
-                mutation_rate = self.get_mutation_rate(best_cars_fitness[chosen_parent] / self.max_fitness_possible)
-                # print(chosen_parent, mutation_rate)
                 car.neural_net.mutate_model_from_query(self.carsAI[chosen_parent].neural_net,
-                                                       mutation_rate)
+                                                       self.mutation_rate_best)
         # Incr values
 
         self.max_fitness_possible = self.get_max_possible_fitness()
@@ -155,7 +157,7 @@ class GameTrain(Game):
         text_mean = self.font.render("Mean Gen {:.0f}".format(self.mean_fitness), True,
                                      COLOR_GREEN)
         self.window.blit(text_mean, (self.track.im_w - 50, 220))
-        text_mutation = self.font.render("Min. Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
+        text_mutation = self.font.render("Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
                                          COLOR_GREEN)
         self.window.blit(text_mutation, (self.track.im_w - 50, 280))
         text_max_fitness = self.font.render("Up Bound Fit. {:.1f}".format(self.max_fitness_possible), True,
@@ -197,20 +199,28 @@ class GameTrain(Game):
 
         pickle.dump(self, open(self.save_folder_model + '_game.p', "wb"))
 
-    def get_mutation_rate(self, ratio):
-        val = 4.68 * math.exp(-7.8 * ratio)
-        return val
+    def get_mutation_rate(self, fitness):
+        # new_mute_rate = min(0.5, 4.68 * math.exp(-7.8 * ratio))
+        # new_mute_rate = min(0.75, -1.85 * ratio ** 3 + 5.03 * ratio ** 2 - 4.68 * ratio + 1.5)
+        # if new_mute_rate < 0.2 and self.max_fitness_possible < 300:
+        #     new_mute_rate = 0.2
+        # elif new_mute_rate < 0.15 and self.max_fitness_possible < 600:
+        #     new_mute_rate = 0.15
+        # elif new_mute_rate < 0.1 and self.max_fitness_possible < 1000:
+        #     new_mute_rate = 0.1
+
+        if fitness < 3000:
+            return min(0.75, max(5.1844 * math.pow(fitness, -0.4584), 0.005))
+        else:
+            return min(0.75, max(-0.092 * math.log(fitness) + 0.834, 0.005))
 
     def update_duration_limit(self, ratio):
-        delta_duration_pol = (2.5 * ratio - 1.5) * FPS_MAX
-        delta_duration = max(delta_duration_pol, -generation_duration_incr_frame)
-        new_duration = self.gen_duration_limit_frame + delta_duration
-        if new_duration > generation_duration_max_frame:
-            self.gen_duration_limit_frame = generation_duration_max_frame
-        elif new_duration < generation_duration_init_frame:
-            self.gen_duration_limit_frame = generation_duration_init_frame
-        else:
-            self.gen_duration_limit_frame = int(new_duration)
+        if ratio < 0.2:
+            self.gen_duration_limit_frame = max(int(self.gen_duration_limit_frame / gen_dur_incr_ratio_max),
+                                                generation_duration_init_frame)
+        elif ratio > 0.45:
+            self.gen_duration_limit_frame = min(int(self.gen_duration_limit_frame * gen_dur_incr_ratio_max),
+                                                generation_duration_max_frame)
 
     def get_max_possible_fitness(self):
         lost_fitness = 0

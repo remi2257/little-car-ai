@@ -10,7 +10,7 @@ My algorithm aims to teach a car to drive through AI.
 
 ## How it's work ?
 
-I'm using Q-Learning method to improve my AI over generations.
+I'm using the method of Genetic Evolution to improve my AI over generations.
 1. The Neural Net can access to information from the LIDAR and car's speed.
 2. The NN outputs correspond at the command on the wheel (Go straight, turn left,
 turn right) and the gas' command (None, Speed Up, Slow Down)
@@ -30,7 +30,7 @@ to generate the next generation, thanks to mutation
 - [x] Create LIDAR
 - [x] Give Control to AI
 - [x] Neural Network
-- [ ] Train
+- [X] Train on Easy Tracks
 
 #### And Then
 
@@ -48,13 +48,14 @@ to generate the next generation, thanks to mutation
 
 | Version | Game Render |
 :-------------------------:|:-------------------------:
+1.0 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/good_mutation_v1_0.png" width="400"/>
 0.6 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_Mutation.png" width="400"/>
 0.3 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_True_Design.png" width="400"/>
 0.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_LIDAR.png" width="400"/> |
 
 ### Versions List
 
-- v1.0 : First working version | ? Mi-July 2019 ?
+- v1.0 : First working version | 02/07/19
 - v0.6 : AI & Evolution Algorithm | 30/06/19
 - v0.3 : Evolved Playground design | 28/06/19
 - v0.2 : First Playground design | 27/06/19

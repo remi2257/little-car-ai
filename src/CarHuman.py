@@ -13,13 +13,15 @@ class CarHuman:
         self.y_speed = 0.0
         self.n_speed = 0.0
         self.fitness = 0
+
         self.time_outside_road = 0
+        self.on_road = True
 
         self.last_dir_cmd = dir_NONE
         self.last_gas_cmd = gas_OFF
 
         # GEN CAR IMAGE
-        self.img = pygame.transform.rotate(gen_car_img(track, path_audi), 270.0)
+        self.img = pygame.transform.rotate(gen_car_img(track, path_audi), theta_0)
 
         self.actual_img = self.img
 
@@ -63,9 +65,12 @@ class CarHuman:
             self.last_dir_cmd = new_command
 
     def calculate_new_speed(self, command):
+        if not self.on_road:
+            if (1 - exp(-self.n_speed / n0_speed)) > 0.5:
+                self.n_speed = max(self.n_speed - 4, max_n_speed / 4)
 
         if command == gas_BRAKE and self.speed > 0:
-            self.speed = max(self.speed - 2.0, 0)
+            self.speed = max(self.speed - 2, 0)
             self.n_speed = -n0_speed * math.log2(1 - (self.speed / speed_max))
 
         elif command == gas_OFF:
@@ -82,6 +87,11 @@ class CarHuman:
                 self.speed = speed_max * (1 - exp(-self.n_speed / n0_speed))
             else:
                 self.speed = - 0.25 * speed_max * (1 - exp(self.n_speed / n0_speed))
+
+    def reduce_all_speeds(self, fact):
+        self.speed = max(self.speed - fact, 0)
+        self.x_speed = max(self.x_speed - fact, 0)
+        self.y_speed = max(self.y_speed - fact, 0)
 
     def calculate_new_angle(self, command):
         if command == dir_LEFT:
@@ -103,6 +113,8 @@ class CarHuman:
         # Window
         self.refresh_LIDAR(window)
 
+        self.on_road = self.lidar_filtered[self.lidar_grid_car_y][self.lidar_grid_car_x]
+
     def get_position_left_top(self):
         return tuple([self.position_car.x,
                       self.position_car.y])
@@ -116,13 +128,18 @@ class CarHuman:
                       self.position_car.centery - new_rect.h // 2])
 
     def reset_car(self):
-        x, y = self.get_position_left_top()
-        self.position_car = self.position_car.move(init_car_x - x,
-                                                   init_car_y - y)
-
         self.theta = 0.0
         self.speed = 0.0
+        self.x_speed = 0.0
+        self.y_speed = 0.0
         self.n_speed = 0.0
+        self.fitness = 0
+        self.time_outside_road = 0
+
+        self.actual_img = pygame.transform.rotate(self.img, self.theta)
+        new_rect = self.actual_img.get_rect()
+        self.position_car = new_rect.move(init_car_x,
+                                          init_car_y)
 
         self.refresh_LIDAR()
 
@@ -179,8 +196,7 @@ class CarHuman:
             pygame.draw.circle(window, COLOR_BLUE, point_pos, 4, 2)
 
     def refresh_fitness(self):
-        on_road = self.lidar_filtered[self.lidar_grid_car_y][self.lidar_grid_car_x]
-        if on_road:
+        if self.on_road:
             self.fitness += (max(self.speed, 0) / FPS_MAX) * weight_on_road
 
             self.time_outside_road = max(0, self.time_outside_road - 0.1)

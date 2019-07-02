@@ -7,7 +7,7 @@ class CarAI(CarHuman):
     def __init__(self, neural_net_path, track, lidar_w, lidar_h):
         CarHuman.__init__(self, track, lidar_w, lidar_h)
         self.neural_net = NeuralNet(neural_net_path)
-        self.is_viable = True
+        self.is_alive = True
         self.is_survivor = False
 
         self.img_leader = pygame.transform.rotate(gen_car_img(track, path_viper), 270.0)
@@ -30,19 +30,6 @@ class CarAI(CarHuman):
     def change_to_survivor_img(self):
         self.actual_img = pygame.transform.rotate(self.img_survivor, self.theta)
 
-    def reset_car(self):
-        x, y = self.get_position_left_top()
-        self.position_car = self.position_car.move(init_car_x - x,
-                                                   init_car_y - y)
-
-        self.theta = 0.0
-        self.speed = 0.0
-        self.x_speed = 0.0
-        self.y_speed = 0.0
-        self.n_speed = 0.0
-        self.fitness = 0
-        self.time_outside_road = 0
-
-        self.is_viable = True
-
-        self.refresh_LIDAR()
+    def reset_car_ai(self):
+        self.reset_car()
+        self.is_alive = True

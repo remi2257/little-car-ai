@@ -24,13 +24,11 @@ class GameSolo(Game):
         if not self.is_human:
             self.car.actualize_direction_and_gas(self.car.predict_next_move())
 
+        self.car.move_car_and_refresh_LIDAR(self.window)
         self.car.refresh_fitness()
         self.display_fitness()
         # PEDALS
         self.refresh_arrow_pedal()
-
-        # CAR PLAYER
-        self.car.move_car_and_refresh_LIDAR(self.window)
 
         self.window.blit(self.car.actual_img, self.car.get_position_left_top())
 
