@@ -95,6 +95,13 @@ img_pedals_arrows = {
 }
 
 # -- TRACK -- #
+
+list_track = [
+    "track/track_race_izi.tra",
+    "track/track_race1.tra",
+    "track/track_race2.tra",
+]
+
 road_path = "images/road/"
 
 track_part_1w = {
@@ -155,3 +162,6 @@ track_part_1w_practicable = {
 COLOR_GREEN = (0, 255, 0)
 COLOR_RED = (255, 0, 0)
 COLOR_BLUE = (0, 0, 255)
+
+
+
