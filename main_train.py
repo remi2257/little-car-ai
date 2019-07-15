@@ -15,11 +15,12 @@ stop = False
 # --- INIT PYGAME--- #
 
 game = GameTrain(
-    nn_file_path="models/nn1.net",
+    # nn_file_path="models/nn1.net",
+    nn_file_path="models/nn_tiny.net",
     # nn_file_path="results/first_tiny.h5",
+    # nn_file_path="results/race1_6603.h5",
 
-    track_path="track/track_race2.tra",
-    # track_path="track/track_race_izi.tra",
+    track_path=list_track[0],
 
     save=True,
     # save=False,

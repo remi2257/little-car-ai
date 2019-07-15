@@ -1,5 +1,5 @@
 # Hidden layers
 
 [Hidden1]
-neurons = 3
+neurons = 10
 activation = ReLu

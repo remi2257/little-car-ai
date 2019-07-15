@@ -53,9 +53,8 @@ class NeuralNet:
         return Model(inputs=inp, outputs=[out1, out2])
 
     def mutate_model_from_query(self, target_nn, mutate_rate, fixed_mutate_rate=False):
-        # TODO Do something for the mutation rate
         if not fixed_mutate_rate:
-            mutate_rate = max(mutate_rate * random.random(), 0.01)
+            mutate_rate = min(1.0, max(2 * random.random() * mutate_rate, 0.01))
         for j, layer in enumerate(target_nn.model.layers):
             new_weights_for_layer = []
 

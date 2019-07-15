@@ -15,11 +15,10 @@ stop = False
 # --- INIT PYGAME--- #
 # model_path = "models/nn1.net"
 # model_path = "results/first_result_race.h5"
-# model_path = "results/tiny_8144.h5"
-model_path = "results/race1_6603.h5"
+model_path = "results/tiny_8144.h5"
+# model_path = "results/race1_6603.h5"
 game = GameSolo(nn_file_path=model_path,
-                # track_path="track/track_race2.tra")
-                track_path="track/track_race1.tra")
+                track_path=list_track[0])
 
 # Boucle infinie
 while not stop:

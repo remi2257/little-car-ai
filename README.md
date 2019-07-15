@@ -37,7 +37,7 @@ to generate the next generation, thanks to mutation
 - [ ] Better
 - [ ] Faster
 - [ ] Stronger
-- [ ] Improve Training
+- [ ] Q - Learning
 - [ ] Multi-threading Processing
 - [ ] GPU Processing
 - [ ] Create Playground

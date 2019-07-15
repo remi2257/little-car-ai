@@ -30,16 +30,18 @@ class GameTrain(Game):
 
         self.gen_id = 1
         self.gen_duration = 0
-        self.gen_duration_limit_frame = generation_duration_init_frame
-
-        self.max_fitness_possible = self.get_max_possible_fitness()
 
         if nn_file_path.endswith(".net"):
             self.mutation_rate_best = max_mutation_rate
+            self.gen_duration_limit_frame = generation_duration_init_frame
         elif nn_file_path.endswith(".h5"):
             self.mutation_rate_best = copy_mutation_rate
+            self.gen_duration_limit_frame = round(generation_duration_max_frame * (1 - copy_mutation_rate)**2)
+
         else:
             print("NO MODEL")
+
+        self.max_fitness_possible = self.get_max_possible_fitness()
 
         for i in range(nbr_AI_per_gen):
             self.carsAI.append(CarAI(nn_file_path, self.track, self.lidar_w, self.lidar_h))
