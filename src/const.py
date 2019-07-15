@@ -1,10 +1,16 @@
 import pygame.locals as pygame_const
 
 # -----ENV---- #
+background_path = "images/background.jpg"
+
 size_larg = 1600  # 1280
 # size_haut = size_larg
 size_haut = 900  # 720
 
+grid_w_lim = 32
+grid_h_lim = 18
+
+# ---INIT PARAMETERS ---#
 init_car_x = 260.0
 init_car_y = 140.0
 
@@ -155,3 +161,14 @@ track_part_1w_practicable = {
 COLOR_GREEN = (0, 255, 0)
 COLOR_RED = (255, 0, 0)
 COLOR_BLUE = (0, 0, 255)
+
+
+# Stupid Name
+
+track_names_list = [
+    "hardcore_track",
+    "Legendary",
+    "Stronger",
+    "Better",
+    "Faster",
+]

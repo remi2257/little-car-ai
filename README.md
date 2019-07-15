@@ -55,6 +55,7 @@ to generate the next generation, thanks to mutation
 
 ### Versions List
 
+- v1.1 : Add drawing Module | 15/07/19 (I'm Back :D)
 - v1.0 : First working version | 02/07/19
 - v0.6 : AI & Evolution Algorithm | 30/06/19
 - v0.3 : Evolved Playground design | 28/06/19
