@@ -156,12 +156,27 @@ track_part_1w_practicable = {
     "sr": True,
 
 }
+
+list_track = [
+    "track/track0.tra",
+    "track/track1.tra",
+    "track/track2.tra"
+]
+
 # COLORS
 
-COLOR_GREEN = (0, 255, 0)
-COLOR_RED = (255, 0, 0)
-COLOR_BLUE = (0, 0, 255)
+COLOR_GREEN = (0, 128, 0)
+COLOR_GREEN_LIGHT = (64, 128, 64)
+COLOR_GREEN_BRIGHT = (128, 255, 128)
+COLOR_RED = (128, 0, 0)
+COLOR_RED_LIGHT = (128, 64, 64)
+COLOR_RED_BRIGHT = (255, 64, 64)
+COLOR_BLUE = (0, 0, 128)
+COLOR_BLUE_LIGHT = (64, 64, 128)
+COLOR_BLUE_BRIGHT = (64, 64, 255)
 
+COLORS_LIGHT = [COLOR_GREEN_LIGHT, COLOR_RED_LIGHT, COLOR_BLUE_LIGHT, COLOR_GREEN_LIGHT]
+COLORS_BRIGHT = [COLOR_GREEN_BRIGHT, COLOR_RED_BRIGHT, COLOR_BLUE_BRIGHT, COLOR_GREEN_BRIGHT]
 
 # Stupid Name
 
@@ -172,3 +187,16 @@ track_names_list = [
     "Better",
     "Faster",
 ]
+
+# -- MENU -- #
+
+menu_rect_h = 120
+menu_rect_w = 350
+offset_h = 50
+
+first_rect_y = 200
+second_rect_y = first_rect_y + offset_h + menu_rect_h
+third_rect_y = second_rect_y + offset_h + menu_rect_h
+forth_rect_y = third_rect_y + offset_h + menu_rect_h
+
+state_MENU, state_HUMAN, state_AI, state_TRAIN, state_DRAW = 0, 1, 2, 3, 4

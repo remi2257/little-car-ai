@@ -1,10 +1,10 @@
-from src.Game import *
+from src.GamePlay import *
 
 
-class GameSolo(Game):
+class GameSolo(GamePlay):
     def __init__(self, nn_file_path=None, track_path="track/track1.tra"):
 
-        Game.__init__(self, track_path=track_path)
+        GamePlay.__init__(self, track_path=track_path)
         self.is_human = nn_file_path is None
 
         if self.is_human:

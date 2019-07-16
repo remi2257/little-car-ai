@@ -4,7 +4,7 @@ from src.Track import *
 from pygame.font import Font
 
 
-class Game:
+class GamePlay:
     def __init__(self, track_path="track/track1.tra", fps_max=FPS_MAX_init):
 
         pygame.init()

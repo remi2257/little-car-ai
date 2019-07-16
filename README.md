@@ -46,7 +46,7 @@ to generate the next generation, thanks to mutation
 
 ### Evolution of the Algorithm
 
-| Version | Game Render |
+| Version | GamePlay Render |
 :-------------------------:|:-------------------------:
 1.0 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/good_mutation_v1_0.png" width="400"/>
 0.6 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_Mutation.png" width="400"/>

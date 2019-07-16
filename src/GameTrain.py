@@ -1,4 +1,4 @@
-from src.Game import *
+from src.GamePlay import *
 
 from datetime import datetime
 import os
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 matplotlib.use("Agg")
 
 
-class GameTrain(Game):
+class GameTrain(GamePlay):
     def __init__(self, nn_file_path="models/nn1.net", track_path="track/track1.tra", save=True, fps_max=FPS_MAX_init):
         self.save = save
         if self.save:
@@ -20,7 +20,7 @@ class GameTrain(Game):
             if not os.path.exists(self.save_folder_model):
                 os.makedirs(self.save_folder_model)
 
-        Game.__init__(self, track_path=track_path, fps_max=fps_max)
+        GamePlay.__init__(self, track_path=track_path, fps_max=fps_max)
 
         self.carsAI = []
         self.best_actual_fitness = 0

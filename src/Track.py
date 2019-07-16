@@ -52,7 +52,7 @@ if __name__ == '__main__':
     pygame.init()
     pygame.time.Clock().tick(30)
 
-    pygame.display.set_caption("My Game")
+    pygame.display.set_caption("My GamePlay")
 
     window = pygame.display.set_mode((size_larg, size_haut), )  # RESIZABLE
 
