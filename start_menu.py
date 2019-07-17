@@ -1,8 +1,6 @@
-from src.GameMenu import *
+from src.GameMenu import GameMenu
 from src.const import *
 import pygame
-
-import os
 
 
 def run_menu():
@@ -24,12 +22,13 @@ def run_menu():
                 game.is_holding = True
             if event.type == pygame_const.MOUSEBUTTONUP:
                 game.is_holding = False
-                stop = game.action_selected()
+                # stop = game.action_selected()
+                game.run_action_selected()
         pos = pygame.mouse.get_pos()
 
         game.actualize(pos)
 
-    return stop
+    # return stop
 
 
 if __name__ == '__main__':

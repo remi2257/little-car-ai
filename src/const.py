@@ -190,13 +190,30 @@ track_names_list = [
 
 # -- MENU -- #
 
-menu_rect_h = 120
-menu_rect_w = 350
+menu_button_h = 125
+menu_button_w = 350
 offset_h = 50
 
-first_rect_y = 200
-second_rect_y = first_rect_y + offset_h + menu_rect_h
-third_rect_y = second_rect_y + offset_h + menu_rect_h
-forth_rect_y = third_rect_y + offset_h + menu_rect_h
+nbr_buttons = 4
+
+first_button_y = 200
+
+buttons_y = [first_button_y + i * (offset_h + menu_button_h) for i in range(nbr_buttons)]
 
 state_MENU, state_HUMAN, state_AI, state_TRAIN, state_DRAW = 0, 1, 2, 3, 4
+
+title_path = "images/others/title_menu.png"
+
+buttons_img_path = "images/buttons/"
+
+button_list_name = [
+    "human",
+    "ai",
+    "train",
+    "draw",
+]
+
+buttons_off_path = [buttons_img_path + name + "_off.png" for name in button_list_name]
+buttons_on_path = [buttons_img_path + name + "_on.png" for name in button_list_name]
+buttons_push_path = [buttons_img_path + name + "_push.png" for name in button_list_name]
+
