@@ -1,6 +1,8 @@
 import random
-from src.const import *
+
 import pygame
+
+from src.const import *
 
 
 class CarBot:

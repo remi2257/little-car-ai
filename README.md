@@ -4,7 +4,7 @@ Hi, my name is Remi LUX. I'm currently in my final year of Computer Vision Degre
 My algorithm aims to teach a car to drive through AI.
 
 <p align="center">
-<img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_True_Design.png"  width="500"/>
+<img src="https://github.com/remi2257/little-car-ai/blob/master/images/illustr/strong_evolv.png"  width="500"/>
 </p>
 
 
@@ -34,27 +34,30 @@ to generate the next generation, thanks to mutation
 
 #### And Then
 
-- [ ] Better
+- [X] Better
 - [ ] Faster
 - [ ] Stronger
+- [X] Add Menu
 - [ ] Q - Learning
 - [ ] Multi-threading Processing
 - [ ] GPU Processing
-- [ ] Create Playground
-- [ ] Draw Track from Paper Sheet
+- [X] Draw Track from Paper Sheet
 - [ ] Test environment with different type of drivers
 
 ### Evolution of the Algorithm
 
 | Version | GamePlay Render |
 :-------------------------:|:-------------------------:
-1.0 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/good_mutation_v1_0.png" width="400"/>
-0.6 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_Mutation.png" width="400"/>
-0.3 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_True_Design.png" width="400"/>
-0.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/First_LIDAR.png" width="400"/> |
+1.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/illustr/menu1.png" width="400"/>
+1.1 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/illustr/draw_module.png" width="400"/>
+1.0 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/illustr/good_mutation_v1_0.png" width="400"/>
+0.6 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/illustr/First_Mutation.png" width="400"/>
+0.3 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/illustr/First_True_Design.png" width="400"/>
+0.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/images/illustr/First_LIDAR.png" width="400"/> |
 
 ### Versions List
 
+- v1.2 : Add Menu | 18/07/19
 - v1.1 : Add drawing Module | 15/07/19 (I'm Back :D)
 - v1.0 : First working version | 02/07/19
 - v0.6 : AI & Evolution Algorithm | 30/06/19

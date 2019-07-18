@@ -1,6 +1,7 @@
+import pygame
+
 from src.GameMenu import GameMenu
 from src.const import *
-import pygame
 
 
 def run_menu():

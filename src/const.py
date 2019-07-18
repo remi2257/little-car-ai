@@ -1,6 +1,7 @@
 import pygame.locals as pygame_const
 
 # -----ENV---- #
+game_name = "Little Car AI"
 background_path = "images/background.jpg"
 
 size_larg = 1600  # 1280
@@ -20,7 +21,12 @@ list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 font_size = 20
 
 theta_0 = -90.0
+
 # TRAINING
+models_path = "raw_models/"
+
+trained_model_path = "results_training/"
+
 nbr_AI_per_gen = 50
 rate_survivors = 0.2
 
@@ -44,7 +50,7 @@ gen_dur_incr_ratio_max = 1.2
 generation_duration_incr_sec = 1
 generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
 
-path_train_save = "results/"
+path_train_save = "results_training/"
 
 # -- CAR PARAMETERS -- #
 nbr_bots = 0
@@ -157,6 +163,7 @@ track_part_1w_practicable = {
 
 }
 
+track_files_path = "track/"
 list_track = [
     "track/track0.tra",
     "track/track1.tra",
@@ -165,15 +172,16 @@ list_track = [
 
 # COLORS
 
-COLOR_GREEN = (0, 128, 0)
-COLOR_GREEN_LIGHT = (64, 128, 64)
+COLOR_GREEN = (0, 200, 0)
+COLOR_GREEN_LIGHT = (64, 200, 64)
 COLOR_GREEN_BRIGHT = (128, 255, 128)
-COLOR_RED = (128, 0, 0)
-COLOR_RED_LIGHT = (128, 64, 64)
-COLOR_RED_BRIGHT = (255, 64, 64)
+COLOR_ORANGE = (255, 128, 0)
+COLOR_RED = (255, 0, 0)
+COLOR_RED_LIGHT = (255, 64, 64)
+COLOR_RED_BRIGHT = (255, 128, 128)
 COLOR_BLUE = (0, 0, 128)
-COLOR_BLUE_LIGHT = (64, 64, 128)
-COLOR_BLUE_BRIGHT = (64, 64, 255)
+COLOR_BLUE_LIGHT = (0, 64, 255)
+COLOR_BLUE_BRIGHT = (0, 180, 255)
 
 COLORS_LIGHT = [COLOR_GREEN_LIGHT, COLOR_RED_LIGHT, COLOR_BLUE_LIGHT, COLOR_GREEN_LIGHT]
 COLORS_BRIGHT = [COLOR_GREEN_BRIGHT, COLOR_RED_BRIGHT, COLOR_BLUE_BRIGHT, COLOR_GREEN_BRIGHT]
@@ -217,3 +225,5 @@ buttons_off_path = [buttons_img_path + name + "_off.png" for name in button_list
 buttons_on_path = [buttons_img_path + name + "_on.png" for name in button_list_name]
 buttons_push_path = [buttons_img_path + name + "_push.png" for name in button_list_name]
 
+menu_trackbar_w = 150
+menu_trackbar_h = 400

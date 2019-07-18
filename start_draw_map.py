@@ -1,11 +1,8 @@
 from src.GameDraw import *
 from src.const import *
-import pygame
-
-import os
 
 
-def run_draw_map():
+def run_draw_map(**kwargs):
     # --- INIT Variable--- #
 
     stop = False

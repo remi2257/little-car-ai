@@ -1,7 +1,8 @@
-from src.CarBot import *
-from src.CarAI import *
-from src.Track import *
 from pygame.font import Font
+
+from src.CarAI import *
+from src.CarBot import *
+from src.Track import *
 
 
 class GamePlay:
@@ -13,7 +14,7 @@ class GamePlay:
         pygame.time.Clock().tick(self.FPS_MAX)  # Fixe le nbr max de FPS
         # pygame.key.set_repeat(30, 30)
 
-        pygame.display.set_caption("Little Car AI")
+        pygame.display.set_caption(game_name)
         self.track = Track(track_path)
 
         self.lidar_w, self.lidar_h = self.find_LIDAR_img_size(self.track.im_h)

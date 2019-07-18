@@ -1,8 +1,9 @@
-from src.const import *
-
-from keras.models import Model, load_model
-from keras.layers import Dense, Input
 import random
+
+from keras.layers import Dense, Input
+from keras.models import Model, load_model
+
+from src.const import *
 
 
 class NeuralNet:
@@ -91,14 +92,12 @@ class NeuralNet:
 
 
 if __name__ == '__main__':
-    from keras.utils.vis_utils import plot_model
+    nn = NeuralNet("raw_models/nn_tiny.net")
 
-    nn = NeuralNet("models/nn_tiny.net")
-    print(nn.model.get_weights())
-
-    nn2 = NeuralNet("models/nn_tiny.net")
+    nn2 = NeuralNet("raw_models/nn_tiny.net")
     nn2.mutate_model_from_query(nn, 0.9)
     # print(nn.model.summary())
     print(nn.model.get_weights())
     print(nn2.model.get_weights())
-    # plot_model(nn.model, to_file='models/model_plot.png', show_shapes=True, show_layer_names=True)
+
+    # plot_model(nn.model, to_file='raw_models/model_plot.png', show_shapes=True, show_layer_names=True)

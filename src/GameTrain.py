@@ -1,22 +1,31 @@
-from src.GamePlay import *
-
-from datetime import datetime
 import os
+from datetime import datetime
 
 import matplotlib
-from matplotlib.ticker import MaxNLocator
 import matplotlib.backends.backend_agg as agg
-import pylab
 import matplotlib.pyplot as plt
+import pylab
+from matplotlib.ticker import MaxNLocator
+
+from src.GamePlay import *
 
 matplotlib.use("Agg")
 
 
 class GameTrain(GamePlay):
-    def __init__(self, nn_file_path="models/nn1.net", track_path="track/track1.tra", save=True, fps_max=FPS_MAX_init):
+    def __init__(self, nn_file_path="raw_models/nn1.net", track_path="track/track1.tra", save=True,
+                 fps_max=FPS_MAX_init):
+
         self.save = save
         if self.save:
-            self.save_folder_model = path_train_save + datetime.now().strftime("%d_%m__%H_%M_%S") + "/"
+            self.save_folder_model = "".join([
+                path_train_save,
+                datetime.now().strftime("%d_%m__%H_%M_%S"),
+                "_", nn_file_path.split("/")[1].split(".")[0],
+                "_", track_path.split("/")[1].split(".")[0],
+                "/",
+
+            ])
             if not os.path.exists(self.save_folder_model):
                 os.makedirs(self.save_folder_model)
 
@@ -36,7 +45,8 @@ class GameTrain(GamePlay):
             self.gen_duration_limit_frame = generation_duration_init_frame
         elif nn_file_path.endswith(".h5"):
             self.mutation_rate_best = copy_mutation_rate
-            self.gen_duration_limit_frame = round(generation_duration_max_frame * (1 - copy_mutation_rate)**2)
+            self.gen_duration_limit_frame = round(generation_duration_max_frame * (1 - copy_mutation_rate) ** 2)
+            print("Resuming training")
 
         else:
             print("NO MODEL")

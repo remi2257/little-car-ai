@@ -1,7 +1,8 @@
-from src.const import *
+import math
 import pygame
 from math import cos, sin, radians, exp
-import math
+
+from src.const import *
 
 
 class CarHuman:
@@ -206,7 +207,7 @@ class CarHuman:
             self.time_outside_road = max(0, self.time_outside_road - 0.1)
         else:
             self.time_outside_road += 1
-            self.fitness -= 40 * (max(self.speed, 0) + weight_on_road + self.time_outside_road)/ FPS_MAX_init
+            self.fitness -= 40 * (max(self.speed, 0) + weight_on_road + self.time_outside_road) / FPS_MAX_init
 
 
 def get_forward_speed(n_speed):

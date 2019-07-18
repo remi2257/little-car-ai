@@ -1,7 +1,5 @@
-import numpy as np
+def test(**kwargs):
+    print("a" in kwargs)
 
-array = np.array([[1, 2], [3, 4], [5, 6]])
 
-print(array)
-print(array[0])
-print(array[:,0])
+test()

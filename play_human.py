@@ -4,13 +4,16 @@ from src.GameSolo import GameSolo
 from src.const import *
 
 
-def run_play_human():
+def run_play_human(**kwargs):
     # --- INIT Variable--- #
-
     stop = False
     # --- INIT PYGAME--- #
+    if kwargs:
+        track_path = kwargs["track_path"]
+    else:
+        track_path = list_track[0]
 
-    game = GameSolo(track_path=list_track[0])
+    game = GameSolo(track_path=track_path)
 
     # Boucle infinie
     while not stop:
@@ -39,6 +42,7 @@ def run_play_human():
 
         # Refresh
         game.actualize()
+
 
 if __name__ == '__main__':
     run_play_human()

@@ -1,6 +1,7 @@
-from src.const import *
 import numpy as np
 import pygame
+
+from src.const import *
 
 
 class Track:

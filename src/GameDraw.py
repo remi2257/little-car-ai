@@ -1,13 +1,14 @@
-from src.const import *
-import pygame
 import numpy as np
+import pygame
+
+from src.const import *
 
 
 class GameDraw:
-    def __init__(self):
+    def __init__(self, **kwargs):
         pygame.init()
 
-        pygame.display.set_caption("Little Car AI")
+        pygame.display.set_caption(game_name)
 
         self.grid_h = grid_h_lim
         self.grid_w = grid_w_lim
