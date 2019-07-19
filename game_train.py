@@ -3,7 +3,7 @@ import os
 import pygame
 import tensorflow as tf
 
-from src.Games.GameTrain import GameTrain
+from src.Games.GameTrainRandomEvolv import GameTrainRandomEvolv
 from src.const import *
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -25,17 +25,21 @@ def run_train(**kwargs):
     else:
         model_path = "raw_models/nn_tiny.net"
 
+    if "save" in kwargs:
+        save = kwargs["save"]
+    else:
+        save = True
+
     # --- INIT PYGAME--- #
 
-    game = GameTrain(
+    game = GameTrainRandomEvolv(
         nn_file_path=model_path,
 
         track_path=track_path,
 
-        save=True,
-        # save=False,
+        save=save,
 
-        fps_max=240
+        fps_max=FPS_MAX_max,
     )
 
     # Boucle infinie

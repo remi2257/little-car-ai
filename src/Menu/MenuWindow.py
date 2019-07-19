@@ -1,11 +1,12 @@
-from play_ai import run_play_ai
-from play_human import run_play_human
-from src.Menu.Button import *
+from game_play_ai import run_play_ai
+from game_play_human import run_play_human
+from src.Menu.ButtonPress import *
+from src.Menu.ButtonOnOff import *
 from src.Menu.SelectionPaneModelRaw import *
 from src.Menu.SelectionPaneModelTrain import *
 from src.Menu.SelectionPaneTrack import *
-from start_draw_map import run_draw_map
-from start_train import run_train
+from game_draw_map import run_draw_map
+from game_train import run_train
 
 actions = [run_play_human, run_play_ai, run_train, run_draw_map]
 
@@ -25,7 +26,14 @@ class MenuWindow:
 
         self.window = pygame.display.set_mode((self.window_w, self.window_h))
 
-        self.buttons = [Button(i, actions, self.window_w) for i in range(4)]
+        self.buttons_mode = [ButtonPress(self.window_w // 2, buttons_y[i], actions[i],
+                                         path_img_on=buttons_on_path[i], path_img_off=buttons_off_path[i],
+                                         path_img_push=buttons_push_path[i])
+                             for i in range(4)]
+
+        self.button_save = ButtonOnOff(x=640, y=750, img_on=button_save_on, img_off=button_save_off)
+
+        self.buttons = self.buttons_mode + [self.button_save]
 
         self.button_overlap = None
 
@@ -56,9 +64,11 @@ class MenuWindow:
 
         # Watch for Buttons
         self.button_overlap = self.mouse_on_buttons(pos)
-        for button in self.buttons:
+        for button in self.buttons_mode:
             if button.mouse_on:
                 button.draw_button_image(self.window, self.is_holding)
+        if self.button_save.is_selected:
+            self.button_save.draw_button_image(self.window, self.is_holding)
 
         # Watch for TrackBard*s
         self.select_pane_track.actualize(self.window, pos, self.is_holding)
@@ -87,24 +97,29 @@ class MenuWindow:
 
     def run_action_selected(self):
         if self.button_overlap is not None:
-            model_train_path = self.select_pane_model_train.get_item_path()
-            if model_train_path is not None:
-                model_path = model_train_path
+            if self.button_overlap.__class__.__name__ == "ButtonPress":
+                model_train_path = self.select_pane_model_train.get_item_path()
+                if model_train_path is not None:
+                    model_path = model_train_path
+                else:
+                    model_path = self.select_pane_model_raw.get_item_path()
+
+                dict_parameters = {
+                    "track_path": self.select_pane_track.get_item_path(),
+                    "model_path": model_path,
+                    "save": self.button_save.is_selected
+                }
+
+                # Executing
+                self.button_overlap.run_action(**dict_parameters)
+
+                # Reset
+                self.reset_window_size()
+                if self.button_overlap.action == run_draw_map:
+                    self.select_pane_track = SelectionPaneTrack()
+
             else:
-                model_path = self.select_pane_model_raw.get_item_path()
-
-            dict_parameters = {
-                "track_path": self.select_pane_track.get_item_path(),
-                "model_path": model_path,
-            }
-
-            # Executing
-            self.button_overlap.run_action(**dict_parameters)
-
-            # Reset
-            self.reset_window_size()
-            if self.button_overlap.action == run_draw_map:
-                self.select_pane_track = SelectionPaneTrack()
+                self.button_overlap.run_action()
 
     def reset_window_size(self):
         self.window = pygame.display.set_mode((self.window_w, self.window_h))

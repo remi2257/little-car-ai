@@ -9,13 +9,14 @@ size_larg = 1600  # 1280
 size_haut = 900  # 720
 
 grid_w_lim = 32
-grid_h_lim = 18
+grid_h_lim = 24
 
 # ---INIT PARAMETERS ---#
 init_car_x = 260.0
 init_car_y = 140.0
 
 FPS_MAX_init = 30
+FPS_MAX_max = 240
 list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
 font_size = 20
@@ -172,8 +173,8 @@ list_track = [
 
 # COLORS
 
-COLOR_GREEN = (0, 200, 0)
-COLOR_GREEN_LIGHT = (64, 200, 64)
+COLOR_GREEN = (0, 255, 0)
+COLOR_GREEN_LIGHT = (64, 255, 64)
 COLOR_GREEN_BRIGHT = (128, 255, 128)
 COLOR_ORANGE = (255, 128, 0)
 COLOR_RED = (255, 0, 0)
@@ -224,6 +225,9 @@ button_list_name = [
 buttons_off_path = [buttons_img_path + name + "_off.png" for name in button_list_name]
 buttons_on_path = [buttons_img_path + name + "_on.png" for name in button_list_name]
 buttons_push_path = [buttons_img_path + name + "_push.png" for name in button_list_name]
+
+button_save_on = buttons_img_path + "save_on.png"
+button_save_off = buttons_img_path + "save_off.png"
 
 menu_trackbar_w = 150
 menu_trackbar_h = 400

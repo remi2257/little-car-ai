@@ -13,7 +13,8 @@ def run_draw_map(**kwargs):
 
     # Boucle infinie
     while not stop:
-        pos = None
+        pygame.time.Clock().tick(240)
+
         for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
             if event.type == pygame_const.QUIT or (
                     event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
@@ -24,13 +25,13 @@ def run_draw_map(**kwargs):
                 game.is_holding = False
                 game.last_x = -1
                 game.last_y = -1
-            if pygame.mouse.get_pressed()[0]:  # See if the user has clicked or dragged their mouse
-                pos = pygame.mouse.get_pos()
+            # if pygame.mouse.get_pressed()[0]:  # See if the user has clicked or dragged their mouse
             if event.type == pygame_const.KEYDOWN:
                 if event.key == pygame_const.K_s:  # See if the user has clicked or dragged their mouse
                     game.save_map()
                 if event.key == pygame_const.K_c:  # See if the user has clicked or dragged their mouse
                     game.clean_map()
+        pos = pygame.mouse.get_pos()
 
         game.actualize(pos)
 
