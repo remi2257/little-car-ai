@@ -1,4 +1,5 @@
-from src.GamePlay import *
+from src.Games.GamePlay import *
+from src.Cars.CarAI import *
 
 
 class GameSolo(GamePlay):

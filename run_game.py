@@ -1,6 +1,6 @@
 import pygame
 
-from src.GameMenu import GameMenu
+from src.Menu.MenuWindow import MenuWindow
 from src.const import *
 
 
@@ -11,7 +11,7 @@ def run_menu():
 
     # --- INIT PYGAME--- #
 
-    game = GameMenu()
+    game = MenuWindow()
 
     # Boucle infinie
     while stop is None:

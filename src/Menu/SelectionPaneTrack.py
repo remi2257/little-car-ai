@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from src.SelectionPane import *
+from src.Menu.SelectionPane import *
 
 
 class SelectionPaneTrack(SelectionPane):

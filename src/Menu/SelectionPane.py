@@ -5,12 +5,12 @@ from src.const import *
 
 class SelectionPane:
     def __init__(self):
-        x: int
-        y: int
-        list_y_text: list
-        title: str
-        folder: str
-        extension: str
+        # x: int
+        # y: int
+        # list_y_text: list
+        # title: str
+        # folder: str
+        # extension: str
 
         self.w = menu_trackbar_w
         self.h = menu_trackbar_h

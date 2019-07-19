@@ -1,16 +1,16 @@
 from play_ai import run_play_ai
 from play_human import run_play_human
-from src.Button import *
-from src.SelectionPaneModelRaw import *
-from src.SelectionPaneModelTrain import *
-from src.SelectionPaneTrack import *
+from src.Menu.Button import *
+from src.Menu.SelectionPaneModelRaw import *
+from src.Menu.SelectionPaneModelTrain import *
+from src.Menu.SelectionPaneTrack import *
 from start_draw_map import run_draw_map
 from start_train import run_train
 
 actions = [run_play_human, run_play_ai, run_train, run_draw_map]
 
 
-class GameMenu:
+class MenuWindow:
     def __init__(self):
         pygame.init()
 

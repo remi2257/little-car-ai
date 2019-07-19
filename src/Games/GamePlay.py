@@ -1,8 +1,7 @@
 from pygame.font import Font
 
-from src.CarAI import *
-from src.CarBot import *
-from src.Track import *
+from src.Cars.CarBot import *
+from src.Games.Track import *
 
 
 class GamePlay:

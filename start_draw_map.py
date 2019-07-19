@@ -1,4 +1,4 @@
-from src.GameDraw import *
+from src.Games.GameDraw import *
 from src.const import *
 
 

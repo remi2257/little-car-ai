@@ -3,7 +3,7 @@ import os
 import pygame
 import tensorflow as tf
 
-from src.GameTrain import GameTrain
+from src.Games.GameTrain import GameTrain
 from src.const import *
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'

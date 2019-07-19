@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import math
 
 import matplotlib
 import matplotlib.backends.backend_agg as agg
@@ -7,7 +8,9 @@ import matplotlib.pyplot as plt
 import pylab
 from matplotlib.ticker import MaxNLocator
 
-from src.GamePlay import *
+from src.Games.GamePlay import *
+from src.Cars.CarHuman import get_forward_speed
+from src.Cars.CarAI import CarAI
 
 matplotlib.use("Agg")
 

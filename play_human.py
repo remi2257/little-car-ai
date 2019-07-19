@@ -1,6 +1,6 @@
 import pygame
 
-from src.GameSolo import GameSolo
+from src.Games.GameSolo import GameSolo
 from src.const import *
 
 
