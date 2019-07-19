@@ -1,8 +1,8 @@
 import numpy as np
 import pygame
 
-from src.const import *
 from src.Menu.ButtonPress import ButtonPress
+from src.const import *
 
 
 class GameDraw:
@@ -123,16 +123,42 @@ class GameDraw:
             self.track_id += 1
             self.track_name = "track/{}_{}.tra".format(self.track_raw_name, self.track_id)
 
-        file_track = open(self.track_name, "w+")
         h, w = self.grid_cut.shape
+
+        grid_reconstruct1 = np.zeros((self.grid_h, self.grid_w), dtype='object')
+        grid_reconstruct_final = np.zeros((self.grid_h, self.grid_w), dtype='object')
 
         for i in range(h):
             for j in range(w):
                 if not self.grid_cut[i][j]:
-                    file_track.write("xx")
-
+                    grid_reconstruct1[i][j] = "xx"
                 else:
-                    file_track.write(self.find_adapted_piece(i, j))
+                    grid_reconstruct1[i][j] = self.find_adapted_piece(i, j)
+        # TODO Tous les bails avec les pièces
+        for i in range(h):
+            for j in range(w):
+                val = grid_reconstruct1[i][j]
+                grid_reconstruct_final[i][j] = val
+
+                if val == "xx":
+                    continue
+                if val == 'lr':
+                    if grid_reconstruct1[i + 1][j] == 'lr':
+                        grid_reconstruct_final[i][j] = 'lr1'
+                    elif grid_reconstruct1[i - 1][j] == 'lr':
+                        grid_reconstruct_final[i][j] = 'lr2'
+
+                if val == 'ud':
+                    if grid_reconstruct1[i][j + 1] == 'ud':
+                        grid_reconstruct_final[i][j] = 'ud1'
+                    elif grid_reconstruct1[i][j - 1] == 'ud':
+                        grid_reconstruct_final[i][j] = 'ud2'
+
+        file_track = open(self.track_name, "w+")
+
+        for i in range(h):
+            for j in range(w):
+                file_track.write(grid_reconstruct_final[i][j])
 
                 file_track.write(" ")
             file_track.write("\n")
