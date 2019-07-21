@@ -1,7 +1,6 @@
 import math
 
 from src.Games.GameTrain import *
-from src.Cars.CarHuman import get_forward_speed
 from src.Cars.CarAI import CarAI
 
 matplotlib.use("Agg")
@@ -170,11 +169,14 @@ class GameTrainRandomEvolv(GameTrain):
 
     def get_max_possible_fitness(self):
         lost_fitness = 0
-        max_fitness = get_forward_speed(max_n_speed) * weight_on_road / FPS_MAX_init
+        max_fitness = self.get_forward_speed(max_n_speed) * weight_on_road / FPS_MAX_init
 
         for n in range(1, min(max_n_speed, self.gen_duration_limit_frame)):
-            lost_fitness += max_fitness - get_forward_speed(n) / FPS_MAX_init * weight_on_road
+            lost_fitness += max_fitness - self.get_forward_speed(n) / FPS_MAX_init * weight_on_road
 
         max_sum_fitness = self.gen_duration_limit_frame * max_fitness
 
         return max_sum_fitness - lost_fitness
+
+    def get_forward_speed(self,n_speed):
+        return self.track.speed_max * (1 - math.exp(-n_speed / n0_speed))

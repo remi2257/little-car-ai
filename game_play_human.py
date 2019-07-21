@@ -34,11 +34,11 @@ def run_play_human(**kwargs):
             game.car.reset_car()
 
         if keys[pygame_const.K_LEFT]:
-            game.car.actualize_direction_or_gas(dir_LEFT)
+            game.car.actualize_direction_or_gas(wheel_LEFT)
         elif keys[pygame_const.K_RIGHT]:
-            game.car.actualize_direction_or_gas(dir_RIGHT)
+            game.car.actualize_direction_or_gas(wheel_RIGHT)
         else:
-            game.car.actualize_direction_or_gas(dir_NONE)
+            game.car.actualize_direction_or_gas(wheel_NONE)
 
         # Refresh
         game.actualize()

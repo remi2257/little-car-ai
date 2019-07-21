@@ -59,32 +59,32 @@ class CarBot:
         self.direction = possible_moves[random.randrange(len(possible_moves))]
 
     def adjust_double_road(self, xc, yc, grid_size):
-        if self.direction == bot_LEFT:
+        if self.direction == dir_LEFT:
             yc -= grid_size // 4
-        elif self.direction == bot_RIGHT:
+        elif self.direction == dir_RIGHT:
             yc += grid_size // 4
-        elif self.direction == bot_UP:
+        elif self.direction == dir_UP:
             xc += grid_size // 4
-        elif self.direction == bot_DOWN:
+        elif self.direction == dir_DOWN:
             xc -= grid_size // 4
 
         return xc, yc
 
     def actualize_direction_bot(self, grid_size):
         change = False
-        if self.next_direction == bot_DOWN:
+        if self.next_direction == dir_DOWN:
             dist_from_turn = abs(grid_size // 4 - self.position_car.centerx % grid_size)
             if dist_from_turn < 0.6 * step_dir:
                 change = True
-        elif self.next_direction == bot_UP:
+        elif self.next_direction == dir_UP:
             dist_from_turn = abs(3 * grid_size // 4 - self.position_car.centerx % grid_size)
             if dist_from_turn < 0.6 * step_dir:
                 change = True
-        elif self.next_direction == bot_RIGHT:
+        elif self.next_direction == dir_RIGHT:
             dist_from_turn = abs(3 * grid_size // 4 - self.position_car.centery % grid_size)
             if dist_from_turn < 0.6 * step_dir:
                 change = True
-        elif self.next_direction == bot_LEFT:
+        elif self.next_direction == dir_LEFT:
             dist_from_turn = abs(grid_size // 4 - self.position_car.centery % grid_size)
             if dist_from_turn < 0.6 * step_dir:
                 change = True
@@ -111,15 +111,15 @@ class CarBot:
         if self.next_direction != self.direction:  # Should Turn
             self.actualize_direction_bot(track.grid_size)
 
-        if self.direction == bot_DOWN:
+        if self.direction == dir_DOWN:
             self.position_car = self.position_car.move(0, step_dir)
-        elif self.direction == bot_UP:
+        elif self.direction == dir_UP:
             self.position_car = self.position_car.move(0, -step_dir)
 
-        elif self.direction == bot_RIGHT:
+        elif self.direction == dir_RIGHT:
             self.position_car = self.position_car.move(step_dir, 0)
 
-        elif self.direction == bot_LEFT:
+        elif self.direction == dir_LEFT:
             self.position_car = self.position_car.move(-step_dir, 0)
 
         new_case_x = self.position_car.centerx // track.grid_size

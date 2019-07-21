@@ -60,7 +60,7 @@ path_viper = "images/vehicles/Black_viper.png"
 path_car_survivor = "images/vehicles/Car.png"
 
 # SPEED/MOVEMENT
-speed_max = 30.0
+speed_max_raw = 300.0  # Speed has to be divide by number of cases
 n0_speed = 15.0
 max_n_speed = 40
 
@@ -84,12 +84,12 @@ offset_LIDAR_grid_y = 20
 
 # -- DIRECTION -- #
 
-# BOT
-bot_DOWN, bot_RIGHT, bot_UP, bot_LEFT = 0, 1, 2, 3
+# Dir for Track & BOT
+dir_DOWN, dir_RIGHT, dir_UP, dir_LEFT = 0, 1, 2, 3
 
 # HUMAN / IA
 gas_ON, gas_BRAKE, gas_OFF = 0, 1, 2
-dir_LEFT, dir_RIGHT, dir_NONE = 3, 4, 5
+wheel_LEFT, wheel_RIGHT, wheel_NONE = 3, 4, 5
 
 # Direction arrows & Pedals
 
@@ -102,9 +102,9 @@ img_pedals_arrows = {
     gas_ON: im_others_path + "pedals_gas.png",
     gas_BRAKE: im_others_path + "pedals_brake.png",
     gas_OFF: im_others_path + "pedals_off.png",
-    dir_LEFT: im_others_path + "arrows_left.png",
-    dir_RIGHT: im_others_path + "arrows_right.png",
-    dir_NONE: im_others_path + "arrows_off.png",
+    wheel_LEFT: im_others_path + "arrows_left.png",
+    wheel_RIGHT: im_others_path + "arrows_right.png",
+    wheel_NONE: im_others_path + "arrows_off.png",
 }
 
 # -- TRACK -- #
@@ -115,11 +115,7 @@ track_part_1w = {
     "xx": None,
     "xxx": None,
     "ud": road_path + "road_ud.png",
-    "ud1": road_path + "road_ud1.png",
-    "ud2": road_path + "road_ud2.png",
     "lr": road_path + "road_lr.png",
-    "lr1": road_path + "road_lr1.png",
-    "lr2": road_path + "road_lr2.png",
     "dr": road_path + "road_dr.png",
     "dl": road_path + "road_dl.png",
     "ur": road_path + "road_ur.png",
@@ -128,24 +124,27 @@ track_part_1w = {
     "udr": road_path + "road_udr.png",
     "udl": road_path + "road_udl.png",
     "dlr": road_path + "road_dlr.png",
+    "dlr1": road_path + "road_dlr1.png",
+    "dlr2": road_path + "road_dlr2.png",
+    "dlr3": road_path + "road_dlr3.png",
     "udlr": road_path + "road_udlr.png",
     "sr": road_path + "start_right.png",
 
 }
 
 bot_possible_moves_1w = {
-    "ud": [bot_UP, bot_DOWN],
-    "lr": [bot_LEFT, bot_RIGHT],
-    "dr": [bot_RIGHT, bot_DOWN],
-    "dl": [bot_LEFT, bot_DOWN],
-    "ur": [bot_UP, bot_RIGHT],
-    "ul": [bot_UP, bot_LEFT],
-    "ulr": [bot_UP, bot_LEFT, bot_RIGHT],
-    "udr": [bot_UP, bot_DOWN, bot_RIGHT],
-    "udl": [bot_UP, bot_LEFT, bot_DOWN],
-    "dlr": [bot_DOWN, bot_LEFT, bot_RIGHT],
-    "udlr": [bot_DOWN, bot_UP, bot_LEFT, bot_RIGHT],
-    "sr": [bot_RIGHT],
+    "ud": [dir_UP, dir_DOWN],
+    "lr": [dir_LEFT, dir_RIGHT],
+    "dr": [dir_RIGHT, dir_DOWN],
+    "dl": [dir_LEFT, dir_DOWN],
+    "ur": [dir_UP, dir_RIGHT],
+    "ul": [dir_UP, dir_LEFT],
+    "ulr": [dir_UP, dir_LEFT, dir_RIGHT],
+    "udr": [dir_UP, dir_DOWN, dir_RIGHT],
+    "udl": [dir_UP, dir_LEFT, dir_DOWN],
+    "dlr": [dir_DOWN, dir_LEFT, dir_RIGHT],
+    "udlr": [dir_DOWN, dir_UP, dir_LEFT, dir_RIGHT],
+    "sr": [dir_RIGHT],
 
 }
 
@@ -154,8 +153,6 @@ track_part_1w_practicable = {
     "xx": False,
     "xxx": False,
     "ud": True,
-    "ud1": True,
-    "ud2": True,
     "lr": True,
     "lr1": True,
     "lr2": True,

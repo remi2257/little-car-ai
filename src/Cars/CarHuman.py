@@ -10,6 +10,7 @@ class CarHuman:
         # INIT VARIABLES
         self.theta = 0.0
         self.speed = 0.0
+        self.speed_max = track.speed_max
         self.x_speed = 0.0
         self.y_speed = 0.0
         self.n_speed = 0.0
@@ -21,11 +22,13 @@ class CarHuman:
         self.time_outside_road = 0
         self.on_road = True
 
-        self.last_dir_cmd = dir_NONE
+        self.last_dir_cmd = wheel_NONE
         self.last_gas_cmd = gas_OFF
 
         # GEN CAR IMAGE
-        self.img = pygame.transform.rotate(gen_car_img(track, path_audi), theta_0)
+        self.img = gen_car_img(track, path_audi)
+        if track.start_orientation == dir_RIGHT:
+            self.img = pygame.transform.rotate(self.img, theta_0)
 
         self.actual_img = self.img
 
@@ -76,11 +79,11 @@ class CarHuman:
 
         if command == gas_BRAKE and self.speed > 0:
             self.speed = max(self.speed - 2, 0)
-            self.n_speed = -n0_speed * math.log2(1 - (self.speed / speed_max))
+            self.n_speed = -n0_speed * math.log2(1 - (self.speed / self.speed_max))
 
         elif command == gas_OFF:
             self.speed = max(self.speed * 0.97, 0)
-            self.n_speed = -n0_speed * math.log2(1 - (self.speed / speed_max))
+            self.n_speed = -n0_speed * math.log2(1 - (self.speed / self.speed_max))
         else:
             if command == gas_BRAKE:
                 self.n_speed = max(self.n_speed - 2.0, -10)
@@ -89,9 +92,9 @@ class CarHuman:
                 self.n_speed = min(self.n_speed + 1.0, max_n_speed)
 
             if self.n_speed > 0:
-                self.speed = speed_max * (1 - exp(-self.n_speed / n0_speed))
+                self.speed = self.speed_max * (1 - exp(-self.n_speed / n0_speed))
             else:
-                self.speed = - 0.25 * speed_max * (1 - exp(self.n_speed / n0_speed))
+                self.speed = - 0.25 * self.speed_max * (1 - exp(self.n_speed / n0_speed))
 
     def reduce_all_speeds(self, fact):
         self.speed = max(self.speed - fact, 0)
@@ -99,12 +102,12 @@ class CarHuman:
         self.y_speed = max(self.y_speed - fact, 0)
 
     def calculate_new_angle(self, command):
-        if command == dir_LEFT:
+        if command == wheel_LEFT:
             self.theta += step_angle
-        elif command == dir_RIGHT:
+        elif command == wheel_RIGHT:
             self.theta -= step_angle
 
-        drift_fact = min(drift_factor_cst * math.pow(self.speed / speed_max, 2), drift_factor_max)
+        drift_fact = min(drift_factor_cst * math.pow(self.speed / self.speed_max, 2), drift_factor_max)
         self.x_speed = drift_fact * self.x_speed + (1 - drift_fact) * round(self.speed * cos(radians(self.theta)))
         self.y_speed = drift_fact * self.y_speed + (1 - drift_fact) * round(-self.speed * sin(radians(self.theta)))
 
@@ -174,7 +177,8 @@ class CarHuman:
 
                 self.lidar_mat[i][j] = corresponding_square
 
-                is_practicable = track_part_1w_practicable[corresponding_square]
+                # is_practicable = track_part_1w_practicable[corresponding_square]
+                is_practicable = "x" not in corresponding_square
 
                 self.lidar_filtered[i][j] = is_practicable
 
@@ -210,8 +214,6 @@ class CarHuman:
             self.fitness -= 40 * (max(self.speed, 0) + weight_on_road + self.time_outside_road) / FPS_MAX_init
 
 
-def get_forward_speed(n_speed):
-    return speed_max * (1 - exp(-n_speed / n0_speed))
 
 
 def gen_car_img(track, path_img):

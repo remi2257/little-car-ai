@@ -25,7 +25,7 @@ class GamePlay:
 
         # GEN ACTION IMGS
         self.actions_imgs = []
-        for i in range(dir_NONE + 1):
+        for i in range(wheel_NONE + 1):
             img = pygame.image.load(img_pedals_arrows[i]).convert_alpha()
             width = img.get_width()
             height = img.get_height()
@@ -65,27 +65,28 @@ class GamePlay:
         raise NotImplementedError
 
     def gen_track_background(self):
-        start_points = []
+        # start_points = []
         # Generate Track
         for i in range(self.track.grid_h):
             for j in range(self.track.grid_w):
-                im_name = track_part_1w[self.track.grid[i][j]]
-                if im_name is None:
+                small_name = self.track.grid[i][j]
+                if "x" in small_name:
                     continue
-                if self.track.grid[i][j].startswith("s"):
-                    start_points.append(tuple([i, j]))
-                self.track.start_spots_bot.append([i, j])
-                self.track.grid_practicable[i][j] = True
+
+                im_name = road_path + "road_{}.png".format(small_name)
+
+                # if self.track.grid[i][j].startswith("s"):
+                #     start_points.append(tuple([i, j]))
                 im = pygame.image.load(im_name).convert_alpha()
                 im = pygame.transform.scale(im, (self.track.grid_size, self.track.grid_size))
 
                 self.background.blit(im, (self.track.grid_size * j, self.track.grid_size * i))
 
         random.shuffle(self.track.start_spots_bot)
-        if start_points:
-            init_car_y_grid, init_car_x_grid = random.choice(start_points)
-            self.track.init_car_y = self.track.grid_size * (init_car_y_grid + 2 / 5)
-            self.track.init_car_x = self.track.grid_size * (init_car_x_grid + 2 / 5)
+        # if start_points:
+        #     init_car_y_grid, init_car_x_grid = random.choice(start_points)
+        #     self.track.init_car_y = self.track.grid_size * (init_car_y_grid + 2 / 5)
+        #     self.track.init_car_x = self.track.grid_size * (init_car_x_grid + 2 / 5)
 
     def gen_LIDAR_background(self):
         # Generate LIDAR background

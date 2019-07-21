@@ -20,17 +20,19 @@ def run_draw_map(**kwargs):
                     event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
                 stop = True  # On arrête la boucle
             if event.type == pygame_const.MOUSEBUTTONDOWN:
-                game.is_holding = True
+                game.is_holding_left = True
             if event.type == pygame_const.MOUSEBUTTONUP:
-                game.is_holding = False
+                game.is_holding_left = False
                 game.last_x = -1
                 game.last_y = -1
             # if pygame.mouse.get_pressed()[0]:  # See if the user has clicked or dragged their mouse
             if event.type == pygame_const.KEYDOWN:
                 if event.key == pygame_const.K_s:  # See if the user has clicked or dragged their mouse
                     game.save_map()
+                if event.key == pygame_const.K_f:  # See if the user has clicked or dragged their mouse
+                    game.free_map()
                 if event.key == pygame_const.K_c:  # See if the user has clicked or dragged their mouse
-                    game.clean_map()
+                    game.checkpoint_cmd()
         pos = pygame.mouse.get_pos()
 
         game.actualize(pos)

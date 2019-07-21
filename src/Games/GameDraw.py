@@ -22,6 +22,9 @@ class GameDraw:
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
         self.grid_cut = None
 
+        self.grid_checkpoints = np.zeros((self.grid_h, self.grid_w), dtype=bool)
+        self.should_put_checkpoint = False
+
         # Generate Window
         self.window_w = self.im_w
         self.window_h = self.im_h
@@ -31,7 +34,7 @@ class GameDraw:
         # Mouse infos
         self.last_x = 0
         self.last_y = 0
-        self.is_holding = False
+        self.is_holding_left = False
 
         # Font
         self.font = pygame.font.Font('freesansbold.ttf', 28)
@@ -59,15 +62,15 @@ class GameDraw:
 
     def actualize(self, pos=None):
         self.window.blit(self.background, (0, 0))
-
         if pos:
             mouse_x = pos[0]
             mouse_y = pos[1]
+            new_x = mouse_x // self.grid_size
+            new_y = mouse_y // self.grid_size
 
-            if self.is_holding:
-                new_x = mouse_x // self.grid_size
-                new_y = mouse_y // self.grid_size
-                if not (self.is_holding and new_y == self.last_y and new_x == self.last_x):
+            if self.is_holding_left:
+
+                if not (self.is_holding_left and new_y == self.last_y and new_x == self.last_x):
                     if new_y != 0 and new_x != 0 and new_y != self.grid_h - 1 and new_x != self.grid_w - 1:
                         self.grid_practicable[new_y][new_x] = not self.grid_practicable[new_y][new_x]
                 self.last_x = new_x
@@ -76,13 +79,24 @@ class GameDraw:
                 self.already_save = False
 
             if self.button_save.mouse_on_button(mouse_x, mouse_y):
-                if self.is_holding and not self.already_save:
+                if self.is_holding_left and not self.already_save:
                     self.button_save.run_action()
                     self.already_save = True
 
+            if self.should_put_checkpoint:
+                self.grid_practicable[new_y][new_x] = True
+                self.grid_checkpoints[new_y][new_x] = True
+                self.should_put_checkpoint = False
+
         for i in range(self.grid_h):
             for j in range(self.grid_w):
-                if self.grid_practicable[i][j]:
+
+                if self.grid_checkpoints[i][j]:
+                    rect_pos = tuple([self.grid_size * j, self.grid_size * i,
+                                      self.grid_size, self.grid_size])
+                    pygame.draw.rect(self.window, COLOR_RED, rect_pos)
+
+                elif self.grid_practicable[i][j]:
                     rect_pos = tuple([self.grid_size * j, self.grid_size * i,
                                       self.grid_size, self.grid_size])
                     pygame.draw.rect(self.window, (50, 50, 50), rect_pos)
@@ -107,7 +121,7 @@ class GameDraw:
 
         self.button_save.draw_button_image(self.background)
 
-        msg = self.font.render("C : Clear    S : Save", True, COLOR_RED)
+        msg = self.font.render("C : Checkpoint   F : Free   S : Save", True, COLOR_RED)
         self.background.blit(msg, (40, self.im_h - self.grid_size))
 
     def save_map(self):
@@ -133,8 +147,8 @@ class GameDraw:
                 if not self.grid_cut[i][j]:
                     grid_reconstruct1[i][j] = "xx"
                 else:
-                    grid_reconstruct1[i][j] = self.find_adapted_piece(i, j)
-        # TODO Tous les bails avec les pièces
+                    grid_reconstruct1[i][j] = self.find_izi_piece(i, j)
+
         for i in range(h):
             for j in range(w):
                 val = grid_reconstruct1[i][j]
@@ -142,17 +156,85 @@ class GameDraw:
 
                 if val == "xx":
                     continue
-                if val == 'lr':
-                    if grid_reconstruct1[i + 1][j] == 'lr':
-                        grid_reconstruct_final[i][j] = 'lr1'
-                    elif grid_reconstruct1[i - 1][j] == 'lr':
-                        grid_reconstruct_final[i][j] = 'lr2'
+                if val == 'dlr':
+                    diag_right = False
+                    diag_left = False
+                    if grid_reconstruct1[i + 1][j + 1] != 'xx':
+                        diag_right = True
+                    if grid_reconstruct1[i + 1][j - 1] != 'xx':
+                        diag_left = True
 
-                if val == 'ud':
-                    if grid_reconstruct1[i][j + 1] == 'ud':
-                        grid_reconstruct_final[i][j] = 'ud1'
-                    elif grid_reconstruct1[i][j - 1] == 'ud':
-                        grid_reconstruct_final[i][j] = 'ud2'
+                    if diag_right:
+                        if diag_left:
+                            grid_reconstruct_final[i][j] = 'dlr3'
+                        else:
+                            grid_reconstruct_final[i][j] = 'dlr2'
+                    elif diag_left:
+                        grid_reconstruct_final[i][j] = 'dlr1'
+
+                elif val == 'ulr':
+                    diag_right = False
+                    diag_left = False
+                    if grid_reconstruct1[i - 1][j + 1] != 'xx':
+                        diag_right = True
+                    if grid_reconstruct1[i - 1][j - 1] != 'xx':
+                        diag_left = True
+
+                    if diag_right:
+                        if diag_left:
+                            grid_reconstruct_final[i][j] = 'ulr3'
+                        else:
+                            grid_reconstruct_final[i][j] = 'ulr2'
+                    elif diag_left:
+                        grid_reconstruct_final[i][j] = 'ulr1'
+
+                elif val == 'udr':
+                    diag_up = False
+                    diag_down = False
+                    if grid_reconstruct1[i - 1][j + 1] != 'xx':
+                        diag_up = True
+                    if grid_reconstruct1[i + 1][j + 1] != 'xx':
+                        diag_down = True
+
+                    if diag_up:
+                        if diag_down:
+                            grid_reconstruct_final[i][j] = 'udr3'
+                        else:
+                            grid_reconstruct_final[i][j] = 'udr1'
+                    elif diag_down:
+                        grid_reconstruct_final[i][j] = 'udr2'
+
+                elif val == 'udl':
+                    diag_up = False
+                    diag_down = False
+                    if grid_reconstruct1[i - 1][j - 1] != 'xx':
+                        diag_up = True
+                    if grid_reconstruct1[i + 1][j - 1] != 'xx':
+                        diag_down = True
+
+                    if diag_up:
+                        if diag_down:
+                            grid_reconstruct_final[i][j] = 'udl3'
+                        else:
+                            grid_reconstruct_final[i][j] = 'udl1'
+                    elif diag_down:
+                        grid_reconstruct_final[i][j] = 'udl2'
+
+                elif val == 'ur':
+                    if grid_reconstruct1[i - 1][j + 1] != 'xx':
+                        grid_reconstruct_final[i][j] = 'ur1'
+                elif val == 'dr':
+                    if grid_reconstruct1[i + 1][j + 1] != 'xx':
+                        grid_reconstruct_final[i][j] = 'dr1'
+                elif val == 'ul':
+                    if grid_reconstruct1[i - 1][j - 1] != 'xx':
+                        grid_reconstruct_final[i][j] = 'ul1'
+                elif val == 'dl':
+                    if grid_reconstruct1[i + 1][j - 1] != 'xx':
+                        grid_reconstruct_final[i][j] = 'dl1'
+
+                if self.grid_checkpoints[i][j]:
+                    grid_reconstruct_final[i][j] += "c"
 
         file_track = open(self.track_name, "w+")
 
@@ -166,6 +248,7 @@ class GameDraw:
         self.msg_text = "Track recorded as {}".format(self.track_name.split("/")[1])
         file_track.close()
 
+    # TODO Display Where the missing part is
     def check_viable_track(self):
         if not np.any(self.grid_practicable):
             return False
@@ -203,7 +286,7 @@ class GameDraw:
         while not np.any(self.grid_cut[:, -2]):  # On coupe à droite
             self.grid_cut = np.delete(self.grid_cut, -1, axis=1)
 
-    def find_adapted_piece(self, i, j):
+    def find_izi_piece(self, i, j):
         part_str = ""
         if self.grid_cut[i - 1][j]:
             part_str += "u"
@@ -216,8 +299,11 @@ class GameDraw:
 
         return part_str
 
-    def clean_map(self):
+    def free_map(self):
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
+
+    def checkpoint_cmd(self):
+        self.should_put_checkpoint = True
 
     def display_text(self):
         if self.msg_text is not None:
