@@ -1,15 +1,20 @@
 import pygame.locals as pygame_const
+from math import ceil
+
+from src.func import get_screen_infos
 
 # -----ENV---- #
 game_name = "Little Car AI"
 background_path = "images/background.jpg"
 
-size_larg = 1600  # 1280
-# size_haut = size_larg
-size_haut = 900  # 720
+ratio_screen_window = 1.2
+big_window_larg, big_window_haut = get_screen_infos(ratio_screen_window)
+# big_window_larg = 1600  # 1280
+# big_window_haut = big_window_larg
+# big_window_haut = 900  # 720
 
-grid_w_lim = 32
-grid_h_lim = 24
+draw_w_grid = 32
+draw_h_grid = 24
 
 # ---INIT PARAMETERS ---#
 init_car_x = 260.0
@@ -19,7 +24,7 @@ FPS_MAX_init = 30
 FPS_MAX_max = 240
 list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
-font_size = 20
+font_size_global = round(big_window_haut / 45)
 
 theta_0 = -90.0
 
@@ -77,10 +82,12 @@ height_LIDAR = 7
 width_LIDAR = 5
 offset_y_LIDAR = 0
 
-LIDAR_width_img = 150
-erode_LIDAR_grid = 2
+LIDAR_width_img = ceil(big_window_haut / (20 * 8)) * 20
+erode_LIDAR_grid = 1 + int(big_window_larg / 1500)
 offset_LIDAR_grid_x = 20
 offset_LIDAR_grid_y = 20
+
+circle_size = max(1, int(round(big_window_larg / 1920) * 3))
 
 # -- DIRECTION -- #
 
@@ -93,8 +100,8 @@ wheel_LEFT, wheel_RIGHT, wheel_NONE = 3, 4, 5
 
 # Direction arrows & Pedals
 
-width_arrows_pedals = 100
-offset_arrows_pedals = 50
+width_arrows_pedals = round(big_window_haut / 12)
+offset_arrows_pedals = round(big_window_haut / 20)
 
 im_others_path = "images/others/"
 
@@ -203,14 +210,15 @@ track_names_list = [
 ]
 
 # -- MENU -- #
+# 521 x 246 = ratio de 2.13
+menu_button_w = round(big_window_haut / 3)
+menu_button_h = round(menu_button_w / 2.13)
 
-menu_button_h = 125
-menu_button_w = 350
-offset_h = 50
+offset_h = round(20 * big_window_haut / 700)
 
 nbr_buttons = 4
 
-first_button_y = 200
+first_button_y = round(200 * big_window_haut / 800)
 
 buttons_y = [first_button_y + i * (offset_h + menu_button_h) for i in range(nbr_buttons)]
 
@@ -234,5 +242,5 @@ buttons_push_path = [buttons_img_path + name + "_push.png" for name in button_li
 button_save_on = buttons_img_path + "save_on.png"
 button_save_off = buttons_img_path + "save_off.png"
 
-menu_trackbar_w = 150
-menu_trackbar_h = 400
+menu_selection_w = round(150 * 900 / big_window_haut)
+menu_selection_h = round(400 * 900 / big_window_haut)

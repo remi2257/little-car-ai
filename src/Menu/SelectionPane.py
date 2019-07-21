@@ -12,14 +12,14 @@ class SelectionPane:
         # folder: str
         # extension: str
 
-        self.w = menu_trackbar_w
-        self.h = menu_trackbar_h
+        self.w = menu_selection_w
+        self.h = menu_selection_h
 
         self.chosen_id = 0
         self.mouse_on_id = None
 
         # Font
-        self.font = Font('freesansbold.ttf', 28)
+        self.font = Font('freesansbold.ttf', int(font_size_global*1.3))
         self.font_h = self.font.get_height()
         self.space_between_line = 30
 

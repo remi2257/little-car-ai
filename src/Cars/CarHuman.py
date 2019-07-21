@@ -27,7 +27,7 @@ class CarHuman:
 
         # GEN CAR IMAGE
         self.img = gen_car_img(track, path_audi)
-        if track.start_orientation == dir_RIGHT:
+        if track.start_direction == dir_RIGHT:
             self.img = pygame.transform.rotate(self.img, theta_0)
 
         self.actual_img = self.img

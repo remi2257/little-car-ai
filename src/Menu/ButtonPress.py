@@ -5,11 +5,11 @@ from src.Menu.Button import *
 
 
 class ButtonPress(Button):
-    def __init__(self, x, y, action, path_img_off, path_img_on=None, path_img_push=None, button_h=menu_button_h):
+    def __init__(self, x, y, action, path_img_off, path_img_on=None, path_img_push=None, button_w=menu_button_w):
 
-        self.img_off, self.w = self.gen_button_img(path_img_off, new_height=button_h)
-        self.img_on, _ = self.gen_button_img(path_img_on, new_height=button_h)
-        self.img_push, _ = self.gen_button_img(path_img_push, new_height=button_h)
+        self.img_off, self.w = self.gen_button_img(path_img_off, new_width=button_w)
+        self.img_on, _ = self.gen_button_img(path_img_on, new_width=button_w)
+        self.img_push, _ = self.gen_button_img(path_img_push, new_width=button_w)
 
         self.rect_x = x - self.img_off.get_width() // 2
         self.rect_y = y

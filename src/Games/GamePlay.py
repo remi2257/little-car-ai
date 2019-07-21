@@ -44,7 +44,7 @@ class GamePlay:
             self.cars_bot.append(CarBot(self.track))
 
         # Font
-        self.font = Font('freesansbold.ttf', font_size)
+        self.font = Font('freesansbold.ttf', font_size_global)
 
     def actualize(self):
         raise NotImplementedError

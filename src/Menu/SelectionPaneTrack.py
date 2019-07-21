@@ -9,8 +9,8 @@ class SelectionPaneTrack(SelectionPane):
     def __init__(self):
         SelectionPane.__init__(self)
 
-        self.x = 50
-        self.y = 450
+        self.x = big_window_haut // 16
+        self.y = big_window_haut // 3
         self.title = "Choose ur Track !"
 
         # self.list_tracks = sorted([track_files_path + f for f in os.listdir(track_files_path)])

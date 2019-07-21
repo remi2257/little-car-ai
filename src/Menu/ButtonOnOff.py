@@ -7,8 +7,8 @@ from src.Menu.Button import *
 class ButtonOnOff(Button):
     def __init__(self, x, y, img_on, img_off):
 
-        self.img_on, self.w = self.gen_button_img(img_on, new_height=menu_button_h // 2)
-        self.img_off, _ = self.gen_button_img(img_off, new_height=menu_button_h // 2)
+        self.img_on, self.w = self.gen_button_img(img_on, new_width=menu_button_w // 2)
+        self.img_off, _ = self.gen_button_img(img_off, new_width=menu_button_w // 2)
 
         self.imgs = [self.img_off, self.img_on]
 

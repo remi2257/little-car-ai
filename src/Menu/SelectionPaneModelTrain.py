@@ -9,8 +9,8 @@ class SelectionPaneModelTrain(SelectionPane):
     def __init__(self):
         SelectionPane.__init__(self)
 
-        self.x = 640
-        self.y = 300
+        self.x = big_window_haut // 2 + int(3 * menu_button_w / 5)
+        self.y = big_window_haut // 3
         self.title = "Trained Model ?"
 
         self.folder = trained_model_path

@@ -1,12 +1,12 @@
+from game_draw_map import run_draw_map
 from game_play_ai import run_play_ai
 from game_play_human import run_play_human
-from src.Menu.ButtonPress import *
+from game_train import run_train
 from src.Menu.ButtonOnOff import *
+from src.Menu.ButtonPress import *
 from src.Menu.SelectionPaneModelRaw import *
 from src.Menu.SelectionPaneModelTrain import *
 from src.Menu.SelectionPaneTrack import *
-from game_draw_map import run_draw_map
-from game_train import run_train
 
 actions = [run_play_human, run_play_ai, run_train, run_draw_map]
 
@@ -21,8 +21,8 @@ class MenuWindow:
         pygame.display.set_caption(game_name)
 
         # Generate Window
-        self.window_w = size_haut
-        self.window_h = size_haut
+        self.window_w = big_window_haut
+        self.window_h = big_window_haut
 
         self.window = pygame.display.set_mode((self.window_w, self.window_h))
 
@@ -31,7 +31,9 @@ class MenuWindow:
                                          path_img_push=buttons_push_path[i])
                              for i in range(4)]
 
-        self.button_save = ButtonOnOff(x=640, y=750, img_on=button_save_on, img_off=button_save_off)
+        self.button_save = ButtonOnOff(x=int(8 * self.window_w / 10), y=int(8 * self.window_h / 10),
+                                       img_on=button_save_on,
+                                       img_off=button_save_off)
 
         self.buttons = self.buttons_mode + [self.button_save]
 

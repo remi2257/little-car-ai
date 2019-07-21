@@ -24,7 +24,7 @@ class Button:
     def draw_button_image(self, window, mouse_pressed=False):
         raise NotImplementedError
 
-    def gen_button_img(self, path_img, new_height=menu_button_h):
+    def gen_button_img(self, path_img, new_width=menu_button_w):
         if path_img is None:
             return None, None
         img = pygame.image.load(path_img).convert_alpha()
@@ -33,7 +33,7 @@ class Button:
 
         ratio = float(width / height)
 
-        new_width = int(new_height * ratio)
+        new_height = int(new_width / ratio)
 
         img_resize = pygame.transform.scale(img, (new_width, new_height))
         return img_resize, new_width

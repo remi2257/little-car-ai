@@ -11,7 +11,7 @@ class Track:
 
         self.double_road = double_road
 
-        self.grid_size = min(size_haut // self.grid_h, size_larg // self.grid_w)
+        self.grid_size = min(big_window_haut // self.grid_h, big_window_larg // self.grid_w)
 
         self.im_w = self.grid_size * self.grid_w
         self.im_h = self.grid_size * self.grid_h
@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     pygame.display.set_caption("My GamePlay")
 
-    window = pygame.display.set_mode((size_larg, size_haut), )  # RESIZABLE
+    window = pygame.display.set_mode((big_window_larg, big_window_haut), )  # RESIZABLE
 
     background_path = "images/background.jpg"
     background_im = pygame.image.load(background_path).convert()

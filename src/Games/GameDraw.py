@@ -11,10 +11,10 @@ class GameDraw:
 
         pygame.display.set_caption(game_name)
 
-        self.grid_h = grid_h_lim
-        self.grid_w = grid_w_lim
+        self.grid_h = draw_h_grid
+        self.grid_w = draw_w_grid
 
-        self.grid_size = min(size_haut // self.grid_h, size_larg // self.grid_w)
+        self.grid_size = min(big_window_haut // self.grid_h, big_window_larg // self.grid_w)
 
         self.im_w = self.grid_size * self.grid_w
         self.im_h = self.grid_size * self.grid_h
@@ -44,10 +44,11 @@ class GameDraw:
         # Generate Background
         self.background = pygame.image.load(background_path).convert()
 
-        self.button_save = ButtonPress(self.im_w - self.grid_size, self.im_h - self.grid_size, action=self.save_map,
-                                       path_img_off=button_save_off,
-                                       path_img_push=button_save_on,
-                                       button_h=self.grid_size)
+        # self.button_save = ButtonPress(self.im_w - 3 * self.grid_size, self.im_h - 3 * self.grid_size,
+        #                                action=self.save_map,
+        #                                path_img_off=button_save_off,
+        #                                path_img_push=button_save_on,
+        #                                button_w=3 * self.grid_size)
         self.already_save = False
 
         self.gen_track_background()
@@ -78,10 +79,10 @@ class GameDraw:
             else:
                 self.already_save = False
 
-            if self.button_save.mouse_on_button(mouse_x, mouse_y):
-                if self.is_holding_left and not self.already_save:
-                    self.button_save.run_action()
-                    self.already_save = True
+            # if self.button_save.mouse_on_button(mouse_x, mouse_y):
+            #     if self.is_holding_left and not self.already_save:
+            #         self.button_save.run_action()
+            #         self.already_save = True
 
             if self.should_put_checkpoint:
                 self.grid_practicable[new_y][new_x] = True
@@ -101,7 +102,7 @@ class GameDraw:
                                       self.grid_size, self.grid_size])
                     pygame.draw.rect(self.window, (50, 50, 50), rect_pos)
 
-        self.button_save.draw_button_image(self.background)
+        # self.button_save.draw_button_image(self.background)
 
         self.display_text()
 
@@ -119,7 +120,7 @@ class GameDraw:
             line_w_stop = [i * self.grid_size, self.im_h]
             pygame.draw.line(self.background, (0, 0, 0), line_w_start, line_w_stop)
 
-        self.button_save.draw_button_image(self.background)
+        # self.button_save.draw_button_image(self.background)
 
         msg = self.font.render("C : Checkpoint   F : Free   S : Save", True, COLOR_RED)
         self.background.blit(msg, (40, self.im_h - self.grid_size))
