@@ -6,8 +6,8 @@ from src.const import *
 class Button:
     def __init__(self, rect):
 
-        self.rect = rect
-        self.mouse_on = False
+        self.rect = rect # Rect corresponding to (x,y,w,h)
+        self.mouse_on = False # True if mouse is on the button
 
     def get_rect_menu_pos(self):
         raise NotImplementedError

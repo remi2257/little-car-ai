@@ -2,6 +2,10 @@ from pygame.font import Font
 
 from src.const import *
 
+"""
+List on which you can click to select one element
+"""
+
 
 class SelectionPane:
     def __init__(self):
@@ -19,9 +23,9 @@ class SelectionPane:
         self.mouse_on_id = None
 
         # Font
-        self.font = Font('freesansbold.ttf', int(font_size_global*1.3))
+        self.font = Font('freesansbold.ttf', int(font_size_global * 1.3))
         self.font_h = self.font.get_height()
-        self.space_between_line = 30
+        # self.space_between_line = 30
 
     def actualize(self, window, pos=None, is_clicking=False):
         raise NotImplementedError

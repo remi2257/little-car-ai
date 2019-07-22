@@ -5,13 +5,14 @@ from src.const import *
 
 
 def run_play_human(**kwargs):
-    # --- INIT Variable--- #
+    # --- INIT Variables--- #
     stop = False
-    # --- INIT PYGAME--- #
     if kwargs:
         track_path = kwargs["track_path"]
     else:
         track_path = list_track[0]
+
+    # --- INIT GAME Window--- #
 
     game = GameSolo(track_path=track_path)
 
@@ -23,21 +24,22 @@ def run_play_human(**kwargs):
                 stop = True  # On arrête la boucle
 
         keys = pygame.key.get_pressed()
-        if keys[pygame_const.K_DOWN]:  # Si "flèche bas"
+        if keys[pygame_const.K_DOWN]:  # If Down Arrow
             game.car.actualize_direction_or_gas(gas_BRAKE)
-        elif keys[pygame_const.K_UP]:
+        elif keys[pygame_const.K_UP]:  # If Up Arrow
             game.car.actualize_direction_or_gas(gas_ON)
-        else:
+        else:  # If None of them
             game.car.actualize_direction_or_gas(gas_OFF)
 
-        if keys[pygame_const.K_r]:
+        if keys[pygame_const.K_r]:  # If R
+            # Reset car
             game.car.reset_car()
 
-        if keys[pygame_const.K_LEFT]:
+        if keys[pygame_const.K_LEFT]:  # If Left Arrow
             game.car.actualize_direction_or_gas(wheel_LEFT)
-        elif keys[pygame_const.K_RIGHT]:
+        elif keys[pygame_const.K_RIGHT]:  # If Right Arrow
             game.car.actualize_direction_or_gas(wheel_RIGHT)
-        else:
+        else:  # If None of them
             game.car.actualize_direction_or_gas(wheel_NONE)
 
         # Refresh

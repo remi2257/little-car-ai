@@ -3,10 +3,11 @@ import pygame
 from math import cos, sin, radians, exp
 
 from src.const import *
+from src.Games.Track import Track
 
 
 class CarHuman:
-    def __init__(self, track, lidar_w, lidar_h):
+    def __init__(self, track: Track, lidar_w, lidar_h):
         # INIT VARIABLES
         self.theta = 0.0
         self.speed = 0.0
@@ -16,9 +17,11 @@ class CarHuman:
         self.n_speed = 0.0
         self.fitness = 0
 
+        # Set startPosition
         self.x_init = track.init_car_x
         self.y_init = track.init_car_y
 
+        # Count time outside road to penalize
         self.time_outside_road = 0
         self.on_road = True
 
@@ -34,8 +37,10 @@ class CarHuman:
 
         # SET POSITION
         self.position_car = self.actual_img.get_rect()
-
         self.position_car = self.position_car.move(self.x_init, self.y_init)
+
+        # self.actual_grid_x = None
+        # self.actual_grid_y = None
 
         # GEN LIDAR
         self.track = track
@@ -54,6 +59,10 @@ class CarHuman:
 
         self.refresh_LIDAR()
 
+        # Checkpoints
+        self.checkpoints = self.set_checkpoints(track)
+
+    # Is aptly named
     def actualize_direction_and_gas(self, new_commands):
         for command in new_commands:
             self.actualize_direction_or_gas(command)
@@ -74,8 +83,9 @@ class CarHuman:
     def calculate_new_speed(self, command):
         if not self.on_road:
             if (1 - exp(-self.n_speed / n0_speed)) > 0.3:
-                # self.n_speed = max(self.n_speed - 5, max_n_speed / 5)
+                #  If speed at more than 30% of the maximum
                 self.n_speed = self.n_speed - 4
+                # self.n_speed = max(self.n_speed - 5, max_n_speed / 5)
 
         if command == gas_BRAKE and self.speed > 0:
             self.speed = max(self.speed - 2, 0)
@@ -170,7 +180,7 @@ class CarHuman:
                 true_y_grid = true_dy // self.track.grid_size
 
                 if 0 < true_x_grid < self.track.grid_w and 0 < true_y_grid < self.track.grid_h:
-                    corresponding_square = self.track.grid[true_y_grid][true_x_grid]
+                    corresponding_square = self.track.grid_raw[true_y_grid][true_x_grid]
 
                 else:
                     corresponding_square = "xx"
@@ -195,7 +205,7 @@ class CarHuman:
                     else:
                         color = COLOR_RED
 
-                    pygame.draw.circle(window, color, point_pos, 3)
+                    pygame.draw.circle(window, color, point_pos, circle_size)
                     pygame.draw.rect(window, color, rect_pos)
 
         if window is not None:
@@ -204,7 +214,8 @@ class CarHuman:
 
             pygame.draw.circle(window, COLOR_BLUE, point_pos, 4, 2)
 
-    def refresh_fitness(self):
+    # Use some functions to calculate new fitness
+    def refresh_fitness_v1(self):
         if self.on_road:
             self.fitness += max(self.speed, 0) * weight_on_road / FPS_MAX_init
 
@@ -213,7 +224,52 @@ class CarHuman:
             self.time_outside_road += 1
             self.fitness -= 40 * (max(self.speed, 0) + weight_on_road + self.time_outside_road) / FPS_MAX_init
 
+    def refresh_fitness_v2(self):  # With Checkpoint
+        if self.on_road:
+            self.fitness += max(self.speed, 0) * weight_on_road / FPS_MAX_init
 
+            self.time_outside_road = max(0, self.time_outside_road - 0.1)
+
+            if self.checkpoints:
+                # Check if on checkpoint
+                x, y = self.get_position_center()
+                x_grid = x // self.track.grid_size
+                y_grid = y // self.track.grid_size
+
+                for checkpoint in self.checkpoints:
+                    if not checkpoint[1]:
+                        continue
+                    if y_grid == checkpoint[0][0] and x_grid == checkpoint[0][1]:
+                        self.fitness += boost_checkpoint
+                        checkpoint[1] = False
+                        print("ON CHECKPOINT")
+
+                if not any([cp[1] for cp in self.checkpoints]):
+                    self.reset_checkpoints()
+                    print("RESET CHECKPOINT")
+        else:
+            self.time_outside_road += 1
+            self.fitness -= (max(self.speed, 0) + self.time_outside_road) * weight_on_road / FPS_MAX_init
+
+    def set_checkpoints(self, track):
+        my_list = []
+        for checkpoint in track.checkpoints:
+            x, y = self.get_position_center()
+            x_grid = x // self.track.grid_size
+            y_grid = y // self.track.grid_size
+            if x_grid!=checkpoint[1] or y_grid != checkpoint[0]:
+                my_list.append([checkpoint, True])
+            else:
+                my_list.append([checkpoint, False])
+        if not my_list:
+            return None
+        # set first at 0
+        # my_list[0][1] = False
+        return my_list
+
+    def reset_checkpoints(self):
+        for checkpoint in self.checkpoints:
+            checkpoint[1] = True
 
 
 def gen_car_img(track, path_img):

@@ -5,6 +5,10 @@ from keras.models import Model, load_model
 
 from src.const import *
 
+"""
+C'est de là que c'est un AI !
+"""
+
 
 class NeuralNet:
     def __init__(self, nn_file_path=None):

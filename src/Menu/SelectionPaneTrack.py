@@ -4,6 +4,10 @@ import pygame
 
 from src.Menu.SelectionPane import *
 
+"""
+Track selection
+"""
+
 
 class SelectionPaneTrack(SelectionPane):
     def __init__(self):

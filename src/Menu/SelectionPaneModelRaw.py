@@ -4,6 +4,10 @@ import pygame
 
 from src.Menu.SelectionPane import *
 
+"""
+Architecture selection
+"""
+
 
 class SelectionPaneModelRaw(SelectionPane):
     def __init__(self):

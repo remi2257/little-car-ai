@@ -3,6 +3,9 @@ import pygame
 from src.const import *
 from src.Menu.Button import *
 
+'''
+You can either select it or not
+'''
 
 class ButtonOnOff(Button):
     def __init__(self, x, y, img_on, img_off):

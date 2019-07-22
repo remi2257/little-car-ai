@@ -4,6 +4,10 @@ import pygame
 
 from src.Menu.SelectionPane import *
 
+"""
+Trained model selection
+"""
+
 
 class SelectionPaneModelTrain(SelectionPane):
     def __init__(self):

@@ -1,7 +1,6 @@
 import numpy as np
 import pygame
 
-from src.Menu.ButtonPress import ButtonPress
 from src.const import *
 
 
@@ -21,8 +20,12 @@ class GameDraw:
 
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
         self.grid_cut = None
+        self.grid_cut = None
+
+        self.missing_parts = np.zeros((self.grid_h, self.grid_w), dtype=bool)
 
         self.grid_checkpoints = np.zeros((self.grid_h, self.grid_w), dtype=bool)
+        self.grid_checkpoints_cut = None
         self.should_put_checkpoint = False
 
         # Generate Window
@@ -69,10 +72,10 @@ class GameDraw:
             new_x = mouse_x // self.grid_size
             new_y = mouse_y // self.grid_size
 
-            if self.is_holding_left:
-
-                if not (self.is_holding_left and new_y == self.last_y and new_x == self.last_x):
+            if self.is_holding_left: # If button is pushed
+                if not (new_y == self.last_y and new_x == self.last_x): # Si on est pas au même endroit qu'avant
                     if new_y != 0 and new_x != 0 and new_y != self.grid_h - 1 and new_x != self.grid_w - 1:
+                        # si on est pas sur les bords
                         self.grid_practicable[new_y][new_x] = not self.grid_practicable[new_y][new_x]
                 self.last_x = new_x
                 self.last_y = new_y
@@ -92,10 +95,15 @@ class GameDraw:
         for i in range(self.grid_h):
             for j in range(self.grid_w):
 
-                if self.grid_checkpoints[i][j]:
+                if self.missing_parts[i][j]:
                     rect_pos = tuple([self.grid_size * j, self.grid_size * i,
                                       self.grid_size, self.grid_size])
                     pygame.draw.rect(self.window, COLOR_RED, rect_pos)
+
+                elif self.grid_checkpoints[i][j]:
+                    rect_pos = tuple([self.grid_size * j, self.grid_size * i,
+                                      self.grid_size, self.grid_size])
+                    pygame.draw.rect(self.window, COLOR_BLUE_BRIGHT, rect_pos)
 
                 elif self.grid_practicable[i][j]:
                     rect_pos = tuple([self.grid_size * j, self.grid_size * i,
@@ -127,12 +135,13 @@ class GameDraw:
 
     def save_map(self):
         import os
+        self.missing_parts = np.zeros((self.grid_h, self.grid_w), dtype=bool)
 
         if not self.check_viable_track():
             self.msg_text = "Circuit pas viable, toutes les cases doivent avoir au mina 2 connexions"
             return None
 
-        self.cut_grid()
+        self.cut_grids()
 
         while os.path.isfile(self.track_name):
             self.track_id += 1
@@ -234,7 +243,7 @@ class GameDraw:
                     if grid_reconstruct1[i + 1][j - 1] != 'xx':
                         grid_reconstruct_final[i][j] = 'dl1'
 
-                if self.grid_checkpoints[i][j]:
+                if self.grid_checkpoints_cut[i][j]:
                     grid_reconstruct_final[i][j] += "c"
 
         file_track = open(self.track_name, "w+")
@@ -249,10 +258,10 @@ class GameDraw:
         self.msg_text = "Track recorded as {}".format(self.track_name.split("/")[1])
         file_track.close()
 
-    # TODO Display Where the missing part is
     def check_viable_track(self):
         if not np.any(self.grid_practicable):
             return False
+        missing_part = False
         for i in range(1, self.grid_h - 1):
             for j in range(1, self.grid_w - 1):
                 if self.grid_practicable[i][j]:
@@ -269,23 +278,29 @@ class GameDraw:
                         connexion_count += 1
 
                     if connexion_count < 2:
-                        return False
+                        missing_part = True
+                        self.missing_parts[i][j] = True
 
-        return True
+        return not missing_part
 
-    def cut_grid(self):
+    def cut_grids(self):
         self.grid_cut = self.grid_practicable.copy()
+        self.grid_checkpoints_cut = self.grid_checkpoints.copy()
         while not np.any(self.grid_cut[1]):  # On coupe en Haut
             self.grid_cut = np.delete(self.grid_cut, 0, axis=0)
+            self.grid_checkpoints_cut = np.delete(self.grid_checkpoints_cut, 0, axis=0)
 
         while not np.any(self.grid_cut[-2]):  # On coupe en Bas
             self.grid_cut = np.delete(self.grid_cut, -1, axis=0)
+            self.grid_checkpoints_cut = np.delete(self.grid_checkpoints_cut, -1, axis=0)
 
         while not np.any(self.grid_cut[:, 1]):  # On coupe à gauche
             self.grid_cut = np.delete(self.grid_cut, 0, axis=1)
+            self.grid_checkpoints_cut = np.delete(self.grid_checkpoints_cut, 0, axis=1)
 
         while not np.any(self.grid_cut[:, -2]):  # On coupe à droite
             self.grid_cut = np.delete(self.grid_cut, -1, axis=1)
+            self.grid_checkpoints_cut = np.delete(self.grid_checkpoints_cut, -1, axis=1)
 
     def find_izi_piece(self, i, j):
         part_str = ""

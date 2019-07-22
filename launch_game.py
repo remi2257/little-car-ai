@@ -9,7 +9,7 @@ def run_menu():
 
     stop = None
 
-    # --- INIT PYGAME--- #
+    # --- INIT Menu Window --- #
 
     game = MenuWindow()
 
@@ -19,15 +19,14 @@ def run_menu():
             if event.type == pygame_const.QUIT or (
                     event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
                 stop = 0  # On arrête la boucle
-            if event.type == pygame_const.MOUSEBUTTONDOWN:
+            if event.type == pygame_const.MOUSEBUTTONDOWN:  # If Push Mouse's button
                 game.is_holding = True
-            if event.type == pygame_const.MOUSEBUTTONUP:
+            if event.type == pygame_const.MOUSEBUTTONUP:  # If release Mouse's button
                 game.is_holding = False
-                # stop = game.action_selected()
-                game.run_action_selected()
+                game.run_action_selected()  # This release mean a click, so we execute linked action
         pos = pygame.mouse.get_pos()
 
-        game.actualize(pos)
+        game.actualize(pos)  # Actualize window
 
     # return stop
 

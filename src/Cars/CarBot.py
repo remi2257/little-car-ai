@@ -4,6 +4,10 @@ import pygame
 
 from src.const import *
 
+'''
+Pas utilisé en ce moment mais fonctionnel
+'''
+
 
 class CarBot:
     def __init__(self, track, path_img="images/vehicles/car_bot.png"):

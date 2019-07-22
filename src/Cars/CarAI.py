@@ -7,7 +7,10 @@ from src.Games.NeuralNet import *
 class CarAI(CarHuman):
     def __init__(self, neural_net_path, track, lidar_w, lidar_h):
         CarHuman.__init__(self, track, lidar_w, lidar_h)
+        # Import neural net
         self.neural_net = NeuralNet(neural_net_path)
+
+        # --Use during traning--#
         self.is_alive = True
         self.is_survivor = False
 

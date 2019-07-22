@@ -25,12 +25,12 @@ def run_train(**kwargs):
     else:
         model_path = "raw_models/nn_tiny.net"
 
-    if "save" in kwargs:
-        save = kwargs["save"]
+    if "save_train" in kwargs:
+        save = kwargs["save_train"]
     else:
         save = True
 
-    # --- INIT PYGAME--- #
+    # --- INIT Game--- #
 
     game = GameTrainRandomEvolv(
         nn_file_path=model_path,

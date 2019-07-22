@@ -6,42 +6,51 @@ from src.const import *
 
 class Track:
     def __init__(self, track_path, double_road=True):
-        self.grid, self.grid_h, self.grid_w = parse_track_file(track_path)
-        self.speed_max = speed_max_raw / max(self.grid_h, self.grid_w)
+        # Open and parse track file
+        self.grid_raw, self.grid_h, self.grid_w = parse_track_file(track_path)
 
-        self.double_road = double_road
-
+        #  Longeur & Largeur d'une case
         self.grid_size = min(big_window_haut // self.grid_h, big_window_larg // self.grid_w)
 
+        # Taille de l'affichage du circuit
         self.im_w = self.grid_size * self.grid_w
         self.im_h = self.grid_size * self.grid_h
 
+        # --Car--#
+        self.speed_max = speed_max_raw / max(self.grid_h, self.grid_w)
+        self.double_road = double_road  #  If double road, car are 2 times less wide than road
         self.car_size = self.grid_size // (1 + int(self.double_road))
 
+        # Checkpoints
+        self.checkpoints = []  # Grid Coordinates - Not x/y   # [self.init_car_grid_y, self.init_car_grid_x]
+        self.last_checkpoint_id = 0
+
+        #  Infos on track
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
         self.start_spots_bot = []
+        self.init_grid_n_checkp()
 
-        self.init_grid_practicable()
-
-        # self.init_car_x = init_car_x
-        # self.init_car_y = init_car_y
+        # Init position of cars
         self.init_car_grid_x, self.init_car_grid_y, self.start_direction = self.look_for_start_point()
         self.init_car_x = (0.5 + self.init_car_grid_x) * self.grid_size
         self.init_car_y = (0.5 + self.init_car_grid_y) * self.grid_size
 
-        # Checkpoints
-        self.checkpoints = [[self.init_car_grid_y, self.init_car_grid_x]]  # Grid Coordinates - Not x/y
-        self.last_checkpoint_id = 0
-
-    def init_grid_practicable(self):
+    def init_grid_n_checkp(self):
         for i in range(self.grid_h):
             for j in range(self.grid_w):
-                small_name = self.grid[i][j]
+                small_name = self.grid_raw[i][j]
                 if "x" in small_name:
                     continue
 
                 self.start_spots_bot.append([i, j])
                 self.grid_practicable[i][j] = True
+
+                if "c" in small_name:
+                    self.grid_raw[i][j] = self.grid_raw[i][j][:-1]
+                    self.checkpoints.append([i, j])
+
+        if len(self.checkpoints) == 1:
+            self.checkpoints = None
 
     def look_for_start_point(self):
         sum_add = 0
@@ -50,7 +59,7 @@ class Track:
             for j in reversed(range(min(sum_add, self.grid_w))):
                 for i in range(min(sum_add - j, self.grid_h)):
                     if self.grid_practicable[i][j]:
-                        if "u" in self.grid[i][j]:
+                        if "u" in self.grid_raw[i][j]:
                             direction = dir_UP
                         else:
                             direction = dir_RIGHT
@@ -99,7 +108,7 @@ if __name__ == '__main__':
     background_im = pygame.image.load(background_path).convert()
 
     track = Track("track/track1.tra", background_im)
-    print(track.grid)
+    print(track.grid_raw)
 
     window.blit(background_im, (0, 0))
 

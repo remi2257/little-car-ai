@@ -31,21 +31,24 @@ class GameTrain(GamePlay):
                 os.makedirs(self.save_folder_model)
 
         self.carsAI = []
+
+        #  Fitness Information #
         self.best_actual_fitness = 0
         self.mean_fitness = 0
         self.best_fitness_list = [0]
         self.best_fitness_ever = 0
 
+        #  Generation Infos
         self.gen_id = 1
         self.gen_duration = 0
 
-        self.fig = pylab.figure(figsize=[4, 4],  # Inches
-                                dpi=50,  # 100 dots per inch, so the resulting buffer is 400x400 pixels
+        #  Plot settings
+        #  1 px =	0.010416666666819 inches
+        l_fig = 2.3 * 0.010416666666819 * (self.window_w - self.track.im_w)
+        self.fig = pylab.figure(figsize=[l_fig, l_fig],  # Inches
+                                dpi=50,
                                 )
         self.fig_ax = self.fig.gca()
-
-        self.clock = pygame.time.Clock()
-
 
     def actualize(self):
         raise NotImplementedError
@@ -56,13 +59,8 @@ class GameTrain(GamePlay):
     def gen_background(self):
         self.gen_track_background()
 
-    def display_fitness(self):
+    def display_infos_fitness_n_FPS(self):
         raise NotImplementedError
-
-    def display_infos_frame(self):
-        fps = self.font.render("FPS (max): {} ({})".format(int(self.clock.get_fps()), self.FPS_MAX), True,
-                               pygame.Color('white'))
-        self.window.blit(fps, (self.track.im_w - 50, 700))
 
     def refresh_fitness_plot(self):
         self.fig_ax.clear()

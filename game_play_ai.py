@@ -11,7 +11,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 
 
 def run_play_ai(**kwargs):
-    # --- INIT Variable--- #
+    # --- INIT Variables--- #
     stop = False
 
     if "track_path" in kwargs:
@@ -26,7 +26,7 @@ def run_play_ai(**kwargs):
         # model_path = "results_training/first_result_race.h5"
         model_path = "results_training/tiny_izi_8144.h5"
 
-    # --- INIT PYGAME--- #
+    # --- INIT Game--- #
 
     game = GameSolo(nn_file_path=model_path,
                     track_path=track_path)
@@ -39,7 +39,7 @@ def run_play_ai(**kwargs):
                 stop = True  # On arrête la boucle
 
             keys = pygame.key.get_pressed()
-            if keys[pygame_const.K_r]:
+            if keys[pygame_const.K_r]: # If R is pressed, then reset
                 game.car.reset_car()
 
         # Refresh

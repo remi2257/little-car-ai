@@ -4,15 +4,19 @@ from src.Cars.CarAI import *
 
 class GameSolo(GamePlay):
     def __init__(self, nn_file_path=None, track_path="track/track1.tra"):
-
+        # Use super class
         GamePlay.__init__(self, track_path=track_path)
+        # Check if the player is Human by looking at the neural net file
         self.is_human = nn_file_path is None
 
         if self.is_human:
+            # Construct Human Car
             self.car = CarHuman(self.track, self.lidar_w, self.lidar_h)
         else:
+            # Construct AI Car
             self.car = CarAI(nn_file_path, self.track, self.lidar_w, self.lidar_h)
 
+        # Actualize Window
         self.actualize()
 
     def actualize(self):
@@ -21,16 +25,20 @@ class GameSolo(GamePlay):
         # BACKGROUND
         self.window.blit(self.background, (0, 0))
 
-        # Get Next Move
+        # Get Next Move for AI
         if not self.is_human:
             self.car.actualize_direction_and_gas(self.car.predict_next_move())
-
+        # Make next move
         self.car.move_car_and_refresh_LIDAR(self.window)
-        # self.car.refresh_fitness()
-        # self.display_fitness()
-        # PEDALS
+
+        # Display Fitness
+        self.car.refresh_fitness_v2()
+        self.display_fitness()
+        """"""
+        # PEDALS & Direction Arrows
         self.refresh_arrow_pedal()
 
+        # Display car on window
         self.window.blit(self.car.actual_img, self.car.get_position_left_top())
 
         # BOTS CAR
@@ -44,8 +52,8 @@ class GameSolo(GamePlay):
         pygame.display.flip()
 
     def gen_background(self):
-        self.gen_track_background()
-        self.gen_LIDAR_background()
+        self.gen_track_background()  # Draw roads
+        self.gen_LIDAR_background()  # Draw LIDAR rect
 
     def refresh_arrow_pedal(self):
         self.gen_arrows_pedals(self.car.last_dir_cmd, self.car.last_gas_cmd)

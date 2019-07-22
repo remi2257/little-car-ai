@@ -3,6 +3,10 @@ import pygame
 from src.const import *
 from src.Menu.Button import *
 
+'''
+You can press this button to launch an action
+'''
+
 
 class ButtonPress(Button):
     def __init__(self, x, y, action, path_img_off, path_img_on=None, path_img_push=None, button_w=menu_button_w):
