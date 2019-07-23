@@ -89,7 +89,8 @@ class GameDraw:
 
             if self.should_put_checkpoint:
                 self.grid_practicable[new_y][new_x] = True
-                self.grid_checkpoints[new_y][new_x] = True
+
+                self.grid_checkpoints[new_y][new_x] = not self.grid_checkpoints[new_y][new_x]
                 self.should_put_checkpoint = False
 
         for i in range(self.grid_h):

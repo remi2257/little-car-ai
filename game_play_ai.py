@@ -22,7 +22,7 @@ def run_play_ai(**kwargs):
     if "model_path" in kwargs:
         model_path = kwargs["model_path"]
     else:
-        # model_path = "raw_models/nn1.net"
+        # model_path = "raw_models/nn1_dual_layers.net"
         # model_path = "results_training/first_result_race.h5"
         model_path = "results_training/tiny_izi_8144.h5"
 

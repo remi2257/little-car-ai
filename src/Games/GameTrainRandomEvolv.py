@@ -7,7 +7,7 @@ matplotlib.use("Agg")
 
 
 class GameTrainRandomEvolv(GameTrain):
-    def __init__(self, nn_file_path="raw_models/nn1.net", track_path="track/track1.tra", save=True,
+    def __init__(self, nn_file_path="raw_models/nn1_dual_layers.net", track_path="track/track1.tra", save=True,
                  fps_max=FPS_MAX_init):
 
         GameTrain.__init__(self, nn_file_path, track_path, save, fps_max)
@@ -58,7 +58,8 @@ class GameTrainRandomEvolv(GameTrain):
             carAI.move_car_and_refresh_LIDAR()
 
             # refresh fitness
-            carAI.refresh_fitness_v1()
+            # carAI.refresh_fitness_v1()
+            carAI.refresh_fitness_v2()
 
         """
         # Get infos on fitness
@@ -111,8 +112,9 @@ class GameTrainRandomEvolv(GameTrain):
             self.save_gen_best_model()
 
         # -- CALCULATE NEW MUTATION RATE --#
-        ratio_fitness = max(1, self.carsAI[0].fitness) / self.max_fitness_possible
-        self.mutation_rate_best = self.get_mutation_rate(self.carsAI[0].fitness)
+        best_fitness = max(1, self.carsAI[0].fitness - self.carsAI[0].bonus_checkpoints)
+        ratio_fitness = best_fitness / self.max_fitness_possible
+        self.mutation_rate_best = self.get_mutation_rate(best_fitness)
         self.update_duration_limit(ratio_fitness)
         # self.mutation_rate *= decay_mutation_rate
 
@@ -184,7 +186,7 @@ class GameTrainRandomEvolv(GameTrain):
 
     #  New mutation rate which is directly link to the fitness
     def get_mutation_rate(self, fitness):
-        fitness = max(fitness,1)
+        fitness = max(fitness, 1)
         if fitness < 3000:
             return min(0.75, max(5.1844 * math.pow(fitness, -0.4584), 0.005))
         else:

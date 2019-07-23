@@ -41,7 +41,7 @@ nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
 weight_on_road = 10
 lower_bound_fitness = -1000
 
-boost_checkpoint = 500
+boost_checkpoint = 250
 
 max_mutation_rate = 1.0
 decay_mutation_rate = 0.95

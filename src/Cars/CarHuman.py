@@ -16,6 +16,7 @@ class CarHuman:
         self.y_speed = 0.0
         self.n_speed = 0.0
         self.fitness = 0
+        self.bonus_checkpoints = 0
 
         # Set startPosition
         self.x_init = track.init_car_x
@@ -152,6 +153,7 @@ class CarHuman:
         self.y_speed = 0.0
         self.n_speed = 0.0
         self.fitness = 0
+        self.bonus_checkpoints = 0
         self.time_outside_road = 0
 
         self.actual_img = pygame.transform.rotate(self.img, self.theta)
@@ -160,6 +162,8 @@ class CarHuman:
                                           self.y_init)
 
         self.refresh_LIDAR()
+
+        self.reset_checkpoints()
 
     def refresh_LIDAR(self, window=None):
         car_x, car_y = self.get_position_center()
@@ -214,6 +218,8 @@ class CarHuman:
 
             pygame.draw.circle(window, COLOR_BLUE, point_pos, 4, 2)
 
+    # ----Fitness & Checkpoints---#
+
     # Use some functions to calculate new fitness
     def refresh_fitness_v1(self):
         if self.on_road:
@@ -241,15 +247,17 @@ class CarHuman:
                         continue
                     if y_grid == checkpoint[0][0] and x_grid == checkpoint[0][1]:
                         self.fitness += boost_checkpoint
+                        self.bonus_checkpoints += boost_checkpoint
                         checkpoint[1] = False
-                        print("ON CHECKPOINT")
+                        # print("ON CHECKPOINT")
+                        break
 
                 if not any([cp[1] for cp in self.checkpoints]):
                     self.reset_checkpoints()
-                    print("RESET CHECKPOINT")
+                    # print("RESET CHECKPOINT")
         else:
             self.time_outside_road += 1
-            self.fitness -= (max(self.speed, 0) + self.time_outside_road) * weight_on_road / FPS_MAX_init
+            self.fitness -= max(self.speed, 0) * self.time_outside_road * weight_on_road / FPS_MAX_init
 
     def set_checkpoints(self, track):
         my_list = []

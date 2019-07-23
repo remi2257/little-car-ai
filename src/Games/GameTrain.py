@@ -13,7 +13,7 @@ matplotlib.use("Agg")
 
 
 class GameTrain(GamePlay):
-    def __init__(self, nn_file_path="raw_models/nn1.net", track_path="track/track1.tra", save=True,
+    def __init__(self, nn_file_path="raw_models/nn1_dual_layers.net", track_path="track/track1.tra", save=True,
                  fps_max=FPS_MAX_init):
         GamePlay.__init__(self, track_path=track_path, fps_max=fps_max)
 
