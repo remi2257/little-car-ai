@@ -14,6 +14,8 @@ class CarHuman:
         self.speed_max = track.speed_max
         self.x_speed = 0.0
         self.y_speed = 0.0
+        self.rest_pos_x = 0.0
+        self.rest_pos_y = 0.0
         self.n_speed = 0.0
         self.fitness = 0
         self.bonus_checkpoints = 0
@@ -85,27 +87,39 @@ class CarHuman:
         if not self.on_road:
             if (1 - exp(-self.n_speed / n0_speed)) > 0.3:
                 #  If speed at more than 30% of the maximum
-                self.n_speed = self.n_speed - 4
-                # self.n_speed = max(self.n_speed - 5, max_n_speed / 5)
+                # self.n_speed = self.n_speed - 4
+                self.speed = max(self.speed * 0.70, 0)
+                self.recalculate_n_speed()
 
-        if command == gas_BRAKE and self.speed > 0:
-            self.speed = max(self.speed - 2, 0)
-            self.n_speed = -n0_speed * math.log2(1 - (self.speed / self.speed_max))
-
-        elif command == gas_OFF:
+        if command == gas_OFF:
             self.speed = max(self.speed * 0.97, 0)
-            self.n_speed = -n0_speed * math.log2(1 - (self.speed / self.speed_max))
-        else:
-            if command == gas_BRAKE:
-                self.n_speed = max(self.n_speed - 2.0, -10)
+            self.recalculate_n_speed()
 
-            elif command == gas_ON:
-                self.n_speed = min(self.n_speed + 1.0, max_n_speed)
+        elif command == gas_BRAKE and self.speed > 1:
+            self.speed = max(self.speed * 0.90, 0)
+            self.recalculate_n_speed()
+        else:
+
+            if command == gas_BRAKE:
+                self.n_speed = max(self.n_speed - 2.0, -n0_speed / 2)
+
+            else:  # if command == gas_ON
+                if self.on_road:
+                    self.n_speed = min(self.n_speed + 1.0, max_n_speed)
+                else:
+                    self.n_speed = min(self.n_speed + .3, max_n_speed)
 
             if self.n_speed > 0:
                 self.speed = self.speed_max * (1 - exp(-self.n_speed / n0_speed))
             else:
-                self.speed = - 0.25 * self.speed_max * (1 - exp(self.n_speed / n0_speed))
+                self.speed = - 0.5 * self.speed_max * (1 - exp(self.n_speed / n0_speed))
+
+    def recalculate_n_speed(self):
+        if self.speed > 0:
+            self.n_speed = -n0_speed * math.log2(1 - (self.speed / self.speed_max))
+        else:
+            self.n_speed = n0_speed * math.log2(1 - (self.speed / self.speed_max))
+
 
     def reduce_all_speeds(self, fact):
         self.speed = max(self.speed - fact, 0)
@@ -114,24 +128,31 @@ class CarHuman:
 
     def calculate_new_angle(self, command):
         if command == wheel_LEFT:
-            self.theta += step_angle
+            self.theta += car_step_angle
         elif command == wheel_RIGHT:
-            self.theta -= step_angle
+            self.theta -= car_step_angle
 
         drift_fact = min(drift_factor_cst * math.pow(self.speed / self.speed_max, 2), drift_factor_max)
-        self.x_speed = drift_fact * self.x_speed + (1 - drift_fact) * round(self.speed * cos(radians(self.theta)))
-        self.y_speed = drift_fact * self.y_speed + (1 - drift_fact) * round(-self.speed * sin(radians(self.theta)))
+        self.x_speed = drift_fact * self.x_speed + (1 - drift_fact) * round(self.speed * cos(radians(self.theta)), 6)
+        self.y_speed = drift_fact * self.y_speed + (1 - drift_fact) * round(-self.speed * sin(radians(self.theta)), 6)
 
     def move_car(self):
-        self.position_car = self.position_car.move(self.x_speed,
-                                                   self.y_speed)
+        # The fact is that pygame delete post comma digits
+        # We save them !
+        # print(50 * "*")
+        # print("Before : {} / {}".format(self.rest_pos_x, self.rest_pos_y))
+        self.rest_pos_x, x_move_int = math.modf(self.x_speed + self.rest_pos_x)
+        self.rest_pos_y, y_move_int = math.modf(self.y_speed + self.rest_pos_y)
+
+        # print("After : {} / {}".format(self.rest_pos_x, self.rest_pos_y))
+        self.position_car = self.position_car.move(x_move_int,
+                                                   y_move_int)
 
     def move_car_and_refresh_LIDAR(self, window=None):
         # Car
         self.move_car()
         # Window
         self.refresh_LIDAR(window)
-
         self.on_road = self.lidar_filtered[self.lidar_grid_car_y][self.lidar_grid_car_x]
 
     def get_position_left_top(self):
@@ -151,6 +172,8 @@ class CarHuman:
         self.speed = 0.0
         self.x_speed = 0.0
         self.y_speed = 0.0
+        self.rest_pos_x = 0.0
+        self.rest_pos_y = 0.0
         self.n_speed = 0.0
         self.fitness = 0
         self.bonus_checkpoints = 0
@@ -251,7 +274,7 @@ class CarHuman:
                         checkpoint[1] = False
                         # print("ON CHECKPOINT")
                         break
-
+                #  Todo Ne pas reset directement les CP sinon ça fait doublon
                 if not any([cp[1] for cp in self.checkpoints]):
                     self.reset_checkpoints()
                     # print("RESET CHECKPOINT")
@@ -265,7 +288,7 @@ class CarHuman:
             x, y = self.get_position_center()
             x_grid = x // self.track.grid_size
             y_grid = y // self.track.grid_size
-            if x_grid!=checkpoint[1] or y_grid != checkpoint[0]:
+            if x_grid != checkpoint[1] or y_grid != checkpoint[0]:
                 my_list.append([checkpoint, True])
             else:
                 my_list.append([checkpoint, False])

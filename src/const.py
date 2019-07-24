@@ -48,7 +48,7 @@ decay_mutation_rate = 0.95
 
 copy_mutation_rate = 0.08
 
-generation_duration_max_sec = 30
+generation_duration_max_sec = 20
 generation_duration_max_frame = generation_duration_max_sec * FPS_MAX_init
 
 generation_duration_init_sec = 1
@@ -71,9 +71,9 @@ speed_max_raw = 300.0  # Speed has to be divide by number of cases
 n0_speed = 15.0
 max_n_speed = 40
 
-step_dir = 6.0
+step_dir = 9.0
 
-step_angle = 7.0
+car_step_angle = 5.0
 
 drift_factor_cst = 1.3
 drift_factor_max = 0.93

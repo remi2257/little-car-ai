@@ -1,6 +1,6 @@
 import random
 
-from keras.layers import Dense, Input
+from keras.layers import Dense, Input, Conv2D, MaxPool2D, Flatten, Add
 from keras.models import Model, load_model
 
 from src.const import *
@@ -11,13 +11,69 @@ C'est de là que c'est un AI !
 
 
 class NeuralNet:
-    def __init__(self, nn_file_path=None):
+    def __init__(self, nn_file_path=None, cnn=False):
         if nn_file_path is None:
             self.model = None
         elif nn_file_path.endswith(".net"):
-            self.model = self.gen_nn_model(nn_file_path)
+            if cnn:
+                self.model = self.gen_cnn_model(nn_file_path)
+            else:
+                self.model = self.gen_nn_model(nn_file_path)
         elif nn_file_path.endswith(".h5"):
             self.model = load_model(nn_file_path)
+
+    def gen_cnn_model(self, nn_file_path):
+        model_struc = []
+        softmax_classes = 3
+        input_dim_cnn = height_LIDAR * width_LIDAR
+        extra_data_dim = 1
+        with open(nn_file_path) as f:
+            lines_raw = f.readlines()
+            lines = [line.strip() for line in lines_raw if line != "\n"]
+
+        for line in lines:
+            if line[0].startswith("#"):
+                continue
+            if line[0].startswith("["):
+                continue
+
+            line = line.split(" ")
+            # if line[0] == "input_dim":
+            #     input_dim = int(line[-1])
+            if line[0] == "neurons":
+                model_struc.append([int(line[-1])])
+            if line[0] == "activation":
+                model_struc[-1].append(line[-1].lower())
+            if line[0] == "classes":
+                softmax_classes = int(line[-1])
+
+        inp_data = Input((extra_data_dim,), name='data_input')
+
+        inp_cnn = Input((height_LIDAR, width_LIDAR, 1), name='cnn_input')
+
+        cnn = Conv2D(filters=8, kernel_size=(3, 3), padding='Same',
+                     activation='relu')(inp_cnn)
+        cnn = Conv2D(filters=8, kernel_size=(3, 3), padding='Same',
+                     activation='relu')(cnn)
+        cnn = MaxPool2D(pool_size=(2, 2), strides=(2, 2))(cnn)
+
+        cnn = Flatten()(cnn)
+        cnn_output = Dense(5, activation="relu")(cnn)
+
+        # main_inp = Input((cnn_output, extra_data_dim), name='main_input')
+        main_inp = Add(name='main_input')([cnn_output, inp_data])
+
+        neurons, activ_func = model_struc.pop(0)
+        big_model = Dense(neurons, activation=activ_func, name='dense_main_1')(main_inp)
+
+        for i, layer in enumerate(model_struc):
+            neurons, activ_func = layer
+            big_model = Dense(neurons, activation=activ_func, name="dense_main_" + str(i + 2))(big_model)
+
+        out1 = Dense(softmax_classes, activation="softmax", name='output_dir')(big_model)
+        out2 = Dense(softmax_classes, activation="softmax", name='output_gas')(big_model)
+
+        return Model(inputs=[inp_cnn, inp_data], outputs=[out1, out2])
 
     def gen_nn_model(self, nn_file_path):
         model_struc = []
@@ -96,12 +152,8 @@ class NeuralNet:
 
 
 if __name__ == '__main__':
-    nn = NeuralNet("raw_models/nn_tiny.net")
+    from keras.utils import plot_model
 
-    nn2 = NeuralNet("raw_models/nn_tiny.net")
-    nn2.mutate_model_from_query(nn, 0.9)
-    # print(nn.model.summary())
-    print(nn.model.get_weights())
-    print(nn2.model.get_weights())
+    nn = NeuralNet("raw_models/nn_tiny.net", cnn=True)
 
-    # plot_model(nn.model, to_file='raw_models/model_plot.png', show_shapes=True, show_layer_names=True)
+    plot_model(nn.model, to_file='raw_models/model_plot.png', show_shapes=True, show_layer_names=True)

@@ -50,7 +50,7 @@ class Track:
                     self.checkpoints.append([i, j])
 
         if len(self.checkpoints) == 1:
-            self.checkpoints = None
+            self.checkpoints = []
 
     def look_for_start_point(self):
         sum_add = 0

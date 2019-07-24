@@ -17,9 +17,13 @@ class CarAI(CarHuman):
         self.img_leader = pygame.transform.rotate(gen_car_img(track, path_viper), 270.0)
         self.img_survivor = pygame.transform.rotate(gen_car_img(track, path_car_survivor), 270.0)
 
-    def get_inputs(self):
+    def get_inputs_v1(self):
         return np.append(self.speed, np.array(self.lidar_filtered).reshape((-1))
                          .astype(int)).astype(float)
+
+    def get_inputs(self):
+        return np.append(np.array(self.lidar_filtered).reshape((-1))
+                         .astype(int), self.speed / self.speed_max).astype(float)
 
     def predict_next_move(self):
         inputs = self.get_inputs()
