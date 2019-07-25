@@ -1,6 +1,6 @@
 import random
 
-from keras.layers import Dense, Input, Conv2D, MaxPool2D, Flatten, Add
+from keras.layers import Dense, Input, Conv2D, MaxPool2D, Flatten, Concatenate
 from keras.models import Model, load_model
 
 from src.const import *
@@ -11,11 +11,13 @@ C'est de là que c'est un AI !
 
 
 class NeuralNet:
-    def __init__(self, nn_file_path=None, cnn=False):
+    def __init__(self, nn_file_path=None):
+
+        self.is_cnn = "cnn" in nn_file_path
         if nn_file_path is None:
             self.model = None
         elif nn_file_path.endswith(".net"):
-            if cnn:
+            if self.is_cnn:
                 self.model = self.gen_cnn_model(nn_file_path)
             else:
                 self.model = self.gen_nn_model(nn_file_path)
@@ -25,7 +27,7 @@ class NeuralNet:
     def gen_cnn_model(self, nn_file_path):
         model_struc = []
         softmax_classes = 3
-        input_dim_cnn = height_LIDAR * width_LIDAR
+        input_dim_cnn = tuple([height_LIDAR, width_LIDAR, 1])
         extra_data_dim = 1
         with open(nn_file_path) as f:
             lines_raw = f.readlines()
@@ -49,19 +51,19 @@ class NeuralNet:
 
         inp_data = Input((extra_data_dim,), name='data_input')
 
-        inp_cnn = Input((height_LIDAR, width_LIDAR, 1), name='cnn_input')
+        inp_cnn = Input(input_dim_cnn, name='cnn_input')
 
-        cnn = Conv2D(filters=8, kernel_size=(3, 3), padding='Same',
-                     activation='relu')(inp_cnn)
-        cnn = Conv2D(filters=8, kernel_size=(3, 3), padding='Same',
-                     activation='relu')(cnn)
+        cnn = Conv2D(filters=8, kernel_size=(2, 2), padding='Same',
+                     activation='relu', trainable=False)(inp_cnn)
+        cnn = Conv2D(filters=8, kernel_size=(2, 2), padding='Same',
+                     activation='relu', trainable=False)(cnn)
         cnn = MaxPool2D(pool_size=(2, 2), strides=(2, 2))(cnn)
 
         cnn = Flatten()(cnn)
-        cnn_output = Dense(5, activation="relu")(cnn)
+        cnn_output = Dense(7, activation="relu")(cnn)
 
         # main_inp = Input((cnn_output, extra_data_dim), name='main_input')
-        main_inp = Add(name='main_input')([cnn_output, inp_data])
+        main_inp = Concatenate(name='main_input')([cnn_output, inp_data])
 
         neurons, activ_func = model_struc.pop(0)
         big_model = Dense(neurons, activation=activ_func, name='dense_main_1')(main_inp)
@@ -122,11 +124,11 @@ class NeuralNet:
             for weight_array in layer.get_weights():
                 save_shape = weight_array.shape
                 one_dim_weight = weight_array.reshape(-1)
-
-                for i, weight in enumerate(one_dim_weight):
-                    if random.random() <= mutate_rate:
-                        # one_dim_weight[i] = random.uniform(0, 2) - 1
-                        one_dim_weight[i] = random.gauss(0, 0.4)
+                if layer.trainable:
+                    for i, weight in enumerate(one_dim_weight):
+                        if random.random() <= mutate_rate:
+                            # one_dim_weight[i] = random.uniform(0, 2) - 1
+                            one_dim_weight[i] = random.gauss(0, 0.4)
 
                 new_weight_array = one_dim_weight.reshape(save_shape)
                 new_weights_for_layer.append(new_weight_array)
@@ -154,6 +156,14 @@ class NeuralNet:
 if __name__ == '__main__':
     from keras.utils import plot_model
 
-    nn = NeuralNet("raw_models/nn_tiny.net", cnn=True)
+    nn = NeuralNet("raw_models/cnn_standard.net")
+    nn2 = NeuralNet("raw_models/cnn_standard.net")
+    # nn2 = NeuralNet("raw_models/nn_tiny.net")
+
+    nn2.mutate_model_from_query(nn, 0.9)
+    # print(nn.model.summary())
+    # print(nn2.model.summary())
+    # print(nn.model.get_weights())
+    # print(nn2.model.get_weights())
 
     plot_model(nn.model, to_file='raw_models/model_plot.png', show_shapes=True, show_layer_names=True)

@@ -1,7 +1,7 @@
 import math
 
 from src.Games.GameTrain import *
-from src.Cars.CarAI import CarAI
+from src.Cars.CarAI import *
 
 matplotlib.use("Agg")
 
@@ -77,7 +77,7 @@ class GameTrainRandomEvolv(GameTrain):
         self.best_actual_fitness = max(list_fitness)
         # Save Best fitness value
         self.best_fitness_list[-1] = self.best_actual_fitness
-        self.best_fitness_ever = max(self.best_fitness_ever, self.best_actual_fitness)
+        # self.best_fitness_ever = max(self.best_fitness_ever, self.best_actual_fitness)
 
         # -- DISPLAY--#
         # AI's CARS
@@ -124,10 +124,13 @@ class GameTrainRandomEvolv(GameTrain):
         best_fitness_square = np.array(best_cars_fitness) ** 2
         weight_best_fitness = best_fitness_square / np.sum(best_fitness_square)
 
+        if self.carsAI[0].fitness > self.best_fitness_ever:
+            self.best_fitness_ever = self.carsAI[0].fitness
+
         # -- APPLY MUTATION --#
         for i, car in enumerate(self.carsAI):
             car.reset_car_ai()
-            if i < nbr_survivors:
+            if i < nbr_survivors or car.is_best_ever:
                 car.is_survivor = True
             else:
                 car.is_survivor = False
@@ -214,3 +217,9 @@ class GameTrainRandomEvolv(GameTrain):
 
     def get_forward_speed(self, n_speed):
         return self.track.speed_max * (1 - math.exp(-n_speed / n0_speed))
+
+    def reset_best_ever(self):
+        for carAI in self.carsAI:
+            carAI.is_best_ever = False
+
+        self.carsAI[0].is_best_ever = True

@@ -33,8 +33,8 @@ models_path = "raw_models/"
 
 trained_model_path = "results_training/"
 
-nbr_AI_per_gen = 50
-rate_survivors = 0.2
+nbr_AI_per_gen = 28
+rate_survivors = 0.25
 
 nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
 
