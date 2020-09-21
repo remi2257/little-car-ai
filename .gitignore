@@ -1,4 +1,4 @@
 .idea/
-results_training_dev/
-track_dev/
-TODO_dev
+dev/*
+
+src/test_dev.py

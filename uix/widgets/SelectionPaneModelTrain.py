@@ -2,26 +2,28 @@ import os
 
 import pygame
 
-from src.Menu.SelectionPane import *
+from uix.widgets.SelectionPane import *
 
 """
-Architecture selection
+Trained model selection
 """
 
 
-class SelectionPaneModelRaw(SelectionPane):
+class SelectionPaneModelTrain(SelectionPane):
     def __init__(self):
         SelectionPane.__init__(self)
 
         self.x = big_window_haut // 2 + int(3 * menu_button_w / 5)
-        self.y = 2 * big_window_haut // 3
-        self.title = "Model's Design ?"
+        self.y = big_window_haut // 3
+        self.title = "Trained Model ?"
 
-        self.folder = models_path
-        self.extension = ".net"
+        self.folder = trained_model_path
+        self.extension = ".h5"
 
-        list_sorted = sorted([f for f in os.listdir(self.folder) if f.endswith(self.extension)])
-        self.list_nn = [track.split(".")[0] for track in list_sorted]
+        self.list_nn = sorted([f for f in os.listdir(self.folder) if f.endswith(self.extension)])
+        self.list_nn = [track.split(".")[0] for track in self.list_nn]
+
+        self.list_nn.insert(0, "None")
 
         self.list_y_text = [self.y + i * self.font_h for i in range(len(self.list_nn))]
 
@@ -55,4 +57,6 @@ class SelectionPaneModelRaw(SelectionPane):
         return None
 
     def get_item_path(self):
+        if self.list_nn[self.chosen_id] == "None":
+            return None
         return self.folder + self.list_nn[self.chosen_id] + self.extension

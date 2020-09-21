@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from src.Menu.SelectionPane import *
+from uix.widgets.SelectionPane import *
 
 """
 Track selection

@@ -1,7 +1,5 @@
-import math
-
-from src.Games.GameTrain import *
-from src.Cars.CarAI import *
+from uix.screens.ScreenTrain import *
+from src.cars.CarAI import *
 
 matplotlib.use("Agg")
 
@@ -149,7 +147,7 @@ class GameTrainRandomEvolv(GameTrain):
         self.gen_track_background()
 
     def display_infos_fitness_n_FPS(self):
-        x = self.track.im_w - round(0.7 * self.track.grid_size)
+        x = self.track.__im_w - round(0.7 * self.track.grid_size)
         ind = 0
         text_fitness = self.font.render("Fitness - Gen {}".format(self.gen_id), True, COLOR_BLUE)
         self.window.blit(text_fitness, (x, self.list_y_text[ind]))
@@ -223,3 +221,52 @@ class GameTrainRandomEvolv(GameTrain):
             carAI.is_best_ever = False
 
         self.carsAI[0].is_best_ever = True
+
+def run_train(**kwargs):
+    # --- INIT Variable--- #
+
+    stop = False
+
+    if "track_path" in kwargs:
+        track_path = kwargs["track_path"]
+    else:
+        track_path = list_track[0]
+
+    if "model_path" in kwargs:
+        model_path = kwargs["model_path"]
+    else:
+        model_path = "raw_models/nn_tiny.net"
+
+    if "save_train" in kwargs:
+        save = kwargs["save_train"]
+    else:
+        save = True
+
+    # --- INIT Game--- #
+
+    game = GameTrainRandomEvolv(
+        nn_file_path=model_path,
+
+        track_path=track_path,
+
+        save=save,
+
+        fps_max=FPS_MAX_max,
+    )
+
+    # Boucle infinie
+    while not stop:
+        for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
+            if event.type == pygame_const.QUIT or (
+                    event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
+                stop = True  # On arrête la boucle
+            if event.type == pygame_const.KEYDOWN and event.key == pygame_const.K_DOWN:
+                game.decrease_FPS()
+            if event.type == pygame_const.KEYDOWN and event.key == pygame_const.K_UP:
+                game.increase_FPS()
+
+        # Refresh
+        game.actualize()
+
+if __name__ == '__main__':
+    run_train()

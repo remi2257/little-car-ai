@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.Cars.CarHuman import *
-from src.Games.NeuralNet import *
+from src.cars.CarHuman import *
+from src.objects.NeuralNet import *
 
 
 class CarAI(CarHuman):

@@ -1,18 +1,19 @@
-from game_draw_map import run_draw_map
-from game_play_ai import run_play_ai
-from game_play_human import run_play_human
-from game_train import run_train
-from src.Menu.ButtonOnOff import *
-from src.Menu.ButtonPress import *
-from src.Menu.SelectionPaneModelRaw import *
-from src.Menu.SelectionPaneModelTrain import *
-from src.Menu.SelectionPaneTrack import *
+from uix.screens.ScreenDrawTrack import run_draw_map
+from uix.screens.ScreenSolo  import run_play_ai
+from uix.screens.ScreenSolo import run_play_human
+from uix.screens.ScreenTrainEvolv import run_train
+
+from uix.widgets.ButtonOnOff import *
+from uix.widgets.ButtonPress import *
+from uix.widgets.SelectionPaneModelRaw import *
+from uix.widgets.SelectionPaneModelTrain import *
+from uix.widgets.SelectionPaneTrack import *
 
 # List functions which should be linked to buttons
 actions = [run_play_human, run_play_ai, run_train, run_draw_map]
 
 
-class MenuWindow:
+class ScreenHome:
     def __init__(self):
         pygame.init()
 
@@ -151,3 +152,34 @@ def gen_logo_img(path_img):
 
     img_resize = pygame.transform.scale(img, (new_width, new_height))
     return img_resize
+
+
+def run_home_screen():
+    # --- INIT Variable--- #
+
+    should_stop = None
+
+    # --- INIT Menu Window --- #
+
+    game = ScreenHome()
+
+    # Boucle infinie
+    while not should_stop:
+        for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
+            if event.type == pygame_const.QUIT or (
+                    event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
+                should_stop = True  # On arrête la boucle
+            if event.type == pygame_const.MOUSEBUTTONDOWN:  # If Push Mouse's button
+                game.is_holding = True
+            if event.type == pygame_const.MOUSEBUTTONUP:  # If release Mouse's button
+                game.is_holding = False
+                game.run_action_selected()  # This release mean a click, so we execute linked action
+        pos = pygame.mouse.get_pos()
+
+        game.actualize(pos)  # Actualize window
+
+    # return stop
+
+
+if __name__ == '__main__':
+    run_home_screen()

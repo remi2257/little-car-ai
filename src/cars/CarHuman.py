@@ -3,7 +3,7 @@ import pygame
 from math import cos, sin, radians, exp
 
 from src.const import *
-from src.Games.Track import Track
+from src.objects.Track import Track
 
 
 class CarHuman:

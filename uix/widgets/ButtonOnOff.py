@@ -1,7 +1,4 @@
-import pygame
-
-from src.const import *
-from src.Menu.Button import *
+from uix.widgets.Button import *
 
 '''
 You can either select it or not

@@ -1,11 +1,38 @@
 import pygame.locals as pygame_const
 from math import ceil
+import os
 
-from src.func import get_screen_infos_linux
+
+def get_screen_infos_linux(ratio_screen_window):
+    import subprocess
+
+    cmd = ['xrandr']
+    cmd2 = ['grep', '*']
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(cmd2, stdin=p.stdout, stdout=subprocess.PIPE)
+    p.stdout.close()
+
+    resolution_string, junk = p2.communicate()
+    resolution = resolution_string.split()[0].decode('utf8')
+    width, height = resolution.split('x')
+    # print(width,height)
+    return int(int(width) // ratio_screen_window), int(int(height) // ratio_screen_window)
+
+
+def get_screen_infos(ratio_screen_window):
+    import tkinter
+
+    root = tkinter.Tk()
+    width = root.winfo_screenwidth()
+    height = root.winfo_screenheight()
+
+    return int(int(width) // ratio_screen_window), int(int(height) // ratio_screen_window)
+
 
 # -----ENV---- #
 game_name = "Little Car AI"
-background_path = "images/background.jpg"
+images_path = "uix/images/"
+background_path = os.path.join(images_path, "background.jpg")
 
 ratio_screen_window = 1.2
 big_window_larg, big_window_haut = get_screen_infos_linux(ratio_screen_window)
@@ -13,8 +40,6 @@ big_window_larg, big_window_haut = get_screen_infos_linux(ratio_screen_window)
 # big_window_haut = big_window_larg
 # big_window_haut = 900  # 720
 
-draw_w_grid = 32
-draw_h_grid = 24
 
 # ---INIT PARAMETERS ---#
 init_car_x = 260.0
@@ -203,13 +228,7 @@ COLORS_BRIGHT = [COLOR_GREEN_BRIGHT, COLOR_RED_BRIGHT, COLOR_BLUE_BRIGHT, COLOR_
 
 # Stupid Name
 
-track_names_list = [
-    "hardcore_track",
-    "Legendary",
-    "Stronger",
-    "Better",
-    "Faster",
-]
+
 
 # -- MENU -- #
 # 521 x 246 = ratio de 2.13

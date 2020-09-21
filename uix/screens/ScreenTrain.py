@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pylab
 from matplotlib.ticker import MaxNLocator
 
-from src.Games.GamePlay import *
+from uix.screens.ScreenPlay import *
 
 matplotlib.use("Agg")
 
@@ -44,7 +44,7 @@ class GameTrain(GamePlay):
 
         #  Plot settings
         #  1 px =	0.010416666666819 inches
-        l_fig = 2.3 * 0.010416666666819 * (self.window_w - self.track.im_w)
+        l_fig = 2.3 * 0.010416666666819 * (self.window_w - self.track.__im_w)
         self.fig = pylab.figure(figsize=[l_fig, l_fig],  # Inches
                                 dpi=50,
                                 )
@@ -77,7 +77,7 @@ class GameTrain(GamePlay):
 
         surf = pygame.image.fromstring(raw_data, size, "RGB")
         # self.window.blit(surf, (self.track.im_w - 50, 400))
-        self.background.blit(surf, (self.track.im_w - 50, 400))
+        self.background.blit(surf, (self.track.__im_w - 50, 400))
 
     def save_gen_best_model(self):
         new_model_name = self.save_folder_model + "Gen_{}_Fitness_{}.h5".format(self.gen_id,
