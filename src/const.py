@@ -1,14 +1,14 @@
 import pygame.locals as pygame_const
 from math import ceil
 
-from src.func import get_screen_infos
+from src.func import get_screen_infos_linux
 
 # -----ENV---- #
 game_name = "Little Car AI"
 background_path = "images/background.jpg"
 
 ratio_screen_window = 1.2
-big_window_larg, big_window_haut = get_screen_infos(ratio_screen_window)
+big_window_larg, big_window_haut = get_screen_infos_linux(ratio_screen_window)
 # big_window_larg = 1600  # 1280
 # big_window_haut = big_window_larg
 # big_window_haut = 900  # 720

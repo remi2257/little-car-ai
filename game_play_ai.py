@@ -7,7 +7,7 @@ from src.Games.GameSolo import GameSolo
 from src.const import *
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.logging.set_verbosity(tf.logging.ERROR)
+# tf.logging.set_verbosity(tf.logging.ERROR)
 
 
 def run_play_ai(**kwargs):
@@ -24,7 +24,7 @@ def run_play_ai(**kwargs):
     else:
         # model_path = "raw_models/nn1_dual_layers.net"
         # model_path = "results_training/first_result_race.h5"
-        model_path = "results_training/tiny_izi_8144.h5"
+        model_path = "results_training_dev/tiny_izi_8144.h5"
 
     # --- INIT Game--- #
 

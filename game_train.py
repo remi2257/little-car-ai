@@ -7,7 +7,7 @@ from src.Games.GameTrainRandomEvolv import GameTrainRandomEvolv
 from src.const import *
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.logging.set_verbosity(tf.logging.ERROR)
+# tf.logging.set_verbosity(tf.logging.ERROR)
 
 
 def run_train(**kwargs):

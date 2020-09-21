@@ -1,4 +1,4 @@
-def get_screen_infos(ratio_screen_window):
+def get_screen_infos_linux(ratio_screen_window):
     import subprocess
 
     cmd = ['xrandr']
@@ -11,4 +11,14 @@ def get_screen_infos(ratio_screen_window):
     resolution = resolution_string.split()[0].decode('utf8')
     width, height = resolution.split('x')
     # print(width,height)
+    return int(int(width) // ratio_screen_window), int(int(height) // ratio_screen_window)
+
+
+def get_screen_infos(ratio_screen_window):
+    import tkinter
+
+    root = tkinter.Tk()
+    width = root.winfo_screenwidth()
+    height = root.winfo_screenheight()
+
     return int(int(width) // ratio_screen_window), int(int(height) // ratio_screen_window)
