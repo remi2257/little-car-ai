@@ -87,9 +87,10 @@ path_train_save = "results_training/"
 
 # -- CAR PARAMETERS -- #
 nbr_bots = 0
-path_audi = "images/vehicles/Audi.png"
-path_viper = "images/vehicles/Black_viper.png"
-path_car_survivor = "images/vehicles/Car.png"
+path_vehicles = os.path.join(images_path, "vehicles")
+path_audi = os.path.join(path_vehicles, "Audi.png")
+path_viper = os.path.join(path_vehicles, "Black_viper.png")
+path_car_survivor = os.path.join(path_vehicles, "Car.png")
 
 # SPEED/MOVEMENT
 speed_max_raw = 300.0  # Speed has to be divide by number of cases
@@ -130,7 +131,7 @@ wheel_LEFT, wheel_RIGHT, wheel_NONE = 3, 4, 5
 width_arrows_pedals = round(big_window_haut / 12)
 offset_arrows_pedals = round(big_window_haut / 20)
 
-im_others_path = "images/others/"
+im_others_path = os.path.join(images_path, "others/")
 
 img_pedals_arrows = {
     gas_ON: im_others_path + "pedals_gas.png",
@@ -142,7 +143,7 @@ img_pedals_arrows = {
 }
 
 # -- TRACK -- #
-road_path = "images/road/"
+road_path = os.path.join(images_path, "road/")
 
 track_part_1w = {
     "x": None,
@@ -203,7 +204,7 @@ track_part_1w_practicable = {
 
 }
 
-track_files_path = "track/"
+track_files_path = "tracks/"
 list_track = [
     "track/track0.tra",
     "track/track1.tra",
@@ -227,7 +228,6 @@ COLORS_LIGHT = [COLOR_GREEN_LIGHT, COLOR_RED_LIGHT, COLOR_BLUE_LIGHT, COLOR_GREE
 COLORS_BRIGHT = [COLOR_GREEN_BRIGHT, COLOR_RED_BRIGHT, COLOR_BLUE_BRIGHT, COLOR_GREEN_BRIGHT]
 
 # Stupid Name
-
 
 
 # -- MENU -- #

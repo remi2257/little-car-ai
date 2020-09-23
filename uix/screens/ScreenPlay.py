@@ -5,7 +5,7 @@ from src.objects.Track import *
 
 
 class GamePlay:
-    def __init__(self, track_path="track/track1.tra", fps_max=FPS_MAX_init):
+    def __init__(self, track_path, fps_max=FPS_MAX_init):
         # Init PyGame
         pygame.init()
 

@@ -9,7 +9,7 @@ class Track:
         # Open and parse track file
         self.grid_raw, self.grid_h, self.grid_w = parse_track_file(track_path)
 
-        #  Longeur & Largeur d'une case
+        # Longeur & Largeur d'une case
         self.grid_size = min(big_window_haut // self.grid_h, big_window_larg // self.grid_w)
 
         # Taille de l'affichage du circuit
@@ -18,14 +18,14 @@ class Track:
 
         # --Car--#
         self.speed_max = speed_max_raw / max(self.grid_h, self.grid_w)
-        self.double_road = double_road  #  If double road, car are 2 times less wide than road
+        self.double_road = double_road  # If double road, car are 2 times less wide than road
         self.car_size = self.grid_size // (1 + int(self.double_road))
 
         # Checkpoints
         self.checkpoints = []  # Grid Coordinates - Not x/y   # [self.init_car_grid_y, self.init_car_grid_x]
         self.last_checkpoint_id = 0
 
-        #  Infos on track
+        # Infos on track
         self.grid_practicable = np.zeros((self.grid_h, self.grid_w), dtype=bool)
         self.start_spots_bot = []
         self.init_grid_n_checkp()
@@ -70,13 +70,28 @@ def parse_track_file(track_path):
     try:
         with open(track_path) as f:
             lines_raw = f.readlines()
-            lines = [line.strip() for line in lines_raw if line != "\n"]
-            grid = [line.split(" ") for line in lines]
+            grid = [line.strip().split() for line in lines_raw if line != "\n"]
     except FileNotFoundError as e:
         import sys
         print(e, "Bye bye")
         sys.exit(3)
     return grid, len(grid), len(grid[0])
+
+
+def gen_track_background(track, background):
+    # start_points = []
+    # Browse Track
+    for i in range(track.grid_h):
+        for j in range(track.grid_w):
+            small_name = track.grid_raw[i][j]
+            if "x" in small_name:  # If grass, background already good
+                continue
+
+            im_name = road_path + "road_{}.png".format(small_name)
+            im = pygame.image.load(im_name).convert_alpha()
+            im = pygame.transform.scale(im, (track.grid_size, track.grid_size))
+
+            background.blit(im, (track.grid_size * j, track.grid_size * i))
 
 
 class Checkpoint:
@@ -95,7 +110,11 @@ class Checkpoint:
 
 
 if __name__ == '__main__':
+    from src.const import background_path
     import pygame.locals as pygame_const
+
+    track_ = Track("tracks/Legendary_1.tra")
+    print(track_.grid_raw)
 
     pygame.init()
     pygame.time.Clock().tick(30)
@@ -104,11 +123,8 @@ if __name__ == '__main__':
 
     window = pygame.display.set_mode((big_window_larg, big_window_haut), )  # RESIZABLE
 
-    background_path = "images/background.jpg"
     background_im = pygame.image.load(background_path).convert()
-
-    track = Track("track/track1.tra", background_im)
-    print(track.grid_raw)
+    gen_track_background(track_, background_im)
 
     window.blit(background_im, (0, 0))
 

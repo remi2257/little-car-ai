@@ -34,12 +34,17 @@ class Grid:
 
     def __init__(self, grid_h, grid_w):
         self.__grid = np.zeros((grid_h, grid_w), dtype=object)
+        self.__missing_grid = np.zeros((grid_h, grid_w), dtype=bool)
         self.clean_grid()
 
     def clean_grid(self):
         for i in range(self.__grid.shape[0]):
             for j in range(self.__grid.shape[1]):
                 self.__grid[i][j] = Grid.Case.GRASS
+        self.reset_missing()
+
+    def reset_missing(self):
+        self.__missing_grid.fill(False)
 
     def is_practicable(self, i, j):
         return self.__grid[i][j].value > 0
@@ -57,21 +62,29 @@ class Grid:
         return self.__grid[i][j] == Grid.Case.GRASS
 
     def get_color(self, i, j):
+        if self.__missing_grid[i][j]:
+            return self.colors_dict[Grid.Case.MISSING]
         return self.colors_dict[self.__grid[i][j]]
 
-    def invert_case(self, i, j):
+    def invert_road_grass(self, i, j):
         val = self.__grid[i][j].value
         if val > 0:
             self.__grid[i][j] = Grid.Case.GRASS
         else:
             self.__grid[i][j] = Grid.Case.ROAD
 
-    def set_as_checkpoint(self, i, j):
-        self.__grid[i][j] = Grid.Case.CHECKPOINT
+    def set_unset_checkpoint(self, i, j):
+        if self.__grid[i][j] != Grid.Case.CHECKPOINT:
+            self.__grid[i][j] = Grid.Case.CHECKPOINT
+        else:
+            self.__grid[i][j] = Grid.Case.ROAD
+
+    def set_as_missing(self, i, j):
+        self.__missing_grid[i][j] = True
 
     @property
     def practicable(self):
-        return np.where(self.__grid in [Grid.Case.ROAD, Grid.Case.CHECKPOINT], True, False)
+        return np.where((self.__grid == Grid.Case.ROAD) | (self.__grid == Grid.Case.CHECKPOINT), True, False)
 
     @property
     def checkpoints(self):
@@ -107,13 +120,6 @@ class ScreenDrawTrack:
         self.__gen_track_background()
 
         # -- Grid manipulation arrays
-        # # Grid practicable contains whereas each case contains road (True) or grass (False)
-        # self.__grid_practicable = Grid(self.__grid_height, self.__grid_width)
-        # # Grid containing missing circuit part
-        # self.__missing_parts = self.generate_grid_false()
-        # # Grid contraining checkpoint
-        # self.__grid_checkpoints = self.generate_grid_false()
-
         self.__grid = Grid(self.__grid_height, self.__grid_width)
 
         # True if next point is checkpoint
@@ -123,8 +129,8 @@ class ScreenDrawTrack:
         self.__grid_checkpoints_cut = None
 
         # - Mouse infos
-        self.__mouse_last_x = 0
-        self.__mouse_last_y = 0
+        self.__mouse_last_x = -1
+        self.__mouse_last_y = -1
         self.__mouse_is_holding_left = False
 
         # - Saving option
@@ -133,12 +139,7 @@ class ScreenDrawTrack:
         # For Saving
         self.__track_id = 0
         self.__track_raw_name = choice(track_names_list)
-        self.__track_name = "track/{}_{}.tra".format(self.__track_raw_name, self.__track_id)
-        # self.button_save = ButtonPress(self.im_w - 3 * self.grid_size, self.im_h - 3 * self.grid_size,
-        #                                action=self.__save_map,
-        #                                path_img_off=button_save_off,
-        #                                path_img_push=button_save_on,
-        #                                button_w=3 * self.grid_size)
+        self.__track_name = ""
 
         # Finish init by generating the first image !
         self.actualize()
@@ -174,27 +175,19 @@ class ScreenDrawTrack:
 
         if self.__mouse_is_holding_left:  # If button is pushed
             if self._mouse_has_moved(new_x, new_y):
-                # self.__grid_practicable[new_y][new_x] = not self.__grid_practicable[new_y][new_x]
-                self.__grid.invert_case(new_y, new_x)
+                self.__grid.invert_road_grass(new_y, new_x)
             self.__mouse_last_x = new_x
             self.__mouse_last_y = new_y
         else:
             self.__already_save = False
 
-        # if self.button_save.mouse_on_button(mouse_x, mouse_y):
-        #     if self.is_holding_left and not self.already_save:
-        #         self.button_save.run_action()
-        #         self.already_save = True
-
         if self.__should_put_checkpoint:
-            # self.__grid_practicable[new_y][new_x] = True
-            self.__grid.set_as_checkpoint(new_y, new_x)
-            # self.__grid_checkpoints[new_y][new_x] = not self.__grid_checkpoints[new_y][new_x]
+            self.__grid.set_unset_checkpoint(new_y, new_x)
             self.__should_put_checkpoint = False
 
     def _mouse_has_moved(self, new_x, new_y):
         # Si on est pas au même endroit qu'avant
-        if new_y == self.__mouse_last_y or new_x == self.__mouse_last_x:
+        if new_y == self.__mouse_last_y and new_x == self.__mouse_last_x:
             return False
 
         # si on est pas sur les bords
@@ -221,6 +214,15 @@ class ScreenDrawTrack:
         msg = self.__font.render("C : Checkpoint   F : Free   S : Save", True, COLOR_RED)
         self.__background.blit(msg, (40, self.__im_h - self.__grid_shape))
 
+    def display_text(self):
+        if self.__msg_text is not None:
+            msg = self.__font.render(self.__msg_text, True, COLOR_RED)
+            self.__window.blit(msg, (40, 40))
+            self.__text_duration += 1
+            if self.__text_duration > 240:
+                self.__msg_text = None
+                self.__text_duration = 0
+
     # - Callbacks
 
     def mouse_on_release(self):
@@ -242,18 +244,84 @@ class ScreenDrawTrack:
     # - Functions
 
     def __save_map(self):
-        self.__missing_parts = np.zeros((self.__grid_height, self.__grid_width), dtype=bool)
-
         if not self.check_viable_track():
             self.__msg_text = "Circuit pas viable, toutes les cases doivent avoir au mina 2 connexions"
             return None
 
+        # Erasing empty borders
         self.cut_grids()
 
-        while os.path.isfile(self.__track_name):
-            self.__track_id += 1
-            self.__track_name = "track/{}_{}.tra".format(self.__track_raw_name, self.__track_id)
+        # Converting bool grid to strin grid
+        grid_reconstruct_final = self.generate_str_map()
 
+        # - Saving - #
+        while not self.__track_name or os.path.isfile(self.__track_name):
+            self.__track_id += 1
+            self.__track_name = os.path.join(track_files_path,
+                                             "{}_{}.tra".format(self.__track_raw_name, self.__track_id))
+
+        file_track = open(self.__track_name, "w+")
+        h, w = self.__grid_cut.shape
+
+        for i in range(h):
+            for j in range(w):
+                raw_str = grid_reconstruct_final[i][j]
+                clean_str = [" " + raw_str + " ", raw_str + " ", raw_str][len(raw_str) - 2]
+                file_track.write(clean_str)
+
+                file_track.write(" ")
+            file_track.write("\n")
+
+        self.__msg_text = "Track recorded as {}".format(self.__track_name.split("/")[1])
+        file_track.close()
+
+    def check_viable_track(self):
+        self.__grid.reset_missing()
+        grid_practicable = self.__grid.practicable
+        if not np.any(grid_practicable):
+            return False
+        missing_part = False
+        for i in range(1, self.__grid_height - 1):
+            for j in range(1, self.__grid_width - 1):
+                if grid_practicable[i][j]:
+                    connexion_count = 0
+                    if grid_practicable[i][j - 1]:
+                        connexion_count += 1
+                    if grid_practicable[i][j + 1]:
+                        connexion_count += 1
+
+                    if grid_practicable[i - 1][j]:
+                        connexion_count += 1
+
+                    if grid_practicable[i + 1][j]:
+                        connexion_count += 1
+
+                    if connexion_count < 2:
+                        missing_part = True
+                        self.__grid.set_as_missing(i, j)
+
+        return not missing_part
+
+    def cut_grids(self):
+        self.__grid_cut = self.__grid.practicable
+        self.__grid_checkpoints_cut = self.__grid.checkpoints
+        while not np.any(self.__grid_cut[1]):  # On coupe en Haut
+            self.__grid_cut = np.delete(self.__grid_cut, 0, axis=0)
+            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, 0, axis=0)
+
+        while not np.any(self.__grid_cut[-2]):  # On coupe en Bas
+            self.__grid_cut = np.delete(self.__grid_cut, -1, axis=0)
+            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, -1, axis=0)
+
+        while not np.any(self.__grid_cut[:, 1]):  # On coupe à gauche
+            self.__grid_cut = np.delete(self.__grid_cut, 0, axis=1)
+            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, 0, axis=1)
+
+        while not np.any(self.__grid_cut[:, -2]):  # On coupe à droite
+            self.__grid_cut = np.delete(self.__grid_cut, -1, axis=1)
+            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, -1, axis=1)
+
+    def generate_str_map(self):
         h, w = self.__grid_cut.shape
 
         grid_reconstruct1 = np.zeros((self.__grid_height, self.__grid_width), dtype=object)
@@ -264,7 +332,7 @@ class ScreenDrawTrack:
                 if not self.__grid_cut[i][j]:
                     grid_reconstruct1[i][j] = "xx"
                 else:
-                    grid_reconstruct1[i][j] = self.find_izi_piece(i, j)
+                    grid_reconstruct1[i][j] = self.find_base_piece(i, j)
 
         for i in range(h):
             for j in range(w):
@@ -353,67 +421,9 @@ class ScreenDrawTrack:
                 if self.__grid_checkpoints_cut[i][j]:
                     grid_reconstruct_final[i][j] += "c"
 
-        file_track = open(self.__track_name, "w+")
+        return grid_reconstruct_final
 
-        for i in range(h):
-            for j in range(w):
-                file_track.write(grid_reconstruct_final[i][j])
-
-                file_track.write(" ")
-            file_track.write("\n")
-
-        self.__msg_text = "Track recorded as {}".format(self.__track_name.split("/")[1])
-        file_track.close()
-
-    def generate_grid_false(self):
-        return np.zeros((self.__grid_height, self.__grid_width), dtype=bool)
-
-    def check_viable_track(self):
-        grid_practicable = self.__grid.practicable
-        if not np.any(grid_practicable):
-            return False
-        missing_part = False
-        for i in range(1, self.__grid_height - 1):
-            for j in range(1, self.__grid_width - 1):
-                if grid_practicable[i][j]:
-                    connexion_count = 0
-                    if grid_practicable[i][j - 1]:
-                        connexion_count += 1
-                    if grid_practicable[i][j + 1]:
-                        connexion_count += 1
-
-                    if grid_practicable[i - 1][j]:
-                        connexion_count += 1
-
-                    if grid_practicable[i + 1][j]:
-                        connexion_count += 1
-
-                    if connexion_count < 2:
-                        missing_part = True
-                        self.__missing_parts[i][j] = True
-
-        return not missing_part
-
-    def cut_grids(self):
-        self.__grid_cut = self.__grid.practicable
-        self.__grid_checkpoints_cut = self.__grid.checkpoints
-        while not np.any(self.__grid_cut[1]):  # On coupe en Haut
-            self.__grid_cut = np.delete(self.__grid_cut, 0, axis=0)
-            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, 0, axis=0)
-
-        while not np.any(self.__grid_cut[-2]):  # On coupe en Bas
-            self.__grid_cut = np.delete(self.__grid_cut, -1, axis=0)
-            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, -1, axis=0)
-
-        while not np.any(self.__grid_cut[:, 1]):  # On coupe à gauche
-            self.__grid_cut = np.delete(self.__grid_cut, 0, axis=1)
-            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, 0, axis=1)
-
-        while not np.any(self.__grid_cut[:, -2]):  # On coupe à droite
-            self.__grid_cut = np.delete(self.__grid_cut, -1, axis=1)
-            self.__grid_checkpoints_cut = np.delete(self.__grid_checkpoints_cut, -1, axis=1)
-
-    def find_izi_piece(self, i, j):
+    def find_base_piece(self, i, j):
         part_str = ""
         if self.__grid_cut[i - 1][j]:
             part_str += "u"
@@ -425,15 +435,6 @@ class ScreenDrawTrack:
             part_str += "r"
 
         return part_str
-
-    def display_text(self):
-        if self.__msg_text is not None:
-            msg = self.__font.render(self.__msg_text, True, COLOR_RED)
-            self.__window.blit(msg, (40, 40))
-            self.__text_duration += 1
-            if self.__text_duration > 240:
-                self.__msg_text = None
-                self.__text_duration = 0
 
 
 def run_draw_map(**_kwargs):
@@ -471,5 +472,4 @@ def run_draw_map(**_kwargs):
 
 if __name__ == '__main__':
     run_draw_map()
-    # TODO : Refresh pas en live
     # Todo : Revoir le save
