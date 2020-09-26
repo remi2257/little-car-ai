@@ -1,42 +1,50 @@
 import pygame
 
-from src.const import *
+from .Widget import Widget
 
 
-class Button:
-    def __init__(self, rect):
+class Button(Widget):
+    def __init__(self, rect, **kwargs):
+        super(Button, self).__init__(**kwargs)
 
-        self.rect = rect # Rect corresponding to (x,y,w,h)
-        self.mouse_on = False # True if mouse is on the button
+        self._rect = rect  # Rect corresponding to (x,y,w,h)
+        self._mouse_on = False  # True if mouse is on the button
 
     def get_rect_menu_pos(self):
-        raise NotImplementedError
+        return self._rect
 
     def mouse_on_button(self, mouse_x, mouse_y):
-        x, y, w, h = self.rect
+        x, y, w, h = self._rect
         if x <= mouse_x <= x + w and y <= mouse_y <= y + h:
-            self.mouse_on = True
+            self._mouse_on = True
         else:
-            self.mouse_on = False
+            self._mouse_on = False
 
-        return self.mouse_on
+        return self._mouse_on
 
     def draw_button_image(self, window, mouse_pressed=False):
         raise NotImplementedError
 
-    def gen_button_img(self, path_img, new_width=menu_button_w):
+    def gen_button_img(self, path_img):
         if path_img is None:
             return None, None
         img = pygame.image.load(path_img).convert_alpha()
-        width = img.get_width()
-        height = img.get_height()
 
-        ratio = float(width / height)
+        img_resize = pygame.transform.scale(img, (self.w, self.h))
+        return img_resize
 
-        new_height = int(new_width / ratio)
+    @property
+    def x(self):
+        return self._rect[0]
 
-        img_resize = pygame.transform.scale(img, (new_width, new_height))
-        return img_resize, new_width
+    @property
+    def y(self):
+        return self._rect[1]
 
-    def run_action(self, **dict_parameters):
-        raise NotImplementedError
+    @property
+    def w(self):
+        return self._rect[2]
+
+    @property
+    def h(self):
+        return self._rect[3]

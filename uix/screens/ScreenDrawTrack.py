@@ -4,8 +4,8 @@ import numpy as np
 from random import choice
 from enum import Enum
 
+from uix.screens.ScreenBase import ScreenBase
 from src.const import *
-from src.usesful_func import start_pygame, should_stop_pygame
 
 GRID_HEIGHT = 24
 GRID_WIDTH = 32
@@ -91,9 +91,9 @@ class Grid:
         return np.where(self.__grid == Grid.Case.CHECKPOINT, True, False)
 
 
-class ScreenDrawTrack:
+class ScreenDrawTrack(ScreenBase):
     def __init__(self):
-        start_pygame()
+        super(ScreenDrawTrack, self).__init__()
 
         # -- Init drawing settings
         self.__grid_height = GRID_HEIGHT
@@ -131,7 +131,6 @@ class ScreenDrawTrack:
         # - Mouse infos
         self.__mouse_last_x = -1
         self.__mouse_last_y = -1
-        self.__mouse_is_holding_left = False
 
         # - Saving option
         self.__already_save = False
@@ -145,6 +144,14 @@ class ScreenDrawTrack:
         self.actualize()
 
     # - Visualization
+
+    def keydown_handle(self, key):
+        if key == pygame_const.K_s:  # S : Save
+            self.callback_save_map()
+        elif key == pygame_const.K_f:  # F : Free
+            self.free_map()
+        elif key == pygame_const.K_c:  # C : Checkpoint
+            self.checkpoint_cmd()
 
     def actualize(self, pos=None):
         self.__window.blit(self.__background, (0, 0))
@@ -173,7 +180,7 @@ class ScreenDrawTrack:
         new_x = mouse_x // self.__grid_shape
         new_y = mouse_y // self.__grid_shape
 
-        if self.__mouse_is_holding_left:  # If button is pushed
+        if self._mouse_is_holding_left:  # If button is pushed
             if self._mouse_has_moved(new_x, new_y):
                 self.__grid.invert_road_grass(new_y, new_x)
             self.__mouse_last_x = new_x
@@ -225,12 +232,9 @@ class ScreenDrawTrack:
 
     # - Callbacks
 
-    def mouse_on_release(self):
-        self.__mouse_is_holding_left = False
+    def on_mouse_release(self, **kwargs):
+        super(ScreenDrawTrack, self).on_mouse_release()
         self.__mouse_last_x = self.__mouse_last_y = -1
-
-    def mouse_on_press(self):
-        self.__mouse_is_holding_left = True
 
     def callback_save_map(self):
         self.__save_map()
@@ -438,38 +442,8 @@ class ScreenDrawTrack:
 
 
 def run_draw_map(**_kwargs):
-    # --- INIT Variable--- #
-
-    stop = False
-
-    # --- INIT Game--- #
-
-    screen = ScreenDrawTrack()
-
-    # Boucle infinie
-    while not stop:
-        # pygame.time.Clock().tick(240)
-        for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
-            # Si un de ces événements est de type QUIT
-            if should_stop_pygame(event):
-                stop = True  # On arrête la boucle
-            elif event.type == pygame_const.MOUSEBUTTONDOWN:
-                screen.mouse_on_press()
-            elif event.type == pygame_const.MOUSEBUTTONUP:
-                screen.mouse_on_release()
-            # if pygame.mouse.get_pressed()[0]:  # See if the user has clicked or dragged their mouse
-            elif event.type == pygame_const.KEYDOWN:
-                if event.key == pygame_const.K_s:  # S : Save
-                    screen.callback_save_map()
-                elif event.key == pygame_const.K_f:  # F : Free
-                    screen.free_map()
-                elif event.key == pygame_const.K_c:  # C : Checkpoint
-                    screen.checkpoint_cmd()
-        pos = pygame.mouse.get_pos()
-
-        screen.actualize(pos)
+    ScreenDrawTrack().run()
 
 
 if __name__ == '__main__':
     run_draw_map()
-    # Todo : Revoir le save

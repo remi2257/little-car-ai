@@ -34,8 +34,8 @@ game_name = "Little Car AI"
 images_path = "uix/images/"
 background_path = os.path.join(images_path, "background.jpg")
 
-ratio_screen_window = 1.2
-big_window_larg, big_window_haut = get_screen_infos_linux(ratio_screen_window)
+ratio_screen_window_ = 1.2
+big_window_larg, big_window_haut = get_screen_infos_linux(ratio_screen_window_)
 # big_window_larg = 1600  # 1280
 # big_window_haut = big_window_larg
 # big_window_haut = 900  # 720
@@ -232,7 +232,7 @@ COLORS_BRIGHT = [COLOR_GREEN_BRIGHT, COLOR_RED_BRIGHT, COLOR_BLUE_BRIGHT, COLOR_
 
 # -- MENU -- #
 # 521 x 246 = ratio de 2.13
-menu_button_w = round(big_window_haut / 3)
+menu_button_w = round(big_window_haut / 3.5)
 menu_button_h = round(menu_button_w / 2.13)
 
 offset_h = round(20 * big_window_haut / 700)
@@ -245,23 +245,9 @@ buttons_y = [first_button_y + i * (offset_h + menu_button_h) for i in range(nbr_
 
 state_MENU, state_HUMAN, state_AI, state_TRAIN, state_DRAW = 0, 1, 2, 3, 4
 
-title_path = "images/others/title_menu.png"
+title_path = os.path.join(images_path, "others/title_menu.png")
 
-buttons_img_path = "images/buttons/"
-
-button_list_name = [
-    "human",
-    "ai",
-    "train",
-    "draw",
-]
-
-buttons_off_path = [buttons_img_path + name + "_off.png" for name in button_list_name]
-buttons_on_path = [buttons_img_path + name + "_on.png" for name in button_list_name]
-buttons_push_path = [buttons_img_path + name + "_push.png" for name in button_list_name]
-
-button_save_on = buttons_img_path + "save_on.png"
-button_save_off = buttons_img_path + "save_off.png"
+buttons_img_path = os.path.join(images_path, "buttons/")
 
 menu_selection_w = round(150 * 900 / big_window_haut)
 menu_selection_h = round(400 * 900 / big_window_haut)

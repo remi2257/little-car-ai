@@ -148,7 +148,7 @@ class CarBot:
                       self.position_car.centery])
 
     def new_pos(self, new_rect):
-        return tuple([self.position_car.centerx - new_rect.w // 2,
+        return tuple([self.position_car.centerx - new_rect.rect_w // 2,
                       self.position_car.centery - new_rect.h // 2])
 
     def give_opposite_direction(self):
