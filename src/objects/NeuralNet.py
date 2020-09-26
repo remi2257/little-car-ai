@@ -23,7 +23,7 @@ class NeuralNet:
     def gen_cnn_model(self, nn_file_path):
         model_struc = []
         softmax_classes = 3
-        input_dim_cnn = tuple([height_LIDAR, width_LIDAR, 1])
+        input_dim_cnn = tuple([height_grid_LIDAR, width_grid_LIDAR, 1])
         extra_data_dim = 1
         with open(nn_file_path) as f:
             lines_raw = f.readlines()
@@ -76,7 +76,7 @@ class NeuralNet:
     def gen_nn_model(self, nn_file_path):
         model_struc = []
         softmax_classes = 3
-        input_dim = height_LIDAR * width_LIDAR + 1
+        input_dim = height_grid_LIDAR * width_grid_LIDAR + 1
         with open(nn_file_path) as f:
             lines_raw = f.readlines()
             lines = [line.strip() for line in lines_raw if line != "\n"]

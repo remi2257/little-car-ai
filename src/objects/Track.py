@@ -101,7 +101,7 @@ class Track:
                 if "x" in small_name:  # If grass, background already good
                     continue
 
-                im_name = road_path + "road_{}.png".format(small_name)
+                im_name = roads_path + "road_{}.png".format(small_name)
                 im = pygame.image.load(im_name).convert_alpha()
                 im = pygame.transform.scale(im, (self.case_size, self.case_size))
 

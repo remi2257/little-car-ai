@@ -49,11 +49,11 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
             carAI.actualize_direction_and_gas(carAI.predict_next_move())
 
             # Kill car that are bad
-            if carAI.fitness < lower_bound_fitness:
+            if carAI._fitness < lower_bound_fitness:
                 carAI.is_alive = False
 
             # move_car
-            carAI.move_car_and_refresh_LIDAR()
+            carAI.move_car_and_refresh_lidar()
 
             # refresh fitness
             # carAI.refresh_fitness_v1()
@@ -68,7 +68,7 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
             self.gen_duration = self.gen_duration_limit_steps
         """
         # Get infos on fitness
-        list_fitness = [c.fitness for c in self.carsAI]
+        list_fitness = [c._fitness for c in self.carsAI]
 
         # Get mean & max
         self.mean_fitness = np.mean(list_fitness)
@@ -82,17 +82,17 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         for carAI in self.carsAI:
             if not carAI.is_alive:
                 continue
-            if carAI.fitness == self.best_actual_fitness:
+            if carAI._fitness == self.best_actual_fitness:
                 carAI.change_to_leader_img()
             elif carAI.is_survivor:
                 carAI.change_to_survivor_img()
 
-            self._window.blit(carAI.actual_img, carAI.get_position_left_top())
+            self._window.blit(carAI._actual_img, carAI.get_position_left_top())
 
         # BOTS CAR
         for car in self.cars_bot:
             car.move_car_bot(self._track)
-            self._window.blit(car.actual_img, car.get_position_left_top())
+            self._window.blit(car._actual_img, car.get_position_left_top())
 
         # REFRESH
         self.display_infos_fitness_n_FPS()
@@ -103,27 +103,27 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         self.refresh_fitness_plot()
 
         # Sort cars by fitness
-        self.carsAI = sorted(self.carsAI, key=lambda x: x.fitness, reverse=True)
+        self.carsAI = sorted(self.carsAI, key=lambda x: x._fitness, reverse=True)
 
         # Save the best model of this generation if the user put save on On
         if self.save:
             self.save_gen_best_model()
 
         # -- CALCULATE NEW MUTATION RATE --#
-        best_fitness = max(1, self.carsAI[0].fitness - self.carsAI[0].bonus_checkpoints)
+        best_fitness = max(1, self.carsAI[0]._fitness - self.carsAI[0]._bonus_checkpoints)
         ratio_fitness = best_fitness / self.max_fitness_possible
         self.mutation_rate_best = self.get_mutation_rate(best_fitness)
         self.update_duration_limit(ratio_fitness)
         # self.mutation_rate *= decay_mutation_rate
 
         # Get fitness of survivors
-        best_cars_fitness = [max(car.fitness, 1) for car in self.carsAI[0:nbr_survivors]]
+        best_cars_fitness = [max(car._fitness, 1) for car in self.carsAI[0:nbr_survivors]]
         # Use square to increase the gap between lucky survivors & beasts
         best_fitness_square = np.array(best_cars_fitness) ** 2
         weight_best_fitness = best_fitness_square / np.sum(best_fitness_square)
 
-        if self.carsAI[0].fitness > self.best_fitness_ever:
-            self.best_fitness_ever = self.carsAI[0].fitness
+        if self.carsAI[0]._fitness > self.best_fitness_ever:
+            self.best_fitness_ever = self.carsAI[0]._fitness
 
         # -- APPLY MUTATION --#
         for i, car in enumerate(self.carsAI):

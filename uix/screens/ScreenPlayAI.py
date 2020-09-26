@@ -6,7 +6,7 @@ class ScreenPlayAI(ScreenPlaySolo):
 
     def __init__(self, model_path, track_path):
         super(ScreenPlayAI, self).__init__(track_path=track_path)
-        self._car = CarAI(model_path, self._track, self._lidar_im_w, self._lidar_im_h)
+        self._car = CarAI(model_path, self._track)
 
         self.actualize()
 

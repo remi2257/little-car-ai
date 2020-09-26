@@ -81,7 +81,7 @@ class ScreenBaseTrain(ScreenBasePlay):
 
     def save_gen_best_model(self):
         new_model_name = self.save_folder_model + "Gen_{}_Fitness_{}.h5".format(self.gen_id,
-                                                                                int(self.carsAI[0].fitness))
+                                                                                int(self.carsAI[0]._fitness))
 
         self.carsAI[0].neural_net.model.save(new_model_name)
 

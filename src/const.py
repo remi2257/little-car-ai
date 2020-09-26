@@ -1,7 +1,6 @@
 import os
 import glob
 
-from math import ceil
 import pygame.locals as pygame_const
 
 
@@ -108,14 +107,10 @@ drift_factor_max = 0.93
 
 # LIDAR
 
-height_LIDAR = 7
-width_LIDAR = 5
+height_grid_LIDAR = 7
+width_grid_LIDAR = 5
 offset_y_LIDAR = 0
 
-LIDAR_width_img = ceil(big_window_haut / (20 * 8)) * 20
-erode_LIDAR_grid = 1 + int(big_window_larg / 1500)
-offset_LIDAR_grid_x = 20
-offset_LIDAR_grid_y = 20
 
 circle_size = max(1, int(round(big_window_larg / 1920) * 3))
 
@@ -124,48 +119,32 @@ circle_size = max(1, int(round(big_window_larg / 1920) * 3))
 # Dir for Track & BOT
 dir_DOWN, dir_RIGHT, dir_UP, dir_LEFT = 0, 1, 2, 3
 
-# HUMAN / IA
-gas_ON, gas_BRAKE, gas_OFF = 0, 1, 2
-wheel_LEFT, wheel_RIGHT, wheel_NONE = 3, 4, 5
-
-# Direction arrows & Pedals
-
-width_arrows_pedals = round(big_window_haut / 12)
-offset_arrows_pedals = round(big_window_haut / 20)
-
+# --- IMAGES --- #
 im_others_path = os.path.join(images_path, "others/")
 
-img_pedals_arrows = {
-    gas_ON: im_others_path + "pedals_gas.png",
-    gas_BRAKE: im_others_path + "pedals_brake.png",
-    gas_OFF: im_others_path + "pedals_off.png",
-    wheel_LEFT: im_others_path + "arrows_left.png",
-    wheel_RIGHT: im_others_path + "arrows_right.png",
-    wheel_NONE: im_others_path + "arrows_off.png",
-}
 
 # -- TRACK -- #
-road_path = os.path.join(images_path, "road/")
+roads_path = os.path.join(images_path, "road/")
 
 track_part_1w = {
     "x": None,
     "xx": None,
     "xxx": None,
-    "ud": road_path + "road_ud.png",
-    "lr": road_path + "road_lr.png",
-    "dr": road_path + "road_dr.png",
-    "dl": road_path + "road_dl.png",
-    "ur": road_path + "road_ur.png",
-    "ul": road_path + "road_ul.png",
-    "ulr": road_path + "road_ulr.png",
-    "udr": road_path + "road_udr.png",
-    "udl": road_path + "road_udl.png",
-    "dlr": road_path + "road_dlr.png",
-    "dlr1": road_path + "road_dlr1.png",
-    "dlr2": road_path + "road_dlr2.png",
-    "dlr3": road_path + "road_dlr3.png",
-    "udlr": road_path + "road_udlr.png",
-    "sr": road_path + "start_right.png",
+    "ud": roads_path + "road_ud.png",
+    "lr": roads_path + "road_lr.png",
+    "dr": roads_path + "road_dr.png",
+    "dl": roads_path + "road_dl.png",
+    "ur": roads_path + "road_ur.png",
+    "ul": roads_path + "road_ul.png",
+    "ulr": roads_path + "road_ulr.png",
+    "udr": roads_path + "road_udr.png",
+    "udl": roads_path + "road_udl.png",
+    "dlr": roads_path + "road_dlr.png",
+    "dlr1": roads_path + "road_dlr1.png",
+    "dlr2": roads_path + "road_dlr2.png",
+    "dlr3": roads_path + "road_dlr3.png",
+    "udlr": roads_path + "road_udlr.png",
+    "sr": roads_path + "start_right.png",
 
 }
 
