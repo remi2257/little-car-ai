@@ -1,4 +1,4 @@
-from uix.widgets.Button import *
+from uix.widgets.Button import Button
 
 from src.const import menu_button_w, menu_button_h
 

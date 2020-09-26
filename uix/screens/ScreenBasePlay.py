@@ -1,4 +1,3 @@
-from pygame.font import Font
 
 from uix.screens.ScreenBase import ScreenBase
 
@@ -44,11 +43,8 @@ class ScreenBasePlay(ScreenBase):
         for _ in range(nbr_bots):
             self.cars_bot.append(CarBot(self._track))
         """
-        # Font
-        self.font = Font('freesansbold.ttf', int(font_size_global / 1.2))
-        self.font_h = self.font.get_height()
 
-        self.list_y_text = [self._track.im_h // 50 + i * self.font_h for i in range(20)]
+        self.list_y_text = [self._track.im_h // 50 + i * self._font_h for i in range(20)]
 
     def actualize(self, pos=None):
         raise NotImplementedError

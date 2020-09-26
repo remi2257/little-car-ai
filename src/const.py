@@ -1,6 +1,8 @@
-import pygame.locals as pygame_const
-from math import ceil
 import os
+import glob
+
+from math import ceil
+import pygame.locals as pygame_const
 
 
 def get_screen_infos_linux(ratio_screen_window):
@@ -205,9 +207,7 @@ track_part_1w_practicable = {
 }
 
 track_files_path = "tracks/"
-list_track = [
-    "tracks/race_tiny.tra",
-]
+list_tracks = glob.glob(track_files_path + "*tra")
 
 # COLORS
 

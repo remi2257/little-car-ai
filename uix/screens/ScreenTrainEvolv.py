@@ -149,40 +149,40 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
     def display_infos_fitness_n_FPS(self):
         x = self._track.__im_w - round(0.7 * self._track.grid_size)
         ind = 0
-        text_fitness = self.font.render("Fitness - Gen {}".format(self.gen_id), True, COLOR_BLUE)
+        text_fitness = self._font.render("Fitness - Gen {}".format(self.gen_id), True, COLOR_BLUE)
         self._window.blit(text_fitness, (x, self.list_y_text[ind]))
         ind += 2
-        text_ever = self.font.render("Best Ever: {:.0f}".format(self.best_fitness_ever), True, COLOR_GREEN)
+        text_ever = self._font.render("Best Ever: {:.0f}".format(self.best_fitness_ever), True, COLOR_GREEN)
         self._window.blit(text_ever, (x, self.list_y_text[ind]))
         ind += 1
 
-        text_best = self.font.render("Best Gen {:.0f}".format(self.best_actual_fitness), True,
-                                     COLOR_GREEN)
+        text_best = self._font.render("Best Gen {:.0f}".format(self.best_actual_fitness), True,
+                                      COLOR_GREEN)
         self._window.blit(text_best, (x, self.list_y_text[ind]))
         ind += 1
 
-        text_mean = self.font.render("Mean Gen {:.0f}".format(self.mean_fitness), True,
-                                     COLOR_GREEN)
+        text_mean = self._font.render("Mean Gen {:.0f}".format(self.mean_fitness), True,
+                                      COLOR_GREEN)
         self._window.blit(text_mean, (x, self.list_y_text[ind]))
         ind += 1
 
-        text_mutation = self.font.render("Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
-                                         COLOR_GREEN)
+        text_mutation = self._font.render("Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
+                                          COLOR_GREEN)
         self._window.blit(text_mutation, (x, self.list_y_text[ind]))
         ind += 1
 
-        text_max_fitness = self.font.render("Up Bound Fit. {:.1f}".format(self.max_fitness_possible), True,
-                                            COLOR_GREEN)
+        text_max_fitness = self._font.render("Up Bound Fit. {:.1f}".format(self.max_fitness_possible), True,
+                                             COLOR_GREEN)
         self._window.blit(text_max_fitness, (x, self.list_y_text[ind]))
         ind += 1
 
-        limit_frame = self.font.render("Lim. Frames: " + str(self.gen_duration_limit_steps), True,
-                                       pygame.Color('white'))
+        limit_frame = self._font.render("Lim. Frames: " + str(self.gen_duration_limit_steps), True,
+                                        pygame.Color('white'))
         self._window.blit(limit_frame, (x, self.list_y_text[ind]))
         ind += 2
 
-        fps = self.font.render("FPS (max): {} ({})".format(int(self.clock.get_fps()), self.FPS_MAX), True,
-                               pygame.Color('white'))
+        fps = self._font.render("FPS (max): {} ({})".format(int(self.clock.get_fps()), self.FPS_MAX), True,
+                                pygame.Color('white'))
         self._window.blit(fps, (x, self.list_y_text[ind]))
 
     # New mutation rate which is directly link to the fitness
