@@ -1,4 +1,4 @@
-from uix.screens.ScreenPlaySolo import ScreenPlaySolo
+from uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
 from src.cars.CarHuman import CarHuman
 # import pygame.locals as pygame_const
 from src.const import *
@@ -8,7 +8,7 @@ class ScreenPlayHuman(ScreenPlaySolo):
 
     def __init__(self, track_path="track/track1.tra"):
         super(ScreenPlayHuman, self).__init__(track_path=track_path)
-        self._car = CarHuman(self._track, self.lidar_w, self.lidar_h)
+        self._car = CarHuman(self._track, self._lidar_im_w, self._lidar_im_h)
 
         self.actualize()
 

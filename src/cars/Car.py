@@ -9,6 +9,8 @@ from src.objects.Track import Track
 class Car:
     def __init__(self, track: Track, lidar_w, lidar_h):
         # INIT VARIABLES
+        self.track = track
+
         self.theta = 0.0
         self.speed = 0.0
         self.speed_max = track.speed_max
@@ -32,7 +34,7 @@ class Car:
         self.last_gas_cmd = gas_OFF
 
         # GEN CAR IMAGE
-        self.img = self.gen_car_img(track, path_audi)
+        self.img = self.gen_car_img(path_audi)
         if track.start_direction == dir_RIGHT:
             self.img = pygame.transform.rotate(self.img, theta_0)
 
@@ -46,8 +48,7 @@ class Car:
         # self.actual_grid_y = None
 
         # GEN LIDAR
-        self.track = track
-        self.lidar_grid_size = track.grid_size // (1 + int(track.double_road))
+        self.lidar_grid_size = self.track.lidar_case_size
         self.lidar_grid_car_x = width_LIDAR // 2
         self.lidar_grid_car_y = height_LIDAR - offset_y_LIDAR - 1
 
@@ -63,7 +64,7 @@ class Car:
         self.refresh_LIDAR()
 
         # Checkpoints
-        self.checkpoints = self.set_checkpoints(track)
+        self.checkpoints = self.set_checkpoints()
 
     # Is aptly named
     def actualize_direction_and_gas(self, new_commands):
@@ -202,11 +203,11 @@ class Car:
                 true_dx = round(dx_rel + car_x)
                 true_dy = round(dy_rel + car_y)
 
-                true_x_grid = true_dx // self.track.grid_size
-                true_y_grid = true_dy // self.track.grid_size
+                true_x_grid = true_dx // self.track.case_size
+                true_y_grid = true_dy // self.track.case_size
 
                 if 0 < true_x_grid < self.track.grid_w and 0 < true_y_grid < self.track.grid_h:
-                    corresponding_square = self.track.grid_raw[true_y_grid][true_x_grid]
+                    corresponding_square = self.track.get_road_name(true_y_grid, true_x_grid)
 
                 else:
                     corresponding_square = "xx"
@@ -261,8 +262,8 @@ class Car:
             if self.checkpoints:
                 # Check if on checkpoint
                 x, y = self.get_position_center()
-                x_grid = x // self.track.grid_size
-                y_grid = y // self.track.grid_size
+                x_grid = x // self.track.case_size
+                y_grid = y // self.track.case_size
 
                 for checkpoint in self.checkpoints:
                     if not checkpoint[1]:
@@ -281,12 +282,12 @@ class Car:
             self.time_outside_road += 1
             self.fitness -= max(self.speed, 0) * self.time_outside_road * weight_on_road / FPS_MAX_init
 
-    def set_checkpoints(self, track):
+    def set_checkpoints(self):
         my_list = []
-        for checkpoint in track.checkpoints:
+        for checkpoint in self.track.checkpoints:
             x, y = self.get_position_center()
-            x_grid = x // self.track.grid_size
-            y_grid = y // self.track.grid_size
+            x_grid = x // self.track.case_size
+            y_grid = y // self.track.case_size
             if x_grid != checkpoint[1] or y_grid != checkpoint[0]:
                 my_list.append([checkpoint, True])
             else:
@@ -301,13 +302,12 @@ class Car:
         for checkpoint in self.checkpoints:
             checkpoint[1] = True
 
-    @staticmethod
-    def gen_car_img(track, path_img):
+    def gen_car_img(self, path_img):
         img = pygame.image.load(path_img).convert_alpha()
         width = img.get_width()
         height = img.get_height()
         ratio = float(width / height)
-        car_len = track.car_size
+        car_len = self.track.car_size
         if ratio < 1:
             width = car_len
             height = int(car_len * ratio)

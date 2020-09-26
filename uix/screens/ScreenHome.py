@@ -1,7 +1,7 @@
-from uix.screens.ScreenBase import ScreenBase
+from uix.screens.abstract.ScreenBase import ScreenBase
 from uix.screens.ScreenDrawTrack import run_draw_map
-from uix.screens.ScreenPlaySolo import run_play_ai
-from uix.screens.ScreenPlaySolo import run_play_human
+from uix.screens.abstract.ScreenPlaySolo import run_play_ai
+from uix.screens.abstract.ScreenPlaySolo import run_play_human
 from uix.screens.ScreenTrainEvolv import run_train
 
 from uix.widgets.ButtonOnOff import *

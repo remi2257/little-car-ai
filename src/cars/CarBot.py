@@ -17,8 +17,8 @@ class CarBot:
         width = img.get_width()
         height = img.get_height()
         ratio = float(width / height)
-        car_max_len = track.car_size
-        self.double_road = track.double_road
+        car_max_len = track.__car_size
+        self.double_road = track.__double_road
         if ratio < 1:
             self.width = car_max_len
             self.height = int(car_max_len * ratio)
@@ -48,10 +48,10 @@ class CarBot:
 
         self.position_car = self.actual_img.get_rect()
 
-        yc = self.y_grid * track.grid_size + track.grid_size // 2
-        xc = self.x_grid * track.grid_size + track.grid_size // 2
+        yc = self.y_grid * track.__case_size + track.__case_size // 2
+        xc = self.x_grid * track.__case_size + track.__case_size // 2
         if self.double_road:
-            xc, yc = self.adjust_double_road(xc, yc, track.grid_size)
+            xc, yc = self.adjust_double_road(xc, yc, track.__case_size)
         # y_init = yc - self.position_car.height // 2
         # x_init = xc - self.position_car.width // 2
         self.position_car = self.position_car.move(xc - self.position_car.centerx, yc - self.position_car.centery)
@@ -113,7 +113,7 @@ class CarBot:
         if self.can_change_dir:
             self.get_next_dir(track.grid)
         if self.next_direction != self.direction:  # Should Turn
-            self.actualize_direction_bot(track.grid_size)
+            self.actualize_direction_bot(track.__case_size)
 
         if self.direction == dir_DOWN:
             self.position_car = self.position_car.move(0, step_dir)
@@ -126,8 +126,8 @@ class CarBot:
         elif self.direction == dir_LEFT:
             self.position_car = self.position_car.move(-step_dir, 0)
 
-        new_case_x = self.position_car.centerx // track.grid_size
-        new_case_y = self.position_car.centery // track.grid_size
+        new_case_x = self.position_car.centerx // track.__case_size
+        new_case_y = self.position_car.centery // track.__case_size
         if new_case_x != self.x_grid:
             # dist_from_center = abs(track.grid_size // 2 - self.position_car.centerx % track.grid_size)
             # if dist_from_center < step_dir:

@@ -4,7 +4,7 @@ import numpy as np
 from random import choice
 from enum import Enum
 
-from uix.screens.ScreenBase import ScreenBase
+from uix.screens.abstract.ScreenBase import ScreenBase
 from src.const import *
 
 GRID_HEIGHT = 24

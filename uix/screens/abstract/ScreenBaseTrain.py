@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 import matplotlib
@@ -7,7 +6,7 @@ import matplotlib.pyplot as plt
 import pylab
 from matplotlib.ticker import MaxNLocator
 
-from uix.screens.ScreenBasePlay import *
+from .ScreenBasePlay import *
 
 matplotlib.use("Agg")
 
@@ -49,6 +48,7 @@ class ScreenBaseTrain(ScreenBasePlay):
                                 dpi=50,
                                 )
         self.fig_ax = self.fig.gca()
+        self.list_y_text = [self._track.im_h // 50 + i * self._font_h for i in range(20)]
 
     def actualize(self):
         raise NotImplementedError

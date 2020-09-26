@@ -1,4 +1,4 @@
-from uix.screens.ScreenBaseTrain import *
+from uix.screens.abstract.ScreenBaseTrain import *
 from src.cars.CarAI import *
 
 matplotlib.use("Agg")
@@ -23,7 +23,7 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         self.max_fitness_possible = self.get_max_possible_fitness()
 
         for i in range(nbr_AI_per_gen):
-            self.carsAI.append(CarAI(nn_file_path, self._track, self.lidar_w, self.lidar_h))
+            self.carsAI.append(CarAI(nn_file_path, self._track, self._lidar_im_w, self._lidar_im_h))
             if nn_file_path.endswith(".h5") and i > 0:
                 self.carsAI[-1].neural_net.mutate_model(self.mutation_rate_best)
 
@@ -147,7 +147,7 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         self.gen_track_background()
 
     def display_infos_fitness_n_FPS(self):
-        x = self._track.__im_w - round(0.7 * self._track.grid_size)
+        x = self._track.__im_w - round(0.7 * self._track.__case_size)
         ind = 0
         text_fitness = self._font.render("Fitness - Gen {}".format(self.gen_id), True, COLOR_BLUE)
         self._window.blit(text_fitness, (x, self.list_y_text[ind]))
@@ -214,7 +214,7 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         return max_sum_fitness - lost_fitness
 
     def get_forward_speed(self, n_speed):
-        return self._track.speed_max * (1 - math.exp(-n_speed / n0_speed))
+        return self._track.__speed_max * (1 - math.exp(-n_speed / n0_speed))
 
     def reset_best_ever(self):
         for carAI in self.carsAI:

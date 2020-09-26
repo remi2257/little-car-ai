@@ -1,4 +1,4 @@
-from uix.screens.ScreenBasePlay import *
+from .ScreenBasePlay import *
 
 
 class ScreenPlaySolo(ScreenBasePlay):
@@ -39,11 +39,11 @@ class ScreenPlaySolo(ScreenBasePlay):
 
     def gen_arrow(self, dir_cmd):
         self._window.blit(self._actions_imgs[dir_cmd], (self._window_w - width_arrows_pedals - offset_arrows_pedals,
-                                                        self.lidar_h + 5 * offset_arrows_pedals))
+                                                        self._lidar_im_h + 5 * offset_arrows_pedals))
 
     def gen_pedals(self, gas_cmd):
         self._window.blit(self._actions_imgs[gas_cmd], (self._window_w - width_arrows_pedals - offset_arrows_pedals,
-                                                        self.lidar_h + 6 * offset_arrows_pedals))
+                                                        self._lidar_im_h + 6 * offset_arrows_pedals))
 
     def display_fitness(self):
         text = self._font.render("Fitness: {:.0f}".format(self._car.fitness), True, COLOR_GREEN)
