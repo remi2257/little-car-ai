@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 import pylab
 from matplotlib.ticker import MaxNLocator
 
-from uix.screens.ScreenPlay import *
+from uix.screens.ScreenBasePlay import *
 
 matplotlib.use("Agg")
 
 
-class GameTrain(GamePlay):
+class ScreenBaseTrain(ScreenBasePlay):
     def __init__(self, nn_file_path="raw_models/nn1_dual_layers.net", track_path="track/track1.tra", save=True,
                  fps_max=FPS_MAX_init):
-        GamePlay.__init__(self, track_path=track_path, fps_max=fps_max)
+        ScreenBasePlay.__init__(self, track_path=track_path, fps_max=fps_max)
 
         self.save = save
         if self.save:
@@ -32,19 +32,19 @@ class GameTrain(GamePlay):
 
         self.carsAI = []
 
-        #  Fitness Information #
+        # Fitness Information #
         self.best_actual_fitness = 0
         self.mean_fitness = 0
         self.best_fitness_list = [0]
         self.best_fitness_ever = 0
 
-        #  Generation Infos
+        # Generation Infos
         self.gen_id = 1
         self.gen_duration = 0
 
-        #  Plot settings
-        #  1 px =	0.010416666666819 inches
-        l_fig = 2.3 * 0.010416666666819 * (self.window_w - self.track.__im_w)
+        # Plot settings
+        # 1 px =	0.010416666666819 inches
+        l_fig = 2.3 * 0.010416666666819 * (self._window_w - self._track.__im_w)
         self.fig = pylab.figure(figsize=[l_fig, l_fig],  # Inches
                                 dpi=50,
                                 )
@@ -77,7 +77,7 @@ class GameTrain(GamePlay):
 
         surf = pygame.image.fromstring(raw_data, size, "RGB")
         # self.window.blit(surf, (self.track.im_w - 50, 400))
-        self.background.blit(surf, (self.track.__im_w - 50, 400))
+        self._background.blit(surf, (self._track.__im_w - 50, 400))
 
     def save_gen_best_model(self):
         new_model_name = self.save_folder_model + "Gen_{}_Fitness_{}.h5".format(self.gen_id,

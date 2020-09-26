@@ -1,14 +1,14 @@
-from uix.screens.ScreenTrain import *
+from uix.screens.ScreenBaseTrain import *
 from src.cars.CarAI import *
 
 matplotlib.use("Agg")
 
 
-class GameTrainRandomEvolv(GameTrain):
+class GameTrainRandomEvolv(ScreenBaseTrain):
     def __init__(self, nn_file_path="raw_models/nn1_dual_layers.net", track_path="track/track1.tra", save=True,
                  fps_max=FPS_MAX_init):
 
-        GameTrain.__init__(self, nn_file_path, track_path, save, fps_max)
+        ScreenBaseTrain.__init__(self, nn_file_path, track_path, save, fps_max)
 
         if nn_file_path.endswith(".net"):
             self.mutation_rate_best = max_mutation_rate
@@ -23,7 +23,7 @@ class GameTrainRandomEvolv(GameTrain):
         self.max_fitness_possible = self.get_max_possible_fitness()
 
         for i in range(nbr_AI_per_gen):
-            self.carsAI.append(CarAI(nn_file_path, self.track, self.lidar_w, self.lidar_h))
+            self.carsAI.append(CarAI(nn_file_path, self._track, self.lidar_w, self.lidar_h))
             if nn_file_path.endswith(".h5") and i > 0:
                 self.carsAI[-1].neural_net.mutate_model(self.mutation_rate_best)
 
@@ -32,15 +32,15 @@ class GameTrainRandomEvolv(GameTrain):
     def actualize(self):
         self.clock.tick(self.FPS_MAX)  # Fixe le nbr max de FPS
 
-        #  Start new generation if limit of time is reached for the actual generation
+        # Start new generation if limit of time is reached for the actual generation
         if self.gen_duration >= self.gen_duration_limit_steps:
             self.start_new_gen()
         self.gen_duration += 1
 
         # BACKGROUND
-        self.window.blit(self.background, (0, 0))
+        self._window.blit(self._background, (0, 0))
 
-        #  Make every cars' move
+        # Make every cars' move
         for carAI in self.carsAI:
             if not carAI.is_alive:
                 continue
@@ -87,12 +87,12 @@ class GameTrainRandomEvolv(GameTrain):
             elif carAI.is_survivor:
                 carAI.change_to_survivor_img()
 
-            self.window.blit(carAI.actual_img, carAI.get_position_left_top())
+            self._window.blit(carAI.actual_img, carAI.get_position_left_top())
 
         # BOTS CAR
         for car in self.cars_bot:
-            car.move_car_bot(self.track)
-            self.window.blit(car.actual_img, car.get_position_left_top())
+            car.move_car_bot(self._track)
+            self._window.blit(car.actual_img, car.get_position_left_top())
 
         # REFRESH
         self.display_infos_fitness_n_FPS()
@@ -147,45 +147,45 @@ class GameTrainRandomEvolv(GameTrain):
         self.gen_track_background()
 
     def display_infos_fitness_n_FPS(self):
-        x = self.track.__im_w - round(0.7 * self.track.grid_size)
+        x = self._track.__im_w - round(0.7 * self._track.grid_size)
         ind = 0
         text_fitness = self.font.render("Fitness - Gen {}".format(self.gen_id), True, COLOR_BLUE)
-        self.window.blit(text_fitness, (x, self.list_y_text[ind]))
+        self._window.blit(text_fitness, (x, self.list_y_text[ind]))
         ind += 2
         text_ever = self.font.render("Best Ever: {:.0f}".format(self.best_fitness_ever), True, COLOR_GREEN)
-        self.window.blit(text_ever, (x, self.list_y_text[ind]))
+        self._window.blit(text_ever, (x, self.list_y_text[ind]))
         ind += 1
 
         text_best = self.font.render("Best Gen {:.0f}".format(self.best_actual_fitness), True,
                                      COLOR_GREEN)
-        self.window.blit(text_best, (x, self.list_y_text[ind]))
+        self._window.blit(text_best, (x, self.list_y_text[ind]))
         ind += 1
 
         text_mean = self.font.render("Mean Gen {:.0f}".format(self.mean_fitness), True,
                                      COLOR_GREEN)
-        self.window.blit(text_mean, (x, self.list_y_text[ind]))
+        self._window.blit(text_mean, (x, self.list_y_text[ind]))
         ind += 1
 
         text_mutation = self.font.render("Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
                                          COLOR_GREEN)
-        self.window.blit(text_mutation, (x, self.list_y_text[ind]))
+        self._window.blit(text_mutation, (x, self.list_y_text[ind]))
         ind += 1
 
         text_max_fitness = self.font.render("Up Bound Fit. {:.1f}".format(self.max_fitness_possible), True,
                                             COLOR_GREEN)
-        self.window.blit(text_max_fitness, (x, self.list_y_text[ind]))
+        self._window.blit(text_max_fitness, (x, self.list_y_text[ind]))
         ind += 1
 
         limit_frame = self.font.render("Lim. Frames: " + str(self.gen_duration_limit_steps), True,
                                        pygame.Color('white'))
-        self.window.blit(limit_frame, (x, self.list_y_text[ind]))
+        self._window.blit(limit_frame, (x, self.list_y_text[ind]))
         ind += 2
 
         fps = self.font.render("FPS (max): {} ({})".format(int(self.clock.get_fps()), self.FPS_MAX), True,
                                pygame.Color('white'))
-        self.window.blit(fps, (x, self.list_y_text[ind]))
+        self._window.blit(fps, (x, self.list_y_text[ind]))
 
-    #  New mutation rate which is directly link to the fitness
+    # New mutation rate which is directly link to the fitness
     def get_mutation_rate(self, fitness):
         fitness = max(fitness, 1)
         if fitness < 3000:
@@ -193,7 +193,7 @@ class GameTrainRandomEvolv(GameTrain):
         else:
             return min(0.75, max(-0.092 * math.log(fitness) + 0.834, 0.005))
 
-    #  Update duration limit according to fitness/fitness_PIED_AU_PLANCHER
+    # Update duration limit according to fitness/fitness_PIED_AU_PLANCHER
     def update_duration_limit(self, ratio):
         if ratio < 0.15:
             self.gen_duration_limit_steps = max(int(self.gen_duration_limit_steps / gen_dur_incr_ratio_max),
@@ -214,7 +214,7 @@ class GameTrainRandomEvolv(GameTrain):
         return max_sum_fitness - lost_fitness
 
     def get_forward_speed(self, n_speed):
-        return self.track.speed_max * (1 - math.exp(-n_speed / n0_speed))
+        return self._track.speed_max * (1 - math.exp(-n_speed / n0_speed))
 
     def reset_best_ever(self):
         for carAI in self.carsAI:

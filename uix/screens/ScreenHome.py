@@ -1,7 +1,7 @@
 from uix.screens.ScreenBase import ScreenBase
 from uix.screens.ScreenDrawTrack import run_draw_map
-from uix.screens.ScreenSolo import run_play_ai
-from uix.screens.ScreenSolo import run_play_human
+from uix.screens.ScreenPlaySolo import run_play_ai
+from uix.screens.ScreenPlaySolo import run_play_human
 from uix.screens.ScreenTrainEvolv import run_train
 
 from uix.widgets.ButtonOnOff import *
@@ -76,6 +76,9 @@ class ScreenHome(ScreenBase):
         self._is_ready_select = False  # Mouse's button has been pushed on menu's button, waiting for release
 
         self.actualize()
+
+    def gen_background(self):
+        pass
 
     def actualize(self, pos=None):
         self._clock.tick(self._fps_max)

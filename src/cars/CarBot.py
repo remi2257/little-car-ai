@@ -56,7 +56,7 @@ class CarBot:
         # x_init = xc - self.position_car.width // 2
         self.position_car = self.position_car.move(xc - self.position_car.centerx, yc - self.position_car.centery)
 
-        self.can_change_dir = False  #  IN NEW CASE
+        self.can_change_dir = False  # IN NEW CASE
 
     def get_first_dir(self, grid):
         possible_moves = bot_possible_moves_1w[grid[self.y_grid][self.x_grid]]

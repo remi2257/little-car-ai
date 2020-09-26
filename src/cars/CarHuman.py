@@ -86,7 +86,7 @@ class CarHuman:
     def calculate_new_speed(self, command):
         if not self.on_road:
             if (1 - exp(-self.n_speed / n0_speed)) > 0.3:
-                #  If speed at more than 30% of the maximum
+                # If speed at more than 30% of the maximum
                 # self.n_speed = self.n_speed - 4
                 self.speed = max(self.speed * 0.70, 0)
                 self.recalculate_n_speed()
@@ -164,7 +164,7 @@ class CarHuman:
                       self.position_car.centery])
 
     def new_pos_after_turn(self, new_rect):
-        return tuple([self.position_car.centerx - new_rect.rect_w // 2,
+        return tuple([self.position_car.centerx - new_rect.w // 2,
                       self.position_car.centery - new_rect.h // 2])
 
     def reset_car(self):
@@ -274,7 +274,7 @@ class CarHuman:
                         checkpoint[1] = False
                         # print("ON CHECKPOINT")
                         break
-                #  Todo Ne pas reset directement les CP sinon ça fait doublon
+                # Todo Ne pas reset directement les CP sinon ça fait doublon
                 if not any([cp[1] for cp in self.checkpoints]):
                     self.reset_checkpoints()
                     # print("RESET CHECKPOINT")

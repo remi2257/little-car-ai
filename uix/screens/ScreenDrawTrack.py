@@ -145,7 +145,7 @@ class ScreenDrawTrack(ScreenBase):
 
     # - Visualization
 
-    def keydown_handle(self, key):
+    def _key_press_handle(self, key):
         if key == pygame_const.K_s:  # S : Save
             self.callback_save_map()
         elif key == pygame_const.K_f:  # F : Free

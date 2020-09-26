@@ -206,9 +206,7 @@ track_part_1w_practicable = {
 
 track_files_path = "tracks/"
 list_track = [
-    "track/track0.tra",
-    "track/track1.tra",
-    "track/track2.tra"
+    "tracks/race_tiny.tra",
 ]
 
 # COLORS

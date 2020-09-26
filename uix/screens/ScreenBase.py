@@ -4,14 +4,23 @@ import pygame.locals as pygame_const
 
 
 class ScreenBase:
-    def __init__(self):
-        start_pygame()
-        self._mouse_is_holding_left = False
+    def __init__(self, fps_max=60):
+        self._fps_max = fps_max
+        self._clock = pygame.time.Clock()
 
-    def keydown_handle(self, key):
+        self._mouse_is_holding_left = False
+        start_pygame()
+
+    def _key_down_handle(self, key):
+        pass
+
+    def _keys_pressed_handle(self, keys):
         pass
 
     def actualize(self, pos=None):
+        raise NotImplementedError
+
+    def gen_background(self):
         raise NotImplementedError
 
     def run(self):
@@ -25,11 +34,12 @@ class ScreenBase:
                     self.on_mouse_press()
                 elif event.type == pygame_const.MOUSEBUTTONUP:
                     self.on_mouse_release()
-                # if pygame.mouse.get_pressed()[0]:  # See if the user has clicked or dragged their mouse
                 elif event.type == pygame_const.KEYDOWN:
-                    self.keydown_handle(event.key)
-            pos = pygame.mouse.get_pos()
+                    self._keydown_handle(event.key)
+            keys = pygame.key.get_pressed()
+            self._keys_pressed_handle(keys)
 
+            pos = pygame.mouse.get_pos()
             self.actualize(pos)
 
     def on_mouse_release(self, **kwargs):
@@ -37,3 +47,6 @@ class ScreenBase:
 
     def on_mouse_press(self, **kwargs):
         self._mouse_is_holding_left = True
+
+    def _tick_clock(self):
+        self._clock.tick(self._fps_max)
