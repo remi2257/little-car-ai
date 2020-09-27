@@ -6,9 +6,16 @@ from src.usesful_func import start_pygame, should_stop_pygame
 
 
 class ScreenBase:
-    def __init__(self, fps_max=60, **kwargs):
+    def __init__(self, window_size, fps_max=60, **kwargs):
         start_pygame()
 
+        # Generate Main Window
+        self._window_w, self._window_h = window_size
+        self._window = pygame.display.set_mode((self._window_w, self._window_h))
+        # Background
+        self._background = None
+
+        # Frame Rate
         self._fps_max = fps_max
         self._clock = pygame.time.Clock()
 

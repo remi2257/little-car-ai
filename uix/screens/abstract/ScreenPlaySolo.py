@@ -23,7 +23,7 @@ offset_arrows_pedals = round(big_window_haut / 20)
 class ScreenPlaySolo(ScreenBasePlay):
     def __init__(self, track_path, **kwargs):
         ScreenBasePlay.__init__(self, track_path=track_path, **kwargs)
-
+        # Todo : Cacul de la taille de l'image un peu chelou
         self._car = None
 
         # Get infos on LIDAR's image size
@@ -118,13 +118,13 @@ class ScreenPlaySolo(ScreenBasePlay):
     def refresh_lidar_display(self):
         for i in range(height_grid_LIDAR):
             for j in range(width_grid_LIDAR):
-                if self._car.lidar.is_practicable(i, j):
+                if self._car.lidar_is_practicable(i, j):
                     color = COLOR_GREEN
                 else:
                     color = COLOR_RED
 
                 # Print Point & Result
-                point_pos = self._car.lidar.get_true_pos(i, j)
+                point_pos = self._car.lidar_get_true_pos(i, j)
                 pygame.draw.circle(self._window, color, point_pos, circle_size)
 
                 # Draw rectangle

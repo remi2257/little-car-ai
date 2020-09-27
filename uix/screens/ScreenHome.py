@@ -2,7 +2,7 @@ from uix.screens.abstract.ScreenBase import ScreenBase
 from uix.screens.ScreenDrawTrack import run_draw_map
 from uix.screens.ScreenPlayAI import run_play_ai
 from uix.screens.ScreenPlayHuman import run_play_human
-from uix.screens.ScreenTrainEvolv import run_train
+from uix.screens.ScreenTrainRandomEvolv import run_train
 
 from uix.widgets.ButtonOnOff import *
 from uix.widgets.ButtonPress import *
@@ -32,17 +32,8 @@ button_save_off = buttons_img_path + "save_off.png"
 
 class ScreenHome(ScreenBase):
     def __init__(self):
-        super(ScreenHome, self).__init__()
-
-        # Set clock to limit FPS
-        self._fps_max = FPS_MAX
-        pygame.time.Clock().tick(self._fps_max)  # Set max FPS
-        self._clock = pygame.time.Clock()
-
-        # Generate Main Window
-        self._window_w = big_window_haut
-        self._window_h = big_window_haut
-        self._window = pygame.display.set_mode((self._window_w, self._window_h))
+        super(ScreenHome, self).__init__(window_size=(big_window_haut, big_window_haut),
+                                         fps_max=FPS_MAX)
 
         # Add buttons
         self._buttons_action = [ButtonPress(self._window_w // 2, buttons_y[i],

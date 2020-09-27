@@ -1,13 +1,15 @@
+"""
+
 import random
 
 import pygame
 
 from src.const import *
 
-'''
 Pas utilisé en ce moment mais fonctionnel
-'''
+"""
 
+"""
 
 class CarBot:
     def __init__(self, track, path_img="images/vehicles/car_bot.png"):
@@ -153,3 +155,6 @@ class CarBot:
 
     def give_opposite_direction(self):
         return (self.direction + 2) % 4
+
+
+    """

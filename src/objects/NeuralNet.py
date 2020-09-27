@@ -11,14 +11,14 @@ class NeuralNet:
 
         self.is_cnn = "cnn" in nn_file_path
         if nn_file_path is None:
-            self.model = None
+            self._model = None
         elif nn_file_path.endswith(".net"):
             if self.is_cnn:
-                self.model = self.gen_cnn_model(nn_file_path)
+                self._model = self.gen_cnn_model(nn_file_path)
             else:
-                self.model = self.gen_nn_model(nn_file_path)
+                self._model = self.gen_nn_model(nn_file_path)
         elif nn_file_path.endswith(".h5"):
-            self.model = load_model(nn_file_path)
+            self._model = load_model(nn_file_path)
 
     def gen_cnn_model(self, nn_file_path):
         model_struc = []
@@ -111,9 +111,9 @@ class NeuralNet:
 
         return Model(inputs=inp, outputs=[out1, out2])
 
-    def mutate_model_from_query(self, target_nn, mutate_rate, fixed_mutate_rate=False):
-        if not fixed_mutate_rate:
-            mutate_rate = min(1.0, max(2 * random.random() * mutate_rate, 0.01))
+    def mutate_model_from_query(self, target_nn, mutation_rate, fixed_mutation_rate=False):
+        if not fixed_mutation_rate:
+            mutation_rate = min(1.0, max(2 * random.random() * mutation_rate, 0.01))
         for j, layer in enumerate(target_nn.model.layers):
             new_weights_for_layer = []
 
@@ -122,17 +122,17 @@ class NeuralNet:
                 one_dim_weight = weight_array.reshape(-1)
                 if layer.trainable:
                     for i, weight in enumerate(one_dim_weight):
-                        if random.random() <= mutate_rate:
+                        if random.random() <= mutation_rate:
                             # one_dim_weight[i] = random.uniform(0, 2) - 1
                             one_dim_weight[i] = random.gauss(0, 0.4)
 
                 new_weight_array = one_dim_weight.reshape(save_shape)
                 new_weights_for_layer.append(new_weight_array)
 
-            self.model.layers[j].set_weights(new_weights_for_layer)
+            self._model.layers[j].set_weights(new_weights_for_layer)
 
-    def mutate_model(self, mutate_rate):
-        for j, layer in enumerate(self.model.layers):
+    def mutate_model(self, mutation_rate):
+        for j, layer in enumerate(self._model.layers):
             new_weights_for_layer = []
 
             for weight_array in layer.get_weights():
@@ -140,13 +140,23 @@ class NeuralNet:
                 one_dim_weight = weight_array.reshape(-1)
 
                 for i, weight in enumerate(one_dim_weight):
-                    if random.random() <= mutate_rate:
+                    if random.random() <= mutation_rate:
                         one_dim_weight[i] = random.uniform(0, 2) - 1
 
                 new_weight_array = one_dim_weight.reshape(save_shape)
                 new_weights_for_layer.append(new_weight_array)
 
-            self.model.layers[j].set_weights(new_weights_for_layer)
+            self._model.layers[j].set_weights(new_weights_for_layer)
+
+    def save(self, filepath):
+        self._model.save(filepath)
+
+    @property
+    def model(self):
+        return self._model
+
+    def predict(self, inputs):
+        return self._model.predict(inputs)
 
 
 if __name__ == '__main__':

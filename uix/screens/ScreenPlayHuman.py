@@ -7,7 +7,7 @@ from src.const import *
 
 class ScreenPlayHuman(ScreenPlaySolo):
 
-    def __init__(self, track_path="track/track1.tra", **kwargs):
+    def __init__(self, track_path, **kwargs):
         super(ScreenPlayHuman, self).__init__(track_path=track_path, **kwargs)
         self._car = CarHuman(self._track)
 

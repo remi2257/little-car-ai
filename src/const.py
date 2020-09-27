@@ -3,6 +3,7 @@ import glob
 
 import pygame.locals as pygame_const
 
+# Todo : Bouger un peu le tout
 
 def get_screen_infos_linux(ratio_screen_window):
     import subprocess
@@ -84,7 +85,6 @@ gen_dur_incr_ratio_max = 1.2
 generation_duration_incr_sec = 1
 generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
 
-path_train_save = "results_training/"
 
 # -- CAR PARAMETERS -- #
 nbr_bots = 0

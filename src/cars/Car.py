@@ -62,11 +62,11 @@ class Car:
         self._position_car = self._position_car.move(self._x_init, self._y_init)
 
         # GEN LIDAR
-        self.lidar_case_size = self._track.lidar_case_size
-        self.lidar_grid_car_x = width_grid_LIDAR // 2
-        self.lidar_grid_car_y = height_grid_LIDAR - offset_y_LIDAR - 1
+        self._lidar_case_size = self._track.lidar_case_size
+        self._lidar_grid_car_x = width_grid_LIDAR // 2
+        self._lidar_grid_car_y = height_grid_LIDAR - offset_y_LIDAR - 1
 
-        self.lidar = LIDAR()
+        self._lidar = LIDAR()
 
         self._refresh_lidar()
 
@@ -163,7 +163,7 @@ class Car:
         # Lidar
         self._refresh_lidar()
 
-        self._on_road = self.lidar.filtered[self.lidar_grid_car_y][self.lidar_grid_car_x]
+        self._on_road = self._lidar.is_practicable(self._lidar_grid_car_y, self._lidar_grid_car_x)
 
     def get_position_left_top(self):
         return tuple([self._position_car.x,
@@ -203,8 +203,8 @@ class Car:
 
         for i in range(height_grid_LIDAR):
             for j in range(width_grid_LIDAR):
-                dx_rel_grid = (j - self.lidar_grid_car_x) * self.lidar_case_size
-                dy_rel_grid = (i - self.lidar_grid_car_y) * self.lidar_case_size
+                dx_rel_grid = (j - self._lidar_grid_car_x) * self._lidar_case_size
+                dy_rel_grid = (i - self._lidar_grid_car_y) * self._lidar_case_size
 
                 # /!\ I took theta = 0° when pointing left but the lidar map is pointing top
                 dx_rel = dx_rel_grid * cos(radians(self._theta - 90.0)) + dy_rel_grid * sin(radians(self._theta - 90.0))
@@ -214,23 +214,19 @@ class Car:
                 true_x = round(dx_rel + car_x)
                 true_y = round(dy_rel + car_y)
 
-                self.lidar.true_pos[i][j] = [true_x, true_y]
-
                 true_x_grid = true_x // self._track.case_size
                 true_y_grid = true_y // self._track.case_size
 
                 if 0 < true_x_grid < self._track.grid_w and 0 < true_y_grid < self._track.grid_h:
-                    corresponding_square = self._track.get_road_name(true_y_grid, true_x_grid)
+                    road_type = self._track.get_road_name(true_y_grid, true_x_grid)
 
                 else:
-                    corresponding_square = "xx"
-
-                self.lidar.mat[i][j] = corresponding_square
+                    road_type = "xx"
 
                 # is_practicable = track_part_1w_practicable[corresponding_square]
-                is_practicable = "x" not in corresponding_square
+                is_practicable = "x" not in road_type
 
-                self.lidar.filtered[i][j] = is_practicable
+                self._lidar.refresh_case(i, j, road_type, is_practicable, [true_x, true_y])
 
     # ----Fitness & Checkpoints---#
 
@@ -324,3 +320,17 @@ class Car:
     @property
     def actual_img(self):
         return self._actual_img
+
+    @property
+    def lidar_grid_car_x(self):
+        return self._lidar_grid_car_x
+
+    @property
+    def lidar_grid_car_y(self):
+        return self._lidar_grid_car_y
+
+    def lidar_is_practicable(self, i, j):
+        return self._lidar.is_practicable(i, j)
+
+    def lidar_get_true_pos(self, i, j):
+        return self._lidar.get_true_pos(i, j)

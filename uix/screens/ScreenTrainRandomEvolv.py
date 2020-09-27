@@ -1,14 +1,42 @@
-from uix.screens.abstract.ScreenBaseTrain import *
-from src.cars.CarAI import *
+import numpy as np
+import math
+import pygame
 
-matplotlib.use("Agg")
+from src.const import *
+from src.cars.CarAI import CarAI
+
+from uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
+
+nbr_AI_per_gen = 28
+rate_survivors = 0.25
+
+nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
+
+weight_on_road = 10
+lower_bound_fitness = -1000
+
+boost_checkpoint = 250
+
+max_mutation_rate = 1.0
+decay_mutation_rate = 0.95
+
+copy_mutation_rate = 0.08
+
+generation_duration_max_sec = 20
+generation_duration_max_frame = generation_duration_max_sec * FPS_MAX_init
+
+generation_duration_init_sec = 1
+generation_duration_init_frame = generation_duration_init_sec * FPS_MAX_init
+
+gen_dur_incr_ratio_max = 1.2
+generation_duration_incr_sec = 1
+generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
 
 
-class GameTrainRandomEvolv(ScreenBaseTrain):
-    def __init__(self, nn_file_path="raw_models/nn1_dual_layers.net", track_path="track/track1.tra", save=True,
-                 fps_max=FPS_MAX_init):
+class ScreenTrainRandomEvolv(ScreenBaseTrain):
+    def __init__(self, track_path, fps_max, nn_file_path, save):
 
-        ScreenBaseTrain.__init__(self, nn_file_path, track_path, save, fps_max)
+        ScreenBaseTrain.__init__(self, track_path, fps_max, nn_file_path, save)
 
         if nn_file_path.endswith(".net"):
             self.mutation_rate_best = max_mutation_rate
@@ -23,25 +51,25 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         self.max_fitness_possible = self.get_max_possible_fitness()
 
         for i in range(nbr_AI_per_gen):
-            self.carsAI.append(CarAI(nn_file_path, self._track, self._lidar_im_w, self._lidar_im_h))
+            new_car = CarAI(nn_file_path, self._track)
             if nn_file_path.endswith(".h5") and i > 0:
-                self.carsAI[-1].neural_net.mutate_model(self.mutation_rate_best)
+                new_car.mutate_neural_network(self.mutation_rate_best)
+            self._carsAI.append(new_car)
 
         self.actualize()
 
-    def actualize(self):
-        self.clock.tick(self.FPS_MAX)  # Fixe le nbr max de FPS
-
-        # Start new generation if limit of time is reached for the actual generation
-        if self.gen_duration >= self.gen_duration_limit_steps:
-            self.start_new_gen()
-        self.gen_duration += 1
-
+    def actualize(self, pos=None):
+        self._tick_clock()
         # BACKGROUND
         self._window.blit(self._background, (0, 0))
 
+        # Start new generation if limit of time is reached for the actual generation
+        if self._gen_duration >= self.gen_duration_limit_steps:
+            self.start_new_gen()
+        self._gen_duration += 1
+
         # Make every cars' move
-        for carAI in self.carsAI:
+        for carAI in self._carsAI:
             if not carAI.is_alive:
                 continue
 
@@ -49,8 +77,8 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
             carAI.actualize_direction_and_gas(carAI.predict_next_move())
 
             # Kill car that are bad
-            if carAI._fitness < lower_bound_fitness:
-                carAI.is_alive = False
+            if carAI.fitness < lower_bound_fitness:
+                carAI._is_alive = False
 
             # move_car
             carAI.move_car_and_refresh_lidar()
@@ -68,34 +96,29 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
             self.gen_duration = self.gen_duration_limit_steps
         """
         # Get infos on fitness
-        list_fitness = [c._fitness for c in self.carsAI]
+        list_fitness = [c.fitness for c in self._carsAI]
 
         # Get mean & max
-        self.mean_fitness = np.mean(list_fitness)
-        self.best_actual_fitness = max(list_fitness)
+        self._mean_fitness = np.mean(list_fitness)
+        self._best_actual_fitness = max(list_fitness)
         # Save Best fitness value
-        self.best_fitness_list[-1] = self.best_actual_fitness
+        self._best_fitness_list[-1] = self._best_actual_fitness
         # self.best_fitness_ever = max(self.best_fitness_ever, self.best_actual_fitness)
 
         # -- DISPLAY--#
         # AI's CARS
-        for carAI in self.carsAI:
-            if not carAI.is_alive:
+        for carAI in self._carsAI:
+            if not carAI._is_alive:
                 continue
-            if carAI._fitness == self.best_actual_fitness:
+            if carAI.fitness == self._best_actual_fitness:
                 carAI.change_to_leader_img()
             elif carAI.is_survivor:
                 carAI.change_to_survivor_img()
 
-            self._window.blit(carAI._actual_img, carAI.get_position_left_top())
-
-        # BOTS CAR
-        for car in self.cars_bot:
-            car.move_car_bot(self._track)
-            self._window.blit(car._actual_img, car.get_position_left_top())
+            self._window.blit(carAI.actual_img, carAI.get_position_left_top())
 
         # REFRESH
-        self.display_infos_fitness_n_FPS()
+        self.display_infos_fitness_n_fps()
         pygame.display.flip()
 
     def start_new_gen(self):
@@ -103,87 +126,88 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         self.refresh_fitness_plot()
 
         # Sort cars by fitness
-        self.carsAI = sorted(self.carsAI, key=lambda x: x._fitness, reverse=True)
+        self._carsAI = sorted(self._carsAI, key=lambda x: x.fitness, reverse=True)
 
         # Save the best model of this generation if the user put save on On
-        if self.save:
+        if self._save:
             self.save_gen_best_model()
 
         # -- CALCULATE NEW MUTATION RATE --#
-        best_fitness = max(1, self.carsAI[0]._fitness - self.carsAI[0]._bonus_checkpoints)
+        best_car = self._carsAI[0]
+        best_fitness = max(1, best_car.fitness - best_car.bonus_checkpoints)
         ratio_fitness = best_fitness / self.max_fitness_possible
         self.mutation_rate_best = self.get_mutation_rate(best_fitness)
         self.update_duration_limit(ratio_fitness)
         # self.mutation_rate *= decay_mutation_rate
 
         # Get fitness of survivors
-        best_cars_fitness = [max(car._fitness, 1) for car in self.carsAI[0:nbr_survivors]]
+        best_cars_fitness = [max(car.fitness, 1) for car in self._carsAI[0:nbr_survivors]]
         # Use square to increase the gap between lucky survivors & beasts
         best_fitness_square = np.array(best_cars_fitness) ** 2
         weight_best_fitness = best_fitness_square / np.sum(best_fitness_square)
 
-        if self.carsAI[0]._fitness > self.best_fitness_ever:
-            self.best_fitness_ever = self.carsAI[0]._fitness
+        if best_car.fitness > self._best_fitness_ever:
+            self._best_fitness_ever = best_car.fitness
 
         # -- APPLY MUTATION --#
-        for i, car in enumerate(self.carsAI):
+        for i, car in enumerate(self._carsAI):
             car.reset_car_ai()
             if i < nbr_survivors or car.is_best_ever:
-                car.is_survivor = True
+                car._is_survivor = True
             else:
-                car.is_survivor = False
+                car._is_survivor = False
                 chosen_parent = np.random.choice(nbr_survivors, p=weight_best_fitness)
-                car.neural_net.mutate_model_from_query(self.carsAI[chosen_parent].neural_net,
-                                                       self.mutation_rate_best)
+                car.mutate_model_from_parent(self._carsAI[chosen_parent],
+                                             self.mutation_rate_best)
         # Incr values
 
         self.max_fitness_possible = self.get_max_possible_fitness()
 
-        self.best_fitness_list.append(0)
-        self.gen_id += 1
-        self.gen_duration = 0
+        self._best_fitness_list.append(0)
+        self._gen_id += 1
+        self._gen_duration = 0
 
     def gen_background(self):
-        self.gen_track_background()
+        self._gen_track_background()
 
-    def display_infos_fitness_n_FPS(self):
+    def display_infos_fitness_n_fps(self):
         x = self._track.__im_w - round(0.7 * self._track.__case_size)
         ind = 0
-        text_fitness = self._font.render("Fitness - Gen {}".format(self.gen_id), True, COLOR_BLUE)
-        self._window.blit(text_fitness, (x, self.list_y_text[ind]))
+        text_fitness = self._font.render("Fitness - Gen {}".format(self._gen_id), True, COLOR_BLUE)
+        self._window.blit(text_fitness, (x, self._list_y_text[ind]))
         ind += 2
-        text_ever = self._font.render("Best Ever: {:.0f}".format(self.best_fitness_ever), True, COLOR_GREEN)
-        self._window.blit(text_ever, (x, self.list_y_text[ind]))
+        text_ever = self._font.render("Best Ever: {:.0f}".format(self._best_fitness_ever), True, COLOR_GREEN)
+        self._window.blit(text_ever, (x, self._list_y_text[ind]))
         ind += 1
 
-        text_best = self._font.render("Best Gen {:.0f}".format(self.best_actual_fitness), True,
+        text_best = self._font.render("Best Gen {:.0f}".format(self._best_actual_fitness), True,
                                       COLOR_GREEN)
-        self._window.blit(text_best, (x, self.list_y_text[ind]))
+        self._window.blit(text_best, (x, self._list_y_text[ind]))
         ind += 1
 
-        text_mean = self._font.render("Mean Gen {:.0f}".format(self.mean_fitness), True,
+        text_mean = self._font.render("Mean Gen {:.0f}".format(self._mean_fitness), True,
                                       COLOR_GREEN)
-        self._window.blit(text_mean, (x, self.list_y_text[ind]))
+        self._window.blit(text_mean, (x, self._list_y_text[ind]))
         ind += 1
 
         text_mutation = self._font.render("Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
                                           COLOR_GREEN)
-        self._window.blit(text_mutation, (x, self.list_y_text[ind]))
+        self._window.blit(text_mutation, (x, self._list_y_text[ind]))
         ind += 1
 
         text_max_fitness = self._font.render("Up Bound Fit. {:.1f}".format(self.max_fitness_possible), True,
                                              COLOR_GREEN)
-        self._window.blit(text_max_fitness, (x, self.list_y_text[ind]))
+        self._window.blit(text_max_fitness, (x, self._list_y_text[ind]))
         ind += 1
 
         limit_frame = self._font.render("Lim. Frames: " + str(self.gen_duration_limit_steps), True,
                                         pygame.Color('white'))
-        self._window.blit(limit_frame, (x, self.list_y_text[ind]))
+        self._window.blit(limit_frame, (x, self._list_y_text[ind]))
         ind += 2
 
-        fps = self._font.render("FPS (max): {} ({})".format(int(self.clock.get_fps()), self.FPS_MAX), True,
+        fps = self._font.render("FPS (max): {} ({})".format(int(self._clock.get_fps()), self._fps_max), True,
                                 pygame.Color('white'))
-        self._window.blit(fps, (x, self.list_y_text[ind]))
+        self._window.blit(fps, (x, self._list_y_text[ind]))
 
     # New mutation rate which is directly link to the fitness
     def get_mutation_rate(self, fitness):
@@ -217,56 +241,24 @@ class GameTrainRandomEvolv(ScreenBaseTrain):
         return self._track.__speed_max * (1 - math.exp(-n_speed / n0_speed))
 
     def reset_best_ever(self):
-        for carAI in self.carsAI:
-            carAI.is_best_ever = False
+        for carAI in self._carsAI:
+            carAI._is_best_ever = False
 
-        self.carsAI[0].is_best_ever = True
+        self._carsAI[0].is_best_ever = True
 
-def run_train(**kwargs):
-    # --- INIT Variable--- #
 
-    stop = False
+def run_train(track_path, nn_file_path, save, **kwargs):
+    screen = ScreenTrainRandomEvolv(track_path=track_path,
+                                    nn_file_path=nn_file_path,
+                                    save=save,
+                                    **kwargs)
+    screen.run()
 
-    if "track_path" in kwargs:
-        track_path = kwargs["track_path"]
-    else:
-        track_path = list_track[0]
-
-    if "model_path" in kwargs:
-        model_path = kwargs["model_path"]
-    else:
-        model_path = "raw_models/nn_tiny.net"
-
-    if "save_train" in kwargs:
-        save = kwargs["save_train"]
-    else:
-        save = True
-
-    # --- INIT Game--- #
-
-    game = GameTrainRandomEvolv(
-        nn_file_path=model_path,
-
-        track_path=track_path,
-
-        save=save,
-
-        fps_max=FPS_MAX_max,
-    )
-
-    # Boucle infinie
-    while not stop:
-        for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
-            if event.type == pygame_const.QUIT or (
-                    event.type == pygame_const.KEYDOWN and event.key in list_break):  # Si un de ces événements est de type QUIT
-                stop = True  # On arrête la boucle
-            if event.type == pygame_const.KEYDOWN and event.key == pygame_const.K_DOWN:
-                game.decrease_FPS()
-            if event.type == pygame_const.KEYDOWN and event.key == pygame_const.K_UP:
-                game.increase_FPS()
-
-        # Refresh
-        game.actualize()
 
 if __name__ == '__main__':
-    run_train()
+    run_train(
+        track_path="tracks/race_tiny.tra",
+        nn_file_path="raw_models/nn_tiny.net",
+        save=False,
+
+    )

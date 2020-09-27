@@ -1,29 +1,28 @@
 import pygame
 
 from src.objects.Track import Track
-from src.const import FPS_MAX_init, background_path, roads_path
+from src.const import FPS_MAX_init, background_path, roads_path, big_window_haut, big_window_larg
 from .ScreenBase import ScreenBase
 
 
 class ScreenBasePlay(ScreenBase):
     def __init__(self, track_path, fps_max=FPS_MAX_init, **kwargs):
+        if "window_size" not in kwargs:
+            kwargs["window_size"] = (big_window_haut, big_window_larg)
         super(ScreenBasePlay, self).__init__(fps_max=fps_max, **kwargs)
 
         # Generate track object
         self._track = Track(track_path)
-
-        # Background
-        self._background = None
 
     def actualize(self, pos=None):
         raise NotImplementedError
 
     def gen_background(self):
         self._background = pygame.image.load(background_path).convert()
-        self.gen_track_background()  # Draw roads
+        self._gen_track_background()  # Draw roads
 
     # Generate Track background by drawing roads
-    def gen_track_background(self):
+    def _gen_track_background(self):
         for i in range(self._track.grid_h):
             for j in range(self._track.grid_w):
                 small_name = self._track.get_road_name(i, j)
