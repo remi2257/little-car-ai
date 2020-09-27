@@ -1,5 +1,12 @@
-# Hidden layers
+description: A CNN :D
 
-[Hidden1]
-neurons = 10
-activation = ReLu
+architectures:
+  lidar_layers:
+  - ["conv", 8, [3, 3], 1, "same"]
+  - ["conv", 8, [2, 2], 1, "same"]
+  - ["max_pool", [2, 2], 1, "valid"]
+  - ["flatten"]
+  extra_params_layers:
+    - ["dense", 2]
+  concat_layers:
+    - ["dense", 10]

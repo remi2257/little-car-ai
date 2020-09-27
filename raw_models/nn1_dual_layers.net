@@ -1,13 +1,10 @@
-## Input
-# Velocity + LIDAR (height_LIDAR *
-#                   width_LIDAR)
+description: 2 layers network
 
-# Hidden layers
-
-[Hidden1]
-neurons = 15
-activation = ReLu
-
-[Hidden2]
-neurons = 10
-activation = ReLu
+architectures:
+  lidar_layers:
+    - ["dense", 16]
+    - ["dense", 8]
+  extra_params_layers:
+    - ["dense", 2]
+  concat_layers:
+    - ["dense", 10]

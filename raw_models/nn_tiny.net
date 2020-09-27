@@ -1,5 +1,9 @@
-# Hidden layers
+description: One layer network
 
-[Hidden1]
-neurons = 10
-activation = ReLu
+architectures:
+  lidar_layers:
+    - ["dense", 10]
+  extra_params_layers:
+    - ["dense", 2]
+  concat_layers:
+    - ["dense", 10]

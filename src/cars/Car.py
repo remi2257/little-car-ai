@@ -1,26 +1,10 @@
 import math
 import pygame
 from math import cos, sin, radians, exp
-from enum import Enum
 from src.const import *
 
 from src.objects.LIDAR import LIDAR
-
-
-class Command(Enum):
-    pass
-
-
-class CommandDir(Command):
-    LEFT = 1
-    NONE = 2
-    RIGHT = 3
-
-
-class CommandGas(Command):
-    BRAKE = 1
-    OFF = 2
-    ON = 3
+from .CarCommands import CommandGas, CommandDir
 
 
 class Car:

@@ -1,115 +1,81 @@
 import random
+import yaml
 
-from keras.layers import Dense, Input, Conv2D, MaxPool2D, Flatten, Concatenate
-from keras.models import Model, load_model
+import tensorflow as tf
+from tensorflow.keras.layers import Dense, Input, Conv2D, MaxPool2D, Flatten, Concatenate
+from tensorflow.keras.models import Model, load_model
 
-from src.const import *
+from src.cars.CarCommands import CommandDir, CommandGas
+from src.const import height_grid_LIDAR, width_grid_LIDAR
+
+extra_params_dim = 1
+
+
+def interpret_layer(layer_type, *args):
+    if layer_type == "conv":
+        nb_filter, kernel_size, strides, padding = args
+        return Conv2D(filters=nb_filter, kernel_size=kernel_size,
+                      strides=strides, padding=padding,
+                      activation='relu')
+    elif layer_type == "max_pool":
+        pool_size, strides, padding = args
+        return MaxPool2D(pool_size=pool_size,
+                         strides=strides, padding=padding)
+    elif layer_type == "flatten":
+        return Flatten()
+    elif layer_type == "dense":
+        size = args[0]
+        return Dense(units=size, activation="relu")
+
+
+def add_layers_to_model(model, model_architecture_layers):
+    for layer_type, *args in model_architecture_layers:
+        new_layer = interpret_layer(layer_type, *args)
+        model = new_layer(model)
+    return model
+
+
+def model_parser(model_path):
+    with open(model_path, "r") as input_file:
+        yaml_file = yaml.safe_load(input_file)
+    model_architectures = yaml_file["architectures"]
+    model_lidar_architecture = model_architectures["lidar_layers"]
+
+    use_conv = any("conv" in layer for layer in model_lidar_architecture)
+    if use_conv:
+        input_dim_lidar = tuple([height_grid_LIDAR, width_grid_LIDAR, 1])
+    else:
+        input_dim_lidar = (height_grid_LIDAR * width_grid_LIDAR,)
+
+    lidar_model_input = Input(shape=input_dim_lidar, name='lidar_input')
+    lidar_model = add_layers_to_model(lidar_model_input, model_lidar_architecture)
+
+    extra_params_model_input = Input((extra_params_dim,), name='extra_params_input')
+    extra_params_model = add_layers_to_model(extra_params_model_input, model_architectures["extra_params_layers"])
+
+    concat_model_input = Concatenate(name="merge_input")([lidar_model, extra_params_model])
+    concat_model = add_layers_to_model(concat_model_input, model_architectures["concat_layers"])
+
+    output_dir = Dense(len(CommandDir), activation="softmax", name='output_dir')(concat_model)
+    output_gas = Dense(len(CommandGas), activation="softmax", name='output_gas')(concat_model)
+
+    model = Model(inputs=[lidar_model_input, extra_params_model_input], outputs=[output_dir, output_gas])
+
+    tf.keras.utils.plot_model(
+        model, to_file=model_path.replace('.net', '.png'),
+        show_shapes=True, show_layer_names=True,
+        rankdir='TB', expand_nested=True, dpi=96
+    )
+    return model
 
 
 class NeuralNet:
-    def __init__(self, nn_file_path=None):
+    def __init__(self, nn_file_path):
 
-        self.is_cnn = "cnn" in nn_file_path
-        if nn_file_path is None:
-            self._model = None
-        elif nn_file_path.endswith(".net"):
-            if self.is_cnn:
-                self._model = self.gen_cnn_model(nn_file_path)
-            else:
-                self._model = self.gen_nn_model(nn_file_path)
+        if nn_file_path.endswith(".net"):
+            self._model = model_parser(nn_file_path)
         elif nn_file_path.endswith(".h5"):
             self._model = load_model(nn_file_path)
-
-    def gen_cnn_model(self, nn_file_path):
-        model_struc = []
-        softmax_classes = 3
-        input_dim_cnn = tuple([height_grid_LIDAR, width_grid_LIDAR, 1])
-        extra_data_dim = 1
-        with open(nn_file_path) as f:
-            lines_raw = f.readlines()
-            lines = [line.strip() for line in lines_raw if line != "\n"]
-
-        for line in lines:
-            if line[0].startswith("#"):
-                continue
-            if line[0].startswith("["):
-                continue
-
-            line = line.split(" ")
-            # if line[0] == "input_dim":
-            #     input_dim = int(line[-1])
-            if line[0] == "neurons":
-                model_struc.append([int(line[-1])])
-            if line[0] == "activation":
-                model_struc[-1].append(line[-1].lower())
-            if line[0] == "classes":
-                softmax_classes = int(line[-1])
-
-        inp_data = Input((extra_data_dim,), name='data_input')
-
-        inp_cnn = Input(input_dim_cnn, name='cnn_input')
-
-        cnn = Conv2D(filters=8, kernel_size=(2, 2), padding='Same',
-                     activation='relu', trainable=False)(inp_cnn)
-        cnn = Conv2D(filters=8, kernel_size=(2, 2), padding='Same',
-                     activation='relu', trainable=False)(cnn)
-        cnn = MaxPool2D(pool_size=(2, 2), strides=(2, 2))(cnn)
-
-        cnn = Flatten()(cnn)
-        cnn_output = Dense(7, activation="relu")(cnn)
-
-        # main_inp = Input((cnn_output, extra_data_dim), name='main_input')
-        main_inp = Concatenate(name='main_input')([cnn_output, inp_data])
-
-        neurons, activ_func = model_struc.pop(0)
-        big_model = Dense(neurons, activation=activ_func, name='dense_main_1')(main_inp)
-
-        for i, layer in enumerate(model_struc):
-            neurons, activ_func = layer
-            big_model = Dense(neurons, activation=activ_func, name="dense_main_" + str(i + 2))(big_model)
-
-        out1 = Dense(softmax_classes, activation="softmax", name='output_dir')(big_model)
-        out2 = Dense(softmax_classes, activation="softmax", name='output_gas')(big_model)
-
-        return Model(inputs=[inp_cnn, inp_data], outputs=[out1, out2])
-
-    def gen_nn_model(self, nn_file_path):
-        model_struc = []
-        softmax_classes = 3
-        input_dim = height_grid_LIDAR * width_grid_LIDAR + 1
-        with open(nn_file_path) as f:
-            lines_raw = f.readlines()
-            lines = [line.strip() for line in lines_raw if line != "\n"]
-
-        for line in lines:
-            if line[0].startswith("#"):
-                continue
-            if line[0].startswith("["):
-                continue
-
-            line = line.split(" ")
-            # if line[0] == "input_dim":
-            #     input_dim = int(line[-1])
-            if line[0] == "neurons":
-                model_struc.append([int(line[-1])])
-            if line[0] == "activation":
-                model_struc[-1].append(line[-1].lower())
-            if line[0] == "classes":
-                softmax_classes = int(line[-1])
-
-        inp = Input((input_dim,), name='main_input')
-
-        neurons, activ_func = model_struc.pop(0)
-        model = Dense(neurons, activation=activ_func, name='dense_1')(inp)
-
-        for i, layer in enumerate(model_struc):
-            neurons, activ_func = layer
-            model = Dense(neurons, activation=activ_func, name="dense_" + str(i + 2))(model)
-
-        out1 = Dense(softmax_classes, activation="softmax", name='output_dir')(model)
-        out2 = Dense(softmax_classes, activation="softmax", name='output_gas')(model)
-
-        return Model(inputs=inp, outputs=[out1, out2])
 
     def mutate_model_from_query(self, target_nn, mutation_rate, fixed_mutation_rate=False):
         if not fixed_mutation_rate:
@@ -160,16 +126,17 @@ class NeuralNet:
 
 
 if __name__ == '__main__':
-    from keras.utils import plot_model
+    nn = NeuralNet("raw_models/nn_tiny.net")
+    nn.model.summary()
 
-    nn = NeuralNet("raw_models/cnn_standard.net")
-    nn2 = NeuralNet("raw_models/cnn_standard.net")
+    nn2 = NeuralNet("raw_models/nn1_dual_layers.net")
+    nn2.model.summary()
+
+    nn_cnn = NeuralNet("raw_models/cnn_standard.net")
+    nn_cnn.model.summary()
     # nn2 = NeuralNet("raw_models/nn_tiny.net")
 
-    nn2.mutate_model_from_query(nn, 0.9)
-    # print(nn.model.summary())
+    # nn2.mutate_model_from_query(nn, 0.9)
     # print(nn2.model.summary())
     # print(nn.model.get_weights())
     # print(nn2.model.get_weights())
-
-    plot_model(nn.model, to_file='raw_models/model_plot.png', show_shapes=True, show_layer_names=True)
