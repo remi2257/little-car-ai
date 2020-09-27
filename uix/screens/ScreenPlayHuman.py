@@ -7,23 +7,24 @@ from src.const import *
 
 class ScreenPlayHuman(ScreenPlaySolo):
 
-    def __init__(self, track_path="track/track1.tra"):
-        super(ScreenPlayHuman, self).__init__(track_path=track_path)
+    def __init__(self, track_path="track/track1.tra", **kwargs):
+        super(ScreenPlayHuman, self).__init__(track_path=track_path, **kwargs)
         self._car = CarHuman(self._track)
 
         self.actualize()
 
     def _keys_pressed_handle(self, keys):
+        if keys[pygame_const.K_r]:  # If R
+            # Reset car
+            self._car.reset_car()
+            return
+
         if keys[pygame_const.K_DOWN]:  # If Down Arrow
             self._car.actualize_direction_or_gas(CommandGas.BRAKE)
         elif keys[pygame_const.K_UP]:  # If Up Arrow
             self._car.actualize_direction_or_gas(CommandGas.ON)
         else:  # If None of them
             self._car.actualize_direction_or_gas(CommandGas.OFF)
-
-        if keys[pygame_const.K_r]:  # If R
-            # Reset car
-            self._car.reset_car()
 
         if keys[pygame_const.K_LEFT]:  # If Left Arrow
             self._car.actualize_direction_or_gas(CommandDir.LEFT)
@@ -33,8 +34,8 @@ class ScreenPlayHuman(ScreenPlaySolo):
             self._car.actualize_direction_or_gas(CommandDir.NONE)
 
 
-def run_play_human(track_path):
-    screen = ScreenPlayHuman(track_path=track_path)
+def run_play_human(track_path, **kwargs):
+    screen = ScreenPlayHuman(track_path=track_path, **kwargs)
     screen.run()
 
 

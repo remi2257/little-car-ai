@@ -78,7 +78,7 @@ class Track:
         return self.__car_size
 
     def get_road_name(self, i, j):
-        return self.__grid_raw[i][j]
+        return self.__grid_raw[i][j].replace("c", "")
 
     @property
     def lidar_case_size(self):

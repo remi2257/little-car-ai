@@ -21,8 +21,8 @@ offset_arrows_pedals = round(big_window_haut / 20)
 
 
 class ScreenPlaySolo(ScreenBasePlay):
-    def __init__(self, track_path):
-        ScreenBasePlay.__init__(self, track_path=track_path)
+    def __init__(self, track_path, **kwargs):
+        ScreenBasePlay.__init__(self, track_path=track_path, **kwargs)
 
         self._car = None
 
@@ -49,6 +49,35 @@ class ScreenPlaySolo(ScreenBasePlay):
 
         self.gen_background()
 
+    # -- INIT Functions -- #
+
+    # read global variables to get the size of LIDAR's display
+    def find_lidar_img_size(self):
+        track_height = self._track.im_h
+        ratio = float(height_grid_LIDAR) / width_grid_LIDAR
+        if ratio <= 1.0:
+            return LIDAR_width_img, round(LIDAR_width_img * ratio)
+
+        else:
+            possible_height = ratio * LIDAR_width_img
+            if possible_height + offset_LIDAR_grid_y > track_height:
+                possible_height = track_height - offset_LIDAR_grid_y
+
+            return round(possible_height / ratio), possible_height
+
+    # Basically, a black rectangle :)
+    def gen_lidar_background(self):
+        # Generate LIDAR background
+        rect_pos = tuple([self._track.im_w, offset_LIDAR_grid_y,
+                          self._lidar_im_w, self._lidar_im_h])
+        pygame.draw.rect(self._background, (0, 0, 0), rect_pos)
+
+    def gen_background(self):
+        super(ScreenPlaySolo, self).gen_background()
+        self.gen_lidar_background()  # Draw LIDAR rect
+
+    # -- REFRESH -- #
+
     def actualize(self, pos=None):
         self._tick_clock()
         # BACKGROUND
@@ -71,22 +100,18 @@ class ScreenPlaySolo(ScreenBasePlay):
         # REFRESH
         pygame.display.flip()
 
-    def gen_background(self):
-        super(ScreenPlaySolo, self).gen_background()
-        self.gen_lidar_background()  # Draw LIDAR rect
-
     def refresh_arrow_pedal(self):
-        self.gen_arrows_pedals(self._car.last_dir_cmd, self._car.last_gas_cmd)
+        self.refresh_arrows_pedals(self._car.last_dir_cmd, self._car.last_gas_cmd)
 
-    def gen_arrows_pedals(self, dir_cmd, gas_cmd):
-        self.gen_arrow(dir_cmd)
-        self.gen_pedals(gas_cmd)
+    def refresh_arrows_pedals(self, dir_cmd, gas_cmd):
+        self.refresh_arrow(dir_cmd)
+        self.refresh_pedals(gas_cmd)
 
-    def gen_arrow(self, dir_cmd):
+    def refresh_arrow(self, dir_cmd):
         self._window.blit(self._actions_imgs[dir_cmd], (self._window_w - width_arrows_pedals - offset_arrows_pedals,
                                                         self._lidar_im_h + 5 * offset_arrows_pedals))
 
-    def gen_pedals(self, gas_cmd):
+    def refresh_pedals(self, gas_cmd):
         self._window.blit(self._actions_imgs[gas_cmd], (self._window_w - width_arrows_pedals - offset_arrows_pedals,
                                                         self._lidar_im_h + 6 * offset_arrows_pedals))
 
@@ -120,24 +145,3 @@ class ScreenPlaySolo(ScreenBasePlay):
 
         self._window.blit(text, (self._window_w - 200,
                                  self._window_h - 100))
-
-    # read global variables to get the size of LIDAR's display
-    def find_lidar_img_size(self):
-        track_height = self._track.im_h
-        ratio = float(height_grid_LIDAR) / width_grid_LIDAR
-        if ratio <= 1.0:
-            return LIDAR_width_img, round(LIDAR_width_img * ratio)
-
-        else:
-            possible_height = ratio * LIDAR_width_img
-            if possible_height + offset_LIDAR_grid_y > track_height:
-                possible_height = track_height - offset_LIDAR_grid_y
-
-            return round(possible_height / ratio), possible_height
-
-    # Basically, a black rectangle :)
-    def gen_lidar_background(self):
-        # Generate LIDAR background
-        rect_pos = tuple([self._track.im_w, offset_LIDAR_grid_y,
-                          self._lidar_im_w, self._lidar_im_h])
-        pygame.draw.rect(self._background, (0, 0, 0), rect_pos)

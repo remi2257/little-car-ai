@@ -6,7 +6,7 @@ from src.usesful_func import start_pygame, should_stop_pygame
 
 
 class ScreenBase:
-    def __init__(self, fps_max=60):
+    def __init__(self, fps_max=60, **kwargs):
         start_pygame()
 
         self._fps_max = fps_max

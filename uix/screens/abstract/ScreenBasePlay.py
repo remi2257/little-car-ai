@@ -6,8 +6,8 @@ from .ScreenBase import ScreenBase
 
 
 class ScreenBasePlay(ScreenBase):
-    def __init__(self, track_path, fps_max=FPS_MAX_init):
-        super(ScreenBasePlay, self).__init__(fps_max=fps_max)
+    def __init__(self, track_path, fps_max=FPS_MAX_init, **kwargs):
+        super(ScreenBasePlay, self).__init__(fps_max=fps_max, **kwargs)
 
         # Generate track object
         self._track = Track(track_path)

@@ -1,7 +1,7 @@
 from uix.screens.abstract.ScreenBase import ScreenBase
 from uix.screens.ScreenDrawTrack import run_draw_map
-from uix.screens.abstract.ScreenPlaySolo import run_play_ai
-from uix.screens.abstract.ScreenPlaySolo import run_play_human
+from uix.screens.ScreenPlayAI import run_play_ai
+from uix.screens.ScreenPlayHuman import run_play_human
 from uix.screens.ScreenTrainEvolv import run_train
 
 from uix.widgets.ButtonOnOff import *
@@ -51,9 +51,10 @@ class ScreenHome(ScreenBase):
                                             on_press=actions[i])
                                 for i in range(4)]
 
-        self._button_save_train = ButtonOnOff(int(8 * self._window_w / 10), int(8 * self._window_h / 10),
+        self._button_save_train = ButtonOnOff(int(0.2 * self._window_w), int(8 * self._window_h / 10),
                                               img_on=button_save_on,
-                                              img_off=button_save_off)
+                                              img_off=button_save_off,
+                                              size=(0.7 * menu_button_w, 0.7 * menu_button_h))
 
         self._buttons = self._buttons_action + [self._button_save_train]
 
@@ -134,15 +135,15 @@ class ScreenHome(ScreenBase):
         # Check if the button is among those who run another window of the game
         if self._button_overlap in self._buttons_action:
             # Check if a trained model has been selected, else, use untrained model
-            model_train_path = self._select_pane_model_train.get_item_path()
+            model_train_path = self._select_pane_model_train.get_chosen_item_path()
             if model_train_path is not None:
                 model_path = model_train_path
             else:
-                model_path = self._select_pane_model_raw.get_item_path()
+                model_path = self._select_pane_model_raw.get_chosen_item_path()
 
             # generate **kwargs parameters to give config to others windows
             dict_parameters = {
-                "track_path": self._select_pane_track.get_item_path(),
+                "track_path": self._select_pane_track.get_chosen_item_path(),
                 "model_path": model_path,
                 "save_train": self._button_save_train.is_selected
             }
