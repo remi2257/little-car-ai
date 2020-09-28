@@ -18,9 +18,9 @@ path_train_save = "results_training/"
 
 class ScreenBaseTrain(ScreenBasePlay):
 
-    def __init__(self, track_path, fps_max, nn_file_path, save):
-        ScreenBasePlay.__init__(self, track_path=track_path, fps_max=fps_max,
-                                window_size=(big_window_haut, big_window_larg))
+    def __init__(self, track_path, nn_file_path, save, **kwargs):
+        ScreenBasePlay.__init__(self, track_path=track_path,
+                                window_size=(big_window_larg, big_window_haut), **kwargs)
 
         self._save = save
         if self._save:
@@ -49,12 +49,14 @@ class ScreenBaseTrain(ScreenBasePlay):
 
         # Plot settings
         # 1 px = 0.010416666666819 inches
-        l_fig = 2.3 * 0.010416666666819 * (self._window_w - self._track.__im_w)
+        l_fig = 2.3 * 0.010416666666819 * (self._window_w - self._track.im_w)
         self._fig = pylab.figure(figsize=[l_fig, l_fig],  # Inches
                                  dpi=50,
                                  )
         self._fig_ax = self._fig.gca()
         self._list_y_text = [self._track.im_h // 50 + i * self._font_h for i in range(20)]
+
+        self.gen_background()
 
     def actualize(self, pos=None):
         raise NotImplementedError
@@ -80,7 +82,7 @@ class ScreenBaseTrain(ScreenBasePlay):
 
         surf = pygame.image.fromstring(raw_data, size, "RGB")
         # self.window.blit(surf, (self.track.im_w - 50, 400))
-        self._background.blit(surf, (self._track.__im_w - 50, 400))
+        self._background.blit(surf, (self._track.im_w - 50, 400))
 
     def save_gen_best_model(self):
         best_car = self._carsAI[0]

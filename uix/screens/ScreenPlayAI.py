@@ -25,6 +25,6 @@ def run_play_ai(track_path, model_path, **kwargs):
 
 if __name__ == '__main__':
     run_play_ai(
-        model_path="results_training/good_tiny_cp.h5",
+        model_path="results_training/test1.h5",
         track_path="tracks/race_tiny.tra"
     )

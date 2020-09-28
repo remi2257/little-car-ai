@@ -263,10 +263,6 @@ class Car:
                 my_list.append([checkpoint, True])
             else:
                 my_list.append([checkpoint, False])
-        if not my_list:
-            return None
-        # set first at 0
-        # my_list[0][1] = False
         return my_list
 
     def reset_checkpoints(self):
@@ -300,6 +296,10 @@ class Car:
     @property
     def fitness(self):
         return self._fitness
+
+    @property
+    def bonus_checkpoints(self):
+        return self._bonus_checkpoints
 
     @property
     def actual_img(self):

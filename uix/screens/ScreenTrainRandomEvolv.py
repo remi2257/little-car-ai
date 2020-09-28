@@ -7,7 +7,7 @@ from src.cars.CarAI import CarAI
 
 from uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
 
-nbr_AI_per_gen = 28
+nbr_AI_per_gen = 20
 rate_survivors = 0.25
 
 nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
@@ -34,9 +34,9 @@ generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
 
 
 class ScreenTrainRandomEvolv(ScreenBaseTrain):
-    def __init__(self, track_path, fps_max, nn_file_path, save):
+    def __init__(self, track_path, nn_file_path, save, **kwargs):
 
-        ScreenBaseTrain.__init__(self, track_path, fps_max, nn_file_path, save)
+        ScreenBaseTrain.__init__(self, track_path, nn_file_path, save, **kwargs)
 
         if nn_file_path.endswith(".net"):
             self.mutation_rate_best = max_mutation_rate
@@ -50,6 +50,7 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
 
         self.max_fitness_possible = self.get_max_possible_fitness()
 
+        # Todo : voir pour cloner le model au lieu de parser N fois
         for i in range(nbr_AI_per_gen):
             new_car = CarAI(nn_file_path, self._track)
             if nn_file_path.endswith(".h5") and i > 0:
@@ -157,8 +158,8 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
             else:
                 car._is_survivor = False
                 chosen_parent = np.random.choice(nbr_survivors, p=weight_best_fitness)
-                car.mutate_model_from_parent(self._carsAI[chosen_parent],
-                                             self.mutation_rate_best)
+                car.mutate_neural_network_from_parent(self._carsAI[chosen_parent],
+                                                      self.mutation_rate_best)
         # Incr values
 
         self.max_fitness_possible = self.get_max_possible_fitness()
@@ -167,11 +168,8 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         self._gen_id += 1
         self._gen_duration = 0
 
-    def gen_background(self):
-        self._gen_track_background()
-
     def display_infos_fitness_n_fps(self):
-        x = self._track.__im_w - round(0.7 * self._track.__case_size)
+        x = self._track.im_w - round(0.7 * self._track.case_size)
         ind = 0
         text_fitness = self._font.render("Fitness - Gen {}".format(self._gen_id), True, COLOR_BLUE)
         self._window.blit(text_fitness, (x, self._list_y_text[ind]))
@@ -238,7 +236,7 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         return max_sum_fitness - lost_fitness
 
     def get_forward_speed(self, n_speed):
-        return self._track.__speed_max * (1 - math.exp(-n_speed / n0_speed))
+        return self._track.speed_max * (1 - math.exp(-n_speed / n0_speed))
 
     def reset_best_ever(self):
         for carAI in self._carsAI:
@@ -259,6 +257,5 @@ if __name__ == '__main__':
     run_train(
         track_path="tracks/race_tiny.tra",
         nn_file_path="raw_models/nn_tiny.net",
-        save=False,
-
+        save=True,
     )

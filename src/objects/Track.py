@@ -13,8 +13,8 @@ class Track:
         self.__case_size = min(big_window_haut // self.__grid_h, big_window_larg // self.__grid_w)
 
         # Taille de l'affichage du circuit
-        self.im_w = self.__case_size * self.__grid_w
-        self.im_h = self.__case_size * self.__grid_h
+        self.__im_w = self.__case_size * self.__grid_w
+        self.__im_h = self.__case_size * self.__grid_h
 
         # --Car--#
         self.__speed_max = speed_max_raw / max(self.__grid_h, self.__grid_w)
@@ -68,6 +68,14 @@ class Track:
     @property
     def grid_w(self):
         return self.__grid_w
+    
+    @property
+    def im_h(self):
+        return self.__im_h
+
+    @property
+    def im_w(self):
+        return self.__im_w
 
     @property
     def case_size(self):
