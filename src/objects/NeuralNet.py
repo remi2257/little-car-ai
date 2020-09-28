@@ -75,6 +75,8 @@ def model_parser(model_path):
 
 class NeuralNet:
     def __init__(self, nn_file_path):
+        # Todo : Utiliser des Tensors pour éviter ça
+        tf.compat.v1.disable_eager_execution()
         if nn_file_path.endswith(".net"):
             self._model = model_parser(nn_file_path)
         elif nn_file_path.endswith(".h5"):
@@ -85,39 +87,26 @@ class NeuralNet:
     def mutate_model_from_query(self, target_nn, mutation_rate, fixed_mutation_rate=False):
         if not fixed_mutation_rate:
             mutation_rate = min(1.0, max(2 * random.random() * mutation_rate, 0.01))
-        for j, layer in enumerate(target_nn.model.layers):
-            new_weights_for_layer = []
-
-            for weight_array in layer.get_weights():
-                save_shape = weight_array.shape
-                one_dim_weight = weight_array.reshape(-1)
-                if layer.trainable:
-                    for i, weight in enumerate(one_dim_weight):
-                        if random.random() <= mutation_rate:
-                            # one_dim_weight[i] = random.uniform(0, 2) - 1
-                            one_dim_weight[i] = random.gauss(0, 0.4)
-
-                new_weight_array = one_dim_weight.reshape(save_shape)
-                new_weights_for_layer.append(new_weight_array)
-
-            self._model.layers[j].set_weights(new_weights_for_layer)
+        model_new_weights = []
+        parent_weights = target_nn.get_weights()
+        for parent_layer_weights in parent_weights:
+            model_layer_weights = np.random.normal(loc=0.0, scale=0.4, size=parent_layer_weights.shape)
+            mask_values_from_parent = np.random.choice([0, 1],
+                                                       size=model_layer_weights.shape,
+                                                       p=[mutation_rate, 1 - mutation_rate]).astype(bool)
+            model_layer_weights[mask_values_from_parent] = parent_layer_weights[mask_values_from_parent]
+            model_new_weights.append(model_new_weights)
+        self._model.set_weights(model_new_weights)
 
     def mutate_model(self, mutation_rate):
-        for j, layer in enumerate(self._model.layers):
-            new_weights_for_layer = []
-
-            for weight_array in layer.get_weights():
-                save_shape = weight_array.shape
-                one_dim_weight = weight_array.reshape(-1)
-
-                for i, weight in enumerate(one_dim_weight):
-                    if random.random() <= mutation_rate:
-                        one_dim_weight[i] = random.uniform(0, 2) - 1
-
-                new_weight_array = one_dim_weight.reshape(save_shape)
-                new_weights_for_layer.append(new_weight_array)
-
-            self._model.layers[j].set_weights(new_weights_for_layer)
+        weights = self._model.get_weights()
+        for layer_weights in weights:
+            mask_changed_values = np.random.choice([0, 1],
+                                                   size=layer_weights.shape,
+                                                   p=[1 - mutation_rate, mutation_rate]).astype(bool)
+            normal_values = np.random.normal(loc=0.0, scale=0.4, size=layer_weights.shape)
+            layer_weights[mask_changed_values] = normal_values[mask_changed_values]
+        self._model.set_weights(weights)
 
     def save(self, filepath):
         self._model.save(filepath)
@@ -125,6 +114,9 @@ class NeuralNet:
     @property
     def model(self):
         return self._model
+
+    def get_weights(self):
+        return self._model.get_weights()
 
     def predict(self, inputs):
         input_lidar, input_extra_params = inputs
@@ -142,15 +134,18 @@ class NeuralNet:
         chosen_gas = list(CommandGas)[np.argmax(pred_gas)]
         return chosen_dir, chosen_gas
 
+    def __predict_from_clean_inputs(self, inputs):
+        return self._model.predict(inputs)
+
     def test_predict(self, inputs):
         # print(inputs.shape, inputs)
         return self._model.predict(inputs)
 
 
 if __name__ == '__main__':
-    print(list(CommandGas))
-    # nn = NeuralNet("raw_models/nn_tiny.net")
-
+    nn = NeuralNet("raw_models/nn_tiny.net")
+    nn2 = NeuralNet("raw_models/nn_tiny.net")
+    nn.mutate_model_from_query(nn2, 0.2)
     # input_1 = np.expand_dims([0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1.,
     #                           1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 1., 1.], axis=0)
     # input_2 = np.expand_dims([0.], axis=0)

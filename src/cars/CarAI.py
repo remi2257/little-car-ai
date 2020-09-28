@@ -1,4 +1,3 @@
-import numpy as np
 import pygame
 
 from src.const import path_viper, path_car_survivor
