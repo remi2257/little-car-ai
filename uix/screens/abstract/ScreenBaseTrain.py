@@ -10,6 +10,7 @@ import matplotlib.backends.backend_agg as agg
 import matplotlib.pyplot as plt
 import pylab
 from matplotlib.ticker import MaxNLocator
+import pygame.locals as pygame_const
 
 matplotlib.use("Agg")
 
@@ -49,7 +50,7 @@ class ScreenBaseTrain(ScreenBasePlay):
 
         # Plot settings
         # 1 px = 0.010416666666819 inches
-        l_fig = 2.3 * 0.010416666666819 * (self._window_w - self._track.im_w)
+        l_fig = 2.0 * 0.010416666666819 * (self._window_w - self._track.im_w)
         self._fig = pylab.figure(figsize=[l_fig, l_fig],  # Inches
                                  dpi=50,
                                  )
@@ -60,6 +61,12 @@ class ScreenBaseTrain(ScreenBasePlay):
 
     def actualize(self, pos=None):
         raise NotImplementedError
+
+    def _key_press_handle(self, key):
+        if key == pygame_const.K_KP_PLUS:
+            self.increase_fps()
+        elif key == pygame_const.K_KP_MINUS:
+            self.decrease_fps()
 
     def start_new_gen(self):
         raise NotImplementedError
@@ -82,7 +89,7 @@ class ScreenBaseTrain(ScreenBasePlay):
 
         surf = pygame.image.fromstring(raw_data, size, "RGB")
         # self.window.blit(surf, (self.track.im_w - 50, 400))
-        self._background.blit(surf, (self._track.im_w - 50, 400))
+        self._background.blit(surf, (self._track.im_w - 50, self._list_y_text[-1] + 50))
 
     def save_gen_best_model(self):
         best_car = self._carsAI[0]

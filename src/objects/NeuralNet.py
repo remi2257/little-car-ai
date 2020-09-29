@@ -9,6 +9,9 @@ from tensorflow.keras.models import Model, load_model
 from src.cars.CarCommands import CommandDir, CommandGas
 from src.const import height_grid_LIDAR, width_grid_LIDAR
 
+# Todo : Utiliser des Tensors pour éviter ça
+tf.compat.v1.disable_eager_execution()
+
 extra_params_dim = 1
 
 
@@ -74,15 +77,30 @@ def model_parser(model_path):
 
 
 class NeuralNet:
-    def __init__(self, nn_file_path):
-        # Todo : Utiliser des Tensors pour éviter ça
-        tf.compat.v1.disable_eager_execution()
-        if nn_file_path.endswith(".net"):
-            self._model = model_parser(nn_file_path)
-        elif nn_file_path.endswith(".h5"):
-            self._model = load_model(nn_file_path)
-
+    def __init__(self, model):
+        self._model = model
         self._is_cnn = any([isinstance(layer, Conv2D) for layer in self._model.layers])
+
+    @classmethod
+    def from_path(cls, nn_file_path):
+        if nn_file_path.endswith(".net"):
+            model = model_parser(nn_file_path)
+        elif nn_file_path.endswith(".h5"):
+            model = load_model(nn_file_path)
+        else:
+            raise TypeError("Model should be either .net or .h5")
+        return cls(model)
+
+    @classmethod
+    def copy_architecture(cls, neural_net_query):
+        model_copy = tf.keras.models.clone_model(neural_net_query.model)
+        return cls(model_copy)
+
+    @classmethod
+    def copy_architecture_n_weights(cls, neural_net_query):
+        model_copy = tf.keras.models.clone_model(neural_net_query.model)
+        model_copy.set_weights(neural_net_query.get_weights())
+        return cls(model_copy)
 
     def mutate_model_from_query(self, target_nn, mutation_rate, fixed_mutation_rate=False):
         if not fixed_mutation_rate:
@@ -95,7 +113,7 @@ class NeuralNet:
                                                        size=model_layer_weights.shape,
                                                        p=[mutation_rate, 1 - mutation_rate]).astype(bool)
             model_layer_weights[mask_values_from_parent] = parent_layer_weights[mask_values_from_parent]
-            model_new_weights.append(model_new_weights)
+            model_new_weights.append(model_layer_weights)
         self._model.set_weights(model_new_weights)
 
     def mutate_model(self, mutation_rate):
@@ -143,8 +161,8 @@ class NeuralNet:
 
 
 if __name__ == '__main__':
-    nn = NeuralNet("raw_models/nn_tiny.net")
-    nn2 = NeuralNet("raw_models/nn_tiny.net")
+    nn = NeuralNet.from_path("raw_models/nn_tiny.net")
+    nn2 = NeuralNet.from_path("raw_models/nn_tiny.net")
     nn.mutate_model_from_query(nn2, 0.2)
     # input_1 = np.expand_dims([0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1.,
     #                           1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 1., 1.], axis=0)

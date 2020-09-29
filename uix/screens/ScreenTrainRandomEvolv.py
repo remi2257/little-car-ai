@@ -4,6 +4,7 @@ import pygame
 
 from src.const import *
 from src.cars.CarAI import CarAI
+from src.objects.NeuralNet import NeuralNet
 
 from uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
 
@@ -39,22 +40,27 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         ScreenBaseTrain.__init__(self, track_path, nn_file_path, save, **kwargs)
 
         if nn_file_path.endswith(".net"):
-            self.mutation_rate_best = max_mutation_rate
-            self.gen_duration_limit_steps = generation_duration_init_frame
+            self._mutation_rate_best = max_mutation_rate
+            self._gen_duration_limit_steps = generation_duration_init_frame
         elif nn_file_path.endswith(".h5"):
-            self.mutation_rate_best = copy_mutation_rate
-            self.gen_duration_limit_steps = round(generation_duration_max_frame * (1 - copy_mutation_rate) ** 2)
+            self._mutation_rate_best = copy_mutation_rate
+            self._gen_duration_limit_steps = round(generation_duration_max_frame * (1 - copy_mutation_rate) ** 2)
             print("Resuming training")
         else:
-            print("NO MODEL")
+            raise TypeError("Model should be either .net or .h5")
 
-        self.max_fitness_possible = self.get_max_possible_fitness()
+        self._max_fitness_possible = self.get_max_possible_fitness()
 
-        # Todo : voir pour cloner le model au lieu de parser N fois
-        for i in range(nbr_AI_per_gen):
-            new_car = CarAI(nn_file_path, self._track)
-            if nn_file_path.endswith(".h5") and i > 0:
-                new_car.mutate_neural_network(self.mutation_rate_best)
+        base_neural_net = NeuralNet.from_path(nn_file_path)
+        self._carsAI.append(CarAI(self._track, base_neural_net))
+
+        for i in range(nbr_AI_per_gen - 1):
+            if nn_file_path.endswith(".net"):
+                new_model = NeuralNet.copy_architecture(base_neural_net)
+            else:
+                new_model = NeuralNet.copy_architecture_n_weights(base_neural_net)
+                new_model.mutate_model(self._mutation_rate_best)
+            new_car = CarAI(self._track, new_model)
             self._carsAI.append(new_car)
 
         self.actualize()
@@ -65,7 +71,7 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         self._window.blit(self._background, (0, 0))
 
         # Start new generation if limit of time is reached for the actual generation
-        if self._gen_duration >= self.gen_duration_limit_steps:
+        if self._gen_duration >= self._gen_duration_limit_steps:
             self.start_new_gen()
         self._gen_duration += 1
 
@@ -123,9 +129,6 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         pygame.display.flip()
 
     def start_new_gen(self):
-        # Refresh plot which shows infos on best fitness
-        self.refresh_fitness_plot()
-
         # Sort cars by fitness
         self._carsAI = sorted(self._carsAI, key=lambda x: x.fitness, reverse=True)
 
@@ -136,8 +139,8 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         # -- CALCULATE NEW MUTATION RATE --#
         best_car = self._carsAI[0]
         best_fitness = max(1, best_car.fitness - best_car.bonus_checkpoints)
-        ratio_fitness = best_fitness / self.max_fitness_possible
-        self.mutation_rate_best = self.get_mutation_rate(best_fitness)
+        ratio_fitness = best_fitness / self._max_fitness_possible
+        self._mutation_rate_best = self.get_mutation_rate(best_fitness)
         self.update_duration_limit(ratio_fitness)
         # self.mutation_rate *= decay_mutation_rate
 
@@ -159,10 +162,13 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
                 car._is_survivor = False
                 chosen_parent = np.random.choice(nbr_survivors, p=weight_best_fitness)
                 car.mutate_neural_network_from_parent(self._carsAI[chosen_parent],
-                                                      self.mutation_rate_best)
-        # Incr values
+                                                      self._mutation_rate_best)
 
-        self.max_fitness_possible = self.get_max_possible_fitness()
+        # Refresh plot which shows infos on best fitness
+        self.refresh_fitness_plot()
+
+        # Incr values
+        self._max_fitness_possible = self.get_max_possible_fitness()
 
         self._best_fitness_list.append(0)
         self._gen_id += 1
@@ -188,17 +194,17 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         self._window.blit(text_mean, (x, self._list_y_text[ind]))
         ind += 1
 
-        text_mutation = self._font.render("Mut. Rate {:.1f}%".format(self.mutation_rate_best * 100), True,
+        text_mutation = self._font.render("Mut. Rate {:.1f}%".format(self._mutation_rate_best * 100), True,
                                           COLOR_GREEN)
         self._window.blit(text_mutation, (x, self._list_y_text[ind]))
         ind += 1
 
-        text_max_fitness = self._font.render("Up Bound Fit. {:.1f}".format(self.max_fitness_possible), True,
+        text_max_fitness = self._font.render("Up Bound Fit. {:.1f}".format(self._max_fitness_possible), True,
                                              COLOR_GREEN)
         self._window.blit(text_max_fitness, (x, self._list_y_text[ind]))
         ind += 1
 
-        limit_frame = self._font.render("Lim. Frames: " + str(self.gen_duration_limit_steps), True,
+        limit_frame = self._font.render("Lim. Frames: " + str(self._gen_duration_limit_steps), True,
                                         pygame.Color('white'))
         self._window.blit(limit_frame, (x, self._list_y_text[ind]))
         ind += 2
@@ -218,20 +224,20 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
     # Update duration limit according to fitness/fitness_PIED_AU_PLANCHER
     def update_duration_limit(self, ratio):
         if ratio < 0.15:
-            self.gen_duration_limit_steps = max(int(self.gen_duration_limit_steps / gen_dur_incr_ratio_max),
-                                                generation_duration_init_frame)
+            self._gen_duration_limit_steps = max(int(self._gen_duration_limit_steps / gen_dur_incr_ratio_max),
+                                                 generation_duration_init_frame)
         elif ratio > 0.35:
-            self.gen_duration_limit_steps = min(int(self.gen_duration_limit_steps * gen_dur_incr_ratio_max),
-                                                generation_duration_max_frame)
+            self._gen_duration_limit_steps = min(int(self._gen_duration_limit_steps * gen_dur_incr_ratio_max),
+                                                 generation_duration_max_frame)
 
     def get_max_possible_fitness(self):
         lost_fitness = 0
         max_fitness = self.get_forward_speed(max_n_speed) * weight_on_road / FPS_MAX_init
 
-        for n in range(1, min(max_n_speed, self.gen_duration_limit_steps)):
+        for n in range(1, min(max_n_speed, self._gen_duration_limit_steps)):
             lost_fitness += max_fitness - self.get_forward_speed(n) / FPS_MAX_init * weight_on_road
 
-        max_sum_fitness = self.gen_duration_limit_steps * max_fitness
+        max_sum_fitness = self._gen_duration_limit_steps * max_fitness
 
         return max_sum_fitness - lost_fitness
 

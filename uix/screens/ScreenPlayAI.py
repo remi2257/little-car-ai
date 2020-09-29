@@ -1,12 +1,15 @@
 from uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
 from src.cars.CarAI import CarAI
+from src.objects.NeuralNet import NeuralNet
 
 
 class ScreenPlayAI(ScreenPlaySolo):
 
-    def __init__(self, model_path, track_path, **kwargs):
+    def __init__(self, nn_file_path, track_path, **kwargs):
         super(ScreenPlayAI, self).__init__(track_path=track_path, **kwargs)
-        self._car = CarAI(model_path, self._track)
+
+        neural_net = NeuralNet.from_path(nn_file_path)
+        self._car = CarAI(self._track, neural_net)
 
         self.actualize()
 
@@ -18,13 +21,13 @@ class ScreenPlayAI(ScreenPlaySolo):
         self._car.actualize_direction_and_gas(self._car.predict_next_move())
 
 
-def run_play_ai(track_path, model_path, **kwargs):
-    screen = ScreenPlayAI(model_path=model_path, track_path=track_path, **kwargs)
+def run_play_ai(track_path, nn_file_path, **kwargs):
+    screen = ScreenPlayAI(nn_file_path=nn_file_path, track_path=track_path, **kwargs)
     screen.run()
 
 
 if __name__ == '__main__':
     run_play_ai(
-        model_path="results_training/test1.h5",
+        nn_file_path="results_training/tiny_player.h5",
         track_path="tracks/race_tiny.tra"
     )

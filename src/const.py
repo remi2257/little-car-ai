@@ -3,6 +3,7 @@ import glob
 
 import pygame.locals as pygame_const
 
+
 # Todo : Bouger un peu le tout
 
 def get_screen_infos_linux(ratio_screen_window):
@@ -85,7 +86,6 @@ gen_dur_incr_ratio_max = 1.2
 generation_duration_incr_sec = 1
 generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
 
-
 # -- CAR PARAMETERS -- #
 nbr_bots = 0
 path_vehicles = os.path.join(images_path, "vehicles")
@@ -111,7 +111,6 @@ height_grid_LIDAR = 7
 width_grid_LIDAR = 5
 offset_y_LIDAR = 0
 
-
 circle_size = max(1, int(round(big_window_larg / 1920) * 3))
 
 # -- DIRECTION -- #
@@ -121,7 +120,6 @@ dir_DOWN, dir_RIGHT, dir_UP, dir_LEFT = 0, 1, 2, 3
 
 # --- IMAGES --- #
 im_others_path = os.path.join(images_path, "others/")
-
 
 # -- TRACK -- #
 roads_path = os.path.join(images_path, "road/")
