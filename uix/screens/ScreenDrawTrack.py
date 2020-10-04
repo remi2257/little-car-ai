@@ -4,11 +4,13 @@ import numpy as np
 from random import choice
 from enum import Enum
 
-from uix.my_gui.screens.abstract import ScreenBase
+from uix.screens.abstract.ScreenBase import ScreenBase
 from src.const import *
 
 GRID_HEIGHT = 24
 GRID_WIDTH = 32
+
+FPS_DRAW = 60
 
 track_names_list = [
     "hardcore_track",
@@ -102,7 +104,8 @@ class ScreenDrawTrack(ScreenBase):
         self.__im_w = self.__grid_shape * self.__grid_width
         self.__im_h = self.__grid_shape * self.__grid_height
 
-        super(ScreenDrawTrack, self).__init__(window_size=(self.__im_w, self.__im_h))
+        super(ScreenDrawTrack, self).__init__(window_size=(self.__im_w, self.__im_h),
+                                              fps_max=FPS_DRAW)
 
         # - Text
         self.__font = pygame.font.Font('freesansbold.ttf', 28)
@@ -110,7 +113,7 @@ class ScreenDrawTrack(ScreenBase):
         self.__text_duration = 0
 
         # Generate Background
-        self.gen_background()
+        self._background = self._gen_background()
 
         # -- Grid manipulation arrays
         self.__grid = Grid(self.__grid_height, self.__grid_width)
@@ -133,9 +136,6 @@ class ScreenDrawTrack(ScreenBase):
         self.__track_raw_name = choice(track_names_list)
         self.__track_name = ""
 
-        # Finish init by generating the first image !
-        self.actualize()
-
     # - Visualization
 
     def _key_press_handle(self, key):
@@ -146,9 +146,8 @@ class ScreenDrawTrack(ScreenBase):
         elif key == pygame_const.K_c:  # C : Checkpoint
             self.checkpoint_cmd()
 
-    def actualize(self, pos=None):
-        self._window.blit(self._background, (0, 0))
-
+    def actualize_screen(self, pos=None):
+        super(ScreenDrawTrack, self).actualize_screen()
         if pos:
             self._mouse_pos_effect(pos)
 
@@ -160,12 +159,7 @@ class ScreenDrawTrack(ScreenBase):
                                   self.__grid_shape, self.__grid_shape])
                 pygame.draw.rect(self._window, self.__grid.get_color(i, j), rect_pos)
 
-        # self.button_save.draw_button_image(self.background)
-
         self.display_text()
-
-        # pygame.display.update()
-        pygame.display.flip()
 
     def _mouse_pos_effect(self, pos):
         mouse_x = pos[0]
@@ -198,25 +192,21 @@ class ScreenDrawTrack(ScreenBase):
 
         return True
 
-    def gen_background(self):
-        self._background = pygame.image.load(background_path).convert()
-        self.__gen_grid_background()
-
-    def __gen_grid_background(self):
-        # Generate Track
+    def _gen_background(self):
+        background = super(ScreenDrawTrack, self)._gen_background()
+        # Generate Grid
         for i in range(self.__grid_height):
             line_h_start = [0, i * self.__grid_shape]
             line_h_stop = [self.__im_w, i * self.__grid_shape]
-            pygame.draw.line(self._background, (0, 0, 0), line_h_start, line_h_stop)
+            pygame.draw.line(background, (0, 0, 0), line_h_start, line_h_stop)
         for i in range(self.__grid_width):
             line_w_start = [i * self.__grid_shape, 0]
             line_w_stop = [i * self.__grid_shape, self.__im_h]
-            pygame.draw.line(self._background, (0, 0, 0), line_w_start, line_w_stop)
-
-        # self.button_save.draw_button_image(self.background)
+            pygame.draw.line(background, (0, 0, 0), line_w_start, line_w_stop)
 
         msg = self.__font.render("C : Checkpoint   F : Free   S : Save", True, COLOR_RED)
-        self._background.blit(msg, (40, self.__im_h - self.__grid_shape))
+        background.blit(msg, (40, self.__im_h - self.__grid_shape))
+        return background
 
     def display_text(self):
         if self.__msg_text is not None:

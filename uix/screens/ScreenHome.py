@@ -1,12 +1,14 @@
 import pygame
 from pygame_gui.elements import UIButton
 
-from uix.screens.abstract import ScreenBase
-# from uix.my_gui.screens import run_draw_map
-# from uix.my_gui.screens import run_play_ai
-# from uix.my_gui.screens import run_play_human
-# from uix.my_gui.screens import run_train
+from uix.screens.abstract.ScreenBase import ScreenBase
 from src.const import *
+
+from uix.screens.ScreenDrawTrack import run_draw_map
+# from uix.my_gui.screens.ScreenPlayAI import run_play_ai
+# from uix.my_gui.screens.ScreenPlayHuman import run_play_human
+# from uix.my_gui.screens.ScreenTrainRandomEvolv import run_train
+
 
 FPS_MAX = 30
 
@@ -16,7 +18,7 @@ buttons_dict = {
     "Play !": "run_play_human",
     "Play AI": "run_play_ai",
     "Train": "run_train",
-    "Draw !": "run_draw_map",
+    "Draw !": run_draw_map,
 }
 
 menu_button_w = round(big_window_haut / 3.5)
@@ -36,15 +38,9 @@ class ScreenHome(ScreenBase):
         super(ScreenHome, self).__init__(window_size=window_size,
                                          fps_max=FPS_MAX)
 
-        self._buttons_action = self.gen_buttons()
-
         # Add buttons
-        # self._buttons_action = [ButtonPress(self._window_w // 2, buttons_y[i],
-        #                                     path_img_on=buttons_on_path[i], path_img_off=buttons_off_path[i],
-        #                                     path_img_push=buttons_push_path[i],
-        #                                     on_press=actions[i])
-        #                         for i in range(4)]
-        #
+        self._buttons_action = self._gen_buttons_action()
+
         # self._button_save_train = ButtonOnOff(int(0.2 * self._window_w), int(8 * self._window_h / 10),
         #                                       img_on=button_save_on,
         #                                       img_off=button_save_off,
@@ -62,14 +58,11 @@ class ScreenHome(ScreenBase):
         # self._select_pane_model_raw = SelectionPaneModelRaw()
 
         # Generate Background which contains everything that do not move
-        self._background = pygame.image.load(background_path).convert()
-        self._img_logo = gen_logo_img(title_path)
+        self._background = self._gen_background()
 
-        self._gen_menu_background()
+        # self.actualize_screen()
 
-        self.actualize()
-
-    def gen_buttons(self):
+    def _gen_buttons_action(self):
         buttons = {}
         for i, (label, callback) in enumerate(buttons_dict.items()):
             button_layout_rect = pygame.Rect(self._window_w // 2 - menu_button_w // 2, buttons_y[i],
@@ -80,16 +73,19 @@ class ScreenHome(ScreenBase):
             buttons[button] = callback
         return buttons
 
-    def gen_background(self):
-        pass
-
-    def actualize(self, pos=None):
-        pass
-
-    def _gen_menu_background(self):
+    def _gen_background(self):
+        background = super(ScreenHome, self)._gen_background()
+        img_logo = gen_logo_img(title_path)
         # Draw logo
-        logo_x = (self._window_w - self._img_logo.get_width()) // 2
-        self._background.blit(self._img_logo, (logo_x, offset_h))
+        logo_x = (self._window_w - img_logo.get_width()) // 2
+        background.blit(img_logo, (logo_x, offset_h))
+        return background
+
+    def _button_pressed_handle(self, button):
+        if button not in self._buttons_action:
+            return
+        self._buttons_action[button]()
+        self.reset_n_reload()
 
     def reset_window_size(self):
         self._window = pygame.display.set_mode((self._window_w, self._window_h))
