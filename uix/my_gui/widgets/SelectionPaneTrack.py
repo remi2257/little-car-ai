@@ -1,5 +1,3 @@
-from uix.widgets.SelectionPane import *
-
 """
 Track selection
 """

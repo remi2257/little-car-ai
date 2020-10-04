@@ -1,4 +1,4 @@
-from uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
+from uix.my_gui.screens.abstract import ScreenPlaySolo
 from src.cars.CarAI import CarAI
 from src.objects.NeuralNet import NeuralNet
 

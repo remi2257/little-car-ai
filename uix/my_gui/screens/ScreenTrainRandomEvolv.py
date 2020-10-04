@@ -6,7 +6,7 @@ from src.const import *
 from src.cars.CarAI import CarAI
 from src.objects.NeuralNet import NeuralNet
 
-from uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
+from uix.my_gui.screens.abstract import ScreenBaseTrain
 
 nbr_AI_per_gen = 20
 rate_survivors = 0.25

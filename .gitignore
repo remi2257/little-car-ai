@@ -1,4 +1,4 @@
 .idea/
 dev/*
-
+uix/my_gui
 src/test_dev.py

@@ -1,62 +1,65 @@
-from uix.screens.abstract.ScreenBase import ScreenBase
-from uix.screens.ScreenDrawTrack import run_draw_map
-from uix.screens.ScreenPlayAI import run_play_ai
-from uix.screens.ScreenPlayHuman import run_play_human
-from uix.screens.ScreenTrainRandomEvolv import run_train
+import pygame
+from pygame_gui.elements import UIButton
 
-from uix.widgets.ButtonOnOff import *
-from uix.widgets.ButtonPress import *
-from uix.widgets.SelectionPaneModelRaw import *
-from uix.widgets.SelectionPaneModelTrain import *
-from uix.widgets.SelectionPaneTrack import *
-
-# List functions which should be linked to buttons
-actions = [run_play_human, run_play_ai, run_train, run_draw_map]
+from uix.screens.abstract import ScreenBase
+# from uix.my_gui.screens import run_draw_map
+# from uix.my_gui.screens import run_play_ai
+# from uix.my_gui.screens import run_play_human
+# from uix.my_gui.screens import run_train
+from src.const import *
 
 FPS_MAX = 30
 
-button_list_name = [
-    "human",
-    "ai",
-    "train",
-    "draw",
-]
+window_size = (big_window_haut, big_window_haut)
 
-buttons_off_path = [buttons_img_path + name + "_off.png" for name in button_list_name]
-buttons_on_path = [buttons_img_path + name + "_on.png" for name in button_list_name]
-buttons_push_path = [buttons_img_path + name + "_push.png" for name in button_list_name]
+buttons_dict = {
+    "Play !": "run_play_human",
+    "Play AI": "run_play_ai",
+    "Train": "run_train",
+    "Draw !": "run_draw_map",
+}
 
-button_save_on = buttons_img_path + "save_on.png"
-button_save_off = buttons_img_path + "save_off.png"
+menu_button_w = round(big_window_haut / 3.5)
+menu_button_h = round(menu_button_w / 2.13)
+
+offset_h = round(20 * big_window_haut / 700)
+
+nbr_buttons = 4
+
+first_button_y = round(200 * big_window_haut / 800)
+
+buttons_y = [first_button_y + i * (offset_h + menu_button_h) for i in range(nbr_buttons)]
 
 
 class ScreenHome(ScreenBase):
     def __init__(self):
-        super(ScreenHome, self).__init__(window_size=(big_window_haut, big_window_haut),
+        super(ScreenHome, self).__init__(window_size=window_size,
                                          fps_max=FPS_MAX)
 
+        self._buttons_action = self.gen_buttons()
+
         # Add buttons
-        self._buttons_action = [ButtonPress(self._window_w // 2, buttons_y[i],
-                                            path_img_on=buttons_on_path[i], path_img_off=buttons_off_path[i],
-                                            path_img_push=buttons_push_path[i],
-                                            on_press=actions[i])
-                                for i in range(4)]
+        # self._buttons_action = [ButtonPress(self._window_w // 2, buttons_y[i],
+        #                                     path_img_on=buttons_on_path[i], path_img_off=buttons_off_path[i],
+        #                                     path_img_push=buttons_push_path[i],
+        #                                     on_press=actions[i])
+        #                         for i in range(4)]
+        #
+        # self._button_save_train = ButtonOnOff(int(0.2 * self._window_w), int(8 * self._window_h / 10),
+        #                                       img_on=button_save_on,
+        #                                       img_off=button_save_off,
+        #                                       size=(0.7 * menu_button_w, 0.7 * menu_button_h))
 
-        self._button_save_train = ButtonOnOff(int(0.2 * self._window_w), int(8 * self._window_h / 10),
-                                              img_on=button_save_on,
-                                              img_off=button_save_off,
-                                              size=(0.7 * menu_button_w, 0.7 * menu_button_h))
+        # self._buttons = self._buttons_action + [self._button_save_train]
 
-        self._buttons = self._buttons_action + [self._button_save_train]
-
-        self._button_overlap = None
+        # self._button_overlap = None
 
         # Add selection Pane
-        self._select_pane_track = SelectionPaneTrack()
-
-        self._select_pane_model_train = SelectionPaneModelTrain()
-
-        self._select_pane_model_raw = SelectionPaneModelRaw()
+        # self._select_pane_track = SelectionPaneTrack()
+        #
+        # self._select_pane_model_train = SelectionPaneModelTrain()
+        #
+        # self._select_pane_model_raw = SelectionPaneModelRaw()
 
         # Generate Background which contains everything that do not move
         self._background = pygame.image.load(background_path).convert()
@@ -64,97 +67,35 @@ class ScreenHome(ScreenBase):
 
         self._gen_menu_background()
 
-        # Mouse infos
-        self._is_ready_select = False  # Mouse's button has been pushed on menu's button, waiting for release
-
         self.actualize()
+
+    def gen_buttons(self):
+        buttons = {}
+        for i, (label, callback) in enumerate(buttons_dict.items()):
+            button_layout_rect = pygame.Rect(self._window_w // 2 - menu_button_w // 2, buttons_y[i],
+                                             menu_button_w, menu_button_h)
+            button = UIButton(relative_rect=button_layout_rect,
+                              text=label,
+                              manager=self._ui_manager)
+            buttons[button] = callback
+        return buttons
 
     def gen_background(self):
         pass
 
     def actualize(self, pos=None):
-        self._clock.tick(self._fps_max)
-
-        # Start by drawing background
-        self._window.blit(self._background, (0, 0))
-
-        # Watch if cursor is/is clicking on one button
-        self._button_overlap = self.mouse_on_buttons(pos)
-
-        # Change color of save_train button if selected
-        if self._button_save_train.is_selected:
-            self._button_save_train.draw_button_image(self._window)
-
-        # Watch for SelectionPanes
-        self._select_pane_track.actualize(self._window, pos, self._mouse_is_holding_left)
-        self._select_pane_model_train.actualize(self._window, pos, self._mouse_is_holding_left)
-        self._select_pane_model_raw.actualize(self._window, pos, self._mouse_is_holding_left)
-
-        # Display
-        pygame.display.flip()
+        pass
 
     def _gen_menu_background(self):
         # Draw logo
         logo_x = (self._window_w - self._img_logo.get_width()) // 2
         self._background.blit(self._img_logo, (logo_x, offset_h))
-        # Draw buttons
-        for button in self._buttons:
-            button.draw_button_image(self._background)
-
-    # Check if mouse is on one button and if the case, return the button object
-    def mouse_on_buttons(self, pos):
-        if pos is None:
-            return None
-        mouse_x = pos[0]
-        mouse_y = pos[1]
-        for i, button in enumerate(self._buttons):
-            ret = button.mouse_on_button(mouse_x, mouse_y)
-            if not ret:
-                continue
-            button.draw_button_image(self._window, self._mouse_is_holding_left)
-            return button
-        return None
-
-    def on_mouse_release(self, **kwargs):
-        super(ScreenHome, self).on_mouse_release(**kwargs)
-        self.run_action_selected()
-
-    # Run action corresponding to its button
-    def run_action_selected(self):
-        if self._button_overlap is None:
-            return
-        # Check if the button is among those who run another window of the game
-        if self._button_overlap in self._buttons_action:
-            # Check if a trained model has been selected, else, use untrained model
-            model_train_path = self._select_pane_model_train.get_chosen_item_path()
-            if model_train_path is not None:
-                model_path = model_train_path
-            else:
-                model_path = self._select_pane_model_raw.get_chosen_item_path()
-
-            # generate **kwargs parameters to give config to others windows
-            dict_parameters = {
-                "track_path": self._select_pane_track.get_chosen_item_path(),
-                "model_path": model_path,
-                "save_train": self._button_save_train.is_selected
-            }
-
-            # Executing action
-            self._button_overlap.on_press(**dict_parameters)
-
-            # Resetting window
-            self.reset_n_reload()
-
-        else:  # Action do not need parameters (basically, On/Off Button)
-            self._button_overlap.on_press()
 
     def reset_window_size(self):
         self._window = pygame.display.set_mode((self._window_w, self._window_h))
 
     def reset_n_reload(self):
         self.reset_window_size()
-        # Regenerate Track List
-        self._select_pane_track = SelectionPaneTrack()
 
 
 def gen_logo_img(path_img):

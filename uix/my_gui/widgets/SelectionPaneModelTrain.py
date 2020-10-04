@@ -1,4 +1,4 @@
-from uix.widgets.SelectionPane import SelectionPane
+from uix.my_gui.widgets import SelectionPane
 
 from src.const import big_window_haut, menu_button_w, trained_model_path
 

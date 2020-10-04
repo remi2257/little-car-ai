@@ -2,7 +2,7 @@ import pygame
 from pygame.font import Font
 
 from src.const import *
-from uix.widgets.Widget import Widget
+from uix.my_gui.widgets import Widget
 
 """
 List on which you can click to select one element
