@@ -1,13 +1,13 @@
 import pygame
 from pygame_gui.elements import UIButton
-
+from uix.widgets.ItemDropdown import ItemDropdown
 from uix.screens.abstract.ScreenBase import ScreenBase
 from src.const import *
 
+from uix.screens.ScreenPlayHuman import run_play_human
+from uix.screens.ScreenPlayAI import run_play_ai
+from uix.screens.ScreenTrainRandomEvolv import run_train
 from uix.screens.ScreenDrawTrack import run_draw_map
-# from uix.my_gui.screens.ScreenPlayAI import run_play_ai
-# from uix.my_gui.screens.ScreenPlayHuman import run_play_human
-# from uix.my_gui.screens.ScreenTrainRandomEvolv import run_train
 
 
 FPS_MAX = 30
@@ -15,13 +15,13 @@ FPS_MAX = 30
 window_size = (big_window_haut, big_window_haut)
 
 buttons_dict = {
-    "Play !": "run_play_human",
-    "Play AI": "run_play_ai",
-    "Train": "run_train",
+    "Play !": run_play_human,
+    "Play AI": run_play_ai,
+    "Train": run_train,
     "Draw !": run_draw_map,
 }
 
-menu_button_w = round(big_window_haut / 3.5)
+menu_button_w = round(big_window_haut / 3.7)
 menu_button_h = round(menu_button_w / 2.13)
 
 offset_h = round(20 * big_window_haut / 700)
@@ -40,22 +40,14 @@ class ScreenHome(ScreenBase):
 
         # Add buttons
         self._buttons_action = self._gen_buttons_action()
-
-        # self._button_save_train = ButtonOnOff(int(0.2 * self._window_w), int(8 * self._window_h / 10),
-        #                                       img_on=button_save_on,
-        #                                       img_off=button_save_off,
-        #                                       size=(0.7 * menu_button_w, 0.7 * menu_button_h))
-
-        # self._buttons = self._buttons_action + [self._button_save_train]
-
-        # self._button_overlap = None
+        self._button_save_train = self._gen_save_button()
 
         # Add selection Pane
-        # self._select_pane_track = SelectionPaneTrack()
-        #
-        # self._select_pane_model_train = SelectionPaneModelTrain()
-        #
-        # self._select_pane_model_raw = SelectionPaneModelRaw()
+        self._dropdown_tracks = self._gen_dropdown_tracks()
+
+        self._dropdown_trained_models = self._gen_dropdown_model_trained()
+
+        self._dropdown_raw_models = self._gen_dropdown_model_design()
 
         # Generate Background which contains everything that do not move
         self._background = self._gen_background()
@@ -73,6 +65,38 @@ class ScreenHome(ScreenBase):
             buttons[button] = callback
         return buttons
 
+    def _gen_save_button(self):
+        button_layout_rect = pygame.Rect(int(0.05 * self._window_w), int(8 * self._window_h / 10),
+                                         menu_button_w // 2, menu_button_h // 2)
+        button = UIButton(relative_rect=button_layout_rect,
+                          text="Save",
+                          manager=self._ui_manager)
+        return button
+
+    def _gen_dropdown_tracks(self):
+        x = big_window_haut // 5
+        y = big_window_haut // 3
+        title = "Choose Track"
+
+        return ItemDropdown(rect=(x, y, menu_button_w, menu_button_h // 2), manager=self._ui_manager,
+                            folder=track_files_path, extension=".tra")
+
+    def _gen_dropdown_model_trained(self):
+        x = 8 * big_window_haut // 10
+        y = big_window_haut // 3
+        title = "Trained"
+
+        return ItemDropdown(rect=(x, y, menu_button_w, menu_button_h // 2), manager=self._ui_manager,
+                            folder=trained_model_path, extension=".h5")
+
+    def _gen_dropdown_model_design(self):
+        x = 8 * big_window_haut // 10
+        y = 2 * big_window_haut // 3
+        title = "Model Design"
+
+        return ItemDropdown(rect=(x, y, menu_button_w, menu_button_h // 2), manager=self._ui_manager,
+                            folder=raw_models_path, extension=".net")
+
     def _gen_background(self):
         background = super(ScreenHome, self)._gen_background()
         img_logo = gen_logo_img(title_path)
@@ -82,10 +106,26 @@ class ScreenHome(ScreenBase):
         return background
 
     def _button_pressed_handle(self, button):
-        if button not in self._buttons_action:
-            return
-        self._buttons_action[button]()
-        self.reset_n_reload()
+        if button in self._buttons_action:
+            self._buttons_action[button](**self.dropdown_kwargs)
+            self.reset_n_reload()
+        elif button == self._button_save_train:
+            if self._button_save_train.is_selected:
+                self._button_save_train.unselect()
+            else:
+                self._button_save_train.select()
+
+    @property
+    def dropdown_kwargs(self):
+        # Todo : trained or not ?
+        dict_parameters = {
+            "track_path": self._dropdown_tracks.get_item(),
+            "nn_file_path": self._dropdown_trained_models.get_item(),
+            # "trained_model_path": self._dropdown_trained_models.get_item(),
+            # "raw_model_path": self._dropdown_raw_models.get_item(),
+            "save_train": self._button_save_train.is_selected
+        }
+        return dict_parameters
 
     def reset_window_size(self):
         self._window = pygame.display.set_mode((self._window_w, self._window_h))

@@ -57,9 +57,9 @@ font_size_global = round(big_window_haut / 45)
 theta_0 = -90.0
 
 # TRAINING
-models_path = "raw_models/"
+raw_models_path = "models/raw/"
 
-trained_model_path = "results_training/"
+trained_model_path = "models/trained/"
 
 nbr_AI_per_gen = 28
 rate_survivors = 0.25
