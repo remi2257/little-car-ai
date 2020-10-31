@@ -56,9 +56,9 @@ class Track:
                 for i in range(min(sum_add - j, self.__grid_h)):
                     if self.__grid_practicable[i][j]:
                         if "u" in self.__grid_raw[i][j]:
-                            direction = dir_UP
+                            direction = Direction.UP
                         else:
-                            direction = dir_RIGHT
+                            direction = Direction.RIGHT
                         return j, i, direction
 
     @property
@@ -129,15 +129,18 @@ def parse_track_file(track_path):
 
 
 class Checkpoint:
-    def __init__(self, x, y, direction):
-        self.x = x
-        self.y = y
-        if direction in [dir_DOWN, dir_UP]:
-            self.orientation = dir_RIGHT
-        else:
-            self.orientation = dir_DOWN
-
-        self.line = None
+    def __init__(self):
+        pass
+    # TODO
+    # def __init__(self, x, y, direction):
+        # self.x = x
+        # self.y = y
+        # if direction in [dir_DOWN, dir_UP]:
+        #     self.orientation = dir_RIGHT
+        # else:
+        #     self.orientation = dir_DOWN
+        #
+        # self.line = None
 
     def line_crossed(self):
         pass
@@ -145,10 +148,9 @@ class Checkpoint:
 
 if __name__ == '__main__':
     from src.const import background_path
-    import pygame.locals as pygame_const
     from src.usesful_func import start_pygame, should_stop_pygame
 
-    track_ = Track("tracks/Legendary_1.tra")
+    track_ = Track("tracks/tiny.tra")
     # print(track_.grid_raw)
 
     start_pygame()

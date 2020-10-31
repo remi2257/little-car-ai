@@ -1,7 +1,9 @@
 import pygame
 import pygame.locals as pygame_const
 
-from .const import game_name, list_break
+from .const import game_name
+
+list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
 
 def start_pygame():

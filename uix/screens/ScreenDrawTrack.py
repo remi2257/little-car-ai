@@ -1,8 +1,8 @@
 import pygame
+import pygame.locals as pygame_const
+
 import numpy as np
-# import os
 from random import choice
-from enum import Enum
 
 from uix.screens.abstract.ScreenBase import ScreenBase
 from src.const import *

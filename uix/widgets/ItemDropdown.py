@@ -1,13 +1,16 @@
 import os
 import pygame
-from pygame_gui.elements import UIButton, UIDropDownMenu
+from pygame_gui.elements import UIDropDownMenu, UILabel
 
 
 class ItemDropdown:
-    def __init__(self, rect, manager, folder, extension):
+    def __init__(self, rect, manager, folder, extension, text=None):
         self._folder = folder
-        self._extension = extension  # def get_chosen_item_path(self):
+        self._extension = extension
+
         self._dropdown = self.generate_dropdown(rect, manager)
+        if text is not None:
+            self.generate_label(manager, rect, text)
 
     def generate_dropdown(self, rect, manager):
         x_center, y_center, w, h = rect
@@ -27,3 +30,14 @@ class ItemDropdown:
     @property
     def raw_item(self):
         return self._dropdown.selected_option
+
+    @staticmethod
+    def generate_label(manager, rect, text):
+        x_center, y_center, w, h = rect
+        corrected_w = int(0.7 * w)
+        new_y_center = y_center - 3 * h // 2
+        label_rect = (x_center - corrected_w // 2, new_y_center,
+                         corrected_w, h)
+        label_item = UILabel(relative_rect=pygame.Rect(*label_rect), text=text,
+                             manager=manager)
+        return label_item

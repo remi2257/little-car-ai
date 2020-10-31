@@ -1,10 +1,6 @@
 import os
-import glob
+from enum import Enum
 
-import pygame.locals as pygame_const
-
-
-# Todo : Bouger un peu le tout
 
 def get_screen_infos_linux(ratio_screen_window):
     import subprocess
@@ -39,55 +35,19 @@ background_path = os.path.join(images_path, "background.jpg")
 
 ratio_screen_window_ = 1.2
 big_window_larg, big_window_haut = get_screen_infos_linux(ratio_screen_window_)
-# big_window_larg = 1600  # 1280
-# big_window_haut = big_window_larg
-# big_window_haut = 900  # 720
-
 
 # ---INIT PARAMETERS ---#
-init_car_x = 260.0
-init_car_y = 140.0
-
 FPS_MAX_init = 30
 FPS_MAX_max = 240
-list_break = [pygame_const.K_q, pygame_const.K_ESCAPE]
 
 font_size_global = round(big_window_haut / 45)
-
-theta_0 = -90.0
 
 # TRAINING
 raw_models_path = "models/raw/"
 
 trained_model_path = "models/trained/"
 
-nbr_AI_per_gen = 28
-rate_survivors = 0.25
-
-nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
-
-weight_on_road = 10
-lower_bound_fitness = -1000
-
-boost_checkpoint = 250
-
-max_mutation_rate = 1.0
-decay_mutation_rate = 0.95
-
-copy_mutation_rate = 0.08
-
-generation_duration_max_sec = 20
-generation_duration_max_frame = generation_duration_max_sec * FPS_MAX_init
-
-generation_duration_init_sec = 1
-generation_duration_init_frame = generation_duration_init_sec * FPS_MAX_init
-
-gen_dur_incr_ratio_max = 1.2
-generation_duration_incr_sec = 1
-generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
-
 # -- CAR PARAMETERS -- #
-nbr_bots = 0
 path_vehicles = os.path.join(images_path, "vehicles")
 path_audi = os.path.join(path_vehicles, "Audi.png")
 path_viper = os.path.join(path_vehicles, "Black_viper.png")
@@ -113,15 +73,23 @@ offset_y_LIDAR = 0
 
 circle_size = max(1, int(round(big_window_larg / 1920) * 3))
 
+
 # -- DIRECTION -- #
 
 # Dir for Track & BOT
-dir_DOWN, dir_RIGHT, dir_UP, dir_LEFT = 0, 1, 2, 3
+class Direction(Enum):
+    DOWN = 0
+    UP = 1
+    RIGHT = 2
+    LEFT = 3
+
 
 # --- IMAGES --- #
 im_others_path = os.path.join(images_path, "others/")
 
 # -- TRACK -- #
+track_files_path = "tracks/"
+
 roads_path = os.path.join(images_path, "road/")
 
 track_part_1w = {
@@ -146,22 +114,6 @@ track_part_1w = {
 
 }
 
-bot_possible_moves_1w = {
-    "ud": [dir_UP, dir_DOWN],
-    "lr": [dir_LEFT, dir_RIGHT],
-    "dr": [dir_RIGHT, dir_DOWN],
-    "dl": [dir_LEFT, dir_DOWN],
-    "ur": [dir_UP, dir_RIGHT],
-    "ul": [dir_UP, dir_LEFT],
-    "ulr": [dir_UP, dir_LEFT, dir_RIGHT],
-    "udr": [dir_UP, dir_DOWN, dir_RIGHT],
-    "udl": [dir_UP, dir_LEFT, dir_DOWN],
-    "dlr": [dir_DOWN, dir_LEFT, dir_RIGHT],
-    "udlr": [dir_DOWN, dir_UP, dir_LEFT, dir_RIGHT],
-    "sr": [dir_RIGHT],
-
-}
-
 track_part_1w_practicable = {
     "x": False,
     "xx": False,
@@ -183,9 +135,6 @@ track_part_1w_practicable = {
 
 }
 
-track_files_path = "tracks/"
-list_tracks = glob.glob(track_files_path + "*tra")
-
 # COLORS
 
 COLOR_GREEN = (0, 255, 0)
@@ -202,27 +151,7 @@ COLOR_BLUE_BRIGHT = (0, 180, 255)
 COLORS_LIGHT = [COLOR_GREEN_LIGHT, COLOR_RED_LIGHT, COLOR_BLUE_LIGHT, COLOR_GREEN_LIGHT]
 COLORS_BRIGHT = [COLOR_GREEN_BRIGHT, COLOR_RED_BRIGHT, COLOR_BLUE_BRIGHT, COLOR_GREEN_BRIGHT]
 
-# Stupid Name
-
-
 # -- MENU -- #
-# 521 x 246 = ratio de 2.13
-menu_button_w = round(big_window_haut / 3.5)
-menu_button_h = round(menu_button_w / 2.13)
-
-offset_h = round(20 * big_window_haut / 700)
-
-nbr_buttons = 4
-
-first_button_y = round(200 * big_window_haut / 800)
-
-buttons_y = [first_button_y + i * (offset_h + menu_button_h) for i in range(nbr_buttons)]
-
-state_MENU, state_HUMAN, state_AI, state_TRAIN, state_DRAW = 0, 1, 2, 3, 4
-
 title_path = os.path.join(images_path, "others/title_menu.png")
 
 buttons_img_path = os.path.join(images_path, "buttons/")
-
-menu_selection_w = round(150 * 900 / big_window_haut)
-menu_selection_h = round(400 * 900 / big_window_haut)

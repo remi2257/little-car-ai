@@ -1,8 +1,11 @@
 import pygame
+
+from src.const import *
+
 from pygame_gui.elements import UIButton
 from uix.widgets.ItemDropdown import ItemDropdown
+
 from uix.screens.abstract.ScreenBase import ScreenBase
-from src.const import *
 
 from uix.screens.ScreenPlayHuman import run_play_human
 from uix.screens.ScreenPlayAI import run_play_ai
@@ -79,7 +82,7 @@ class ScreenHome(ScreenBase):
         title = "Choose Track"
 
         return ItemDropdown(rect=(x, y, menu_button_w, menu_button_h // 2), manager=self._ui_manager,
-                            folder=track_files_path, extension=".tra")
+                            folder=track_files_path, extension=".tra", text=title)
 
     def _gen_dropdown_model_trained(self):
         x = 8 * big_window_haut // 10
@@ -87,7 +90,7 @@ class ScreenHome(ScreenBase):
         title = "Trained"
 
         return ItemDropdown(rect=(x, y, menu_button_w, menu_button_h // 2), manager=self._ui_manager,
-                            folder=trained_model_path, extension=".h5")
+                            folder=trained_model_path, extension=".h5", text=title)
 
     def _gen_dropdown_model_design(self):
         x = 8 * big_window_haut // 10
@@ -95,7 +98,7 @@ class ScreenHome(ScreenBase):
         title = "Model Design"
 
         return ItemDropdown(rect=(x, y, menu_button_w, menu_button_h // 2), manager=self._ui_manager,
-                            folder=raw_models_path, extension=".net")
+                            folder=raw_models_path, extension=".net", text=title)
 
     def _gen_background(self):
         background = super(ScreenHome, self)._gen_background()

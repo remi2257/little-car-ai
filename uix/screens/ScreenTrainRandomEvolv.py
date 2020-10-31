@@ -3,8 +3,6 @@ import math
 import pygame
 
 from src.const import *
-from src.cars.CarAI import CarAI
-from src.objects.NeuralNet import NeuralNet
 
 from uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
 
@@ -36,6 +34,9 @@ generation_duration_incr_frame = generation_duration_incr_sec * FPS_MAX_init
 
 class ScreenTrainRandomEvolv(ScreenBaseTrain):
     def __init__(self, track_path, nn_file_path, save, **kwargs):
+        # Import here so that Tensorflow is imported only if needed
+        from src.cars.CarAI import CarAI
+        from src.objects.NeuralNet import NeuralNet
 
         ScreenBaseTrain.__init__(self, track_path, nn_file_path, save, **kwargs)
 

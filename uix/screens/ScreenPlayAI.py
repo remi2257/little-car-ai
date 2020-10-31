@@ -1,11 +1,12 @@
 from uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
-from src.cars.CarAI import CarAI
-from src.objects.NeuralNet import NeuralNet
 
 
 class ScreenPlayAI(ScreenPlaySolo):
-
     def __init__(self, nn_file_path, track_path, **kwargs):
+        # Import here so that Tensorflow is imported only if needed
+        from src.cars.CarAI import CarAI
+        from src.objects.NeuralNet import NeuralNet
+
         super(ScreenPlayAI, self).__init__(track_path=track_path, **kwargs)
 
         neural_net = NeuralNet.from_path(nn_file_path)

@@ -6,6 +6,10 @@ from src.const import *
 from src.objects.LIDAR import LIDAR
 from .CarCommands import CommandGas, CommandDir
 
+# Todo : should be moved !
+weight_on_road = 10
+boost_checkpoint = 250
+
 
 class Car:
     def __init__(self, track):
@@ -36,8 +40,8 @@ class Car:
 
         # GEN CAR IMAGE
         self._img = self._gen_car_img(path_audi)
-        if track.start_direction == dir_RIGHT:
-            self._img = pygame.transform.rotate(self._img, theta_0)
+        if track.start_direction == Direction.RIGHT:
+            self._img = pygame.transform.rotate(self._img, -90.0)
 
         self._actual_img = self._img
 
