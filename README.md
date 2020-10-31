@@ -48,6 +48,7 @@ to generate the next generation, thanks to mutation
 
 | Version | GamePlay Render |
 :-------------------------:|:-------------------------:
+1.4 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/pygame_gui.png" width="400"/>
 1.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/menu1.png" width="400"/>
 1.1 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/draw_module.png" width="400"/>
 1.0 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/good_mutation_v1_0.png" width="400"/>
@@ -57,6 +58,7 @@ to generate the next generation, thanks to mutation
 
 ### Versions List
 
+- v1.4 : Swap from my custom GUI to pygamegui | 31/10/20
 - v1.3 : Clean Code for new adventures | 26/09/20
 - v1.2 : Add Menu | 18/07/19
 - v1.1 : Add drawing Module | 15/07/19 (I'm Back :D)
