@@ -3,14 +3,14 @@ import pygame
 from src.const import *
 
 from pygame_gui.elements import UIButton
-from uix.widgets.ItemDropdown import ItemDropdown
+from src.uix.widgets.ItemDropdown import ItemDropdown
 
-from uix.screens.abstract.ScreenBase import ScreenBase
+from src.uix.screens.abstract.ScreenBase import ScreenBase
 
-from uix.screens.ScreenPlayHuman import run_play_human
-from uix.screens.ScreenPlayAI import run_play_ai
-from uix.screens.ScreenTrainRandomEvolv import run_train
-from uix.screens.ScreenDrawTrack import run_draw_map
+from src.uix.screens.ScreenPlayHuman import run_play_human
+from src.uix.screens.ScreenPlayAI import run_play_ai
+from src.uix.screens.ScreenTrainRandomEvolv import run_train
+from src.uix.screens.ScreenDrawTrack import run_draw_map
 
 FPS_MAX = 30
 

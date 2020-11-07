@@ -4,7 +4,7 @@ import pygame.locals as pygame_const
 import numpy as np
 from random import choice
 
-from uix.screens.abstract.ScreenBase import ScreenBase
+from src.uix.screens.abstract.ScreenBase import ScreenBase
 from src.const import *
 
 GRID_HEIGHT = 24

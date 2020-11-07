@@ -81,6 +81,7 @@ def model_parser(model_path):
 
 class NeuralNet:
     def __init__(self, model):
+        # Todo : Ensure model is the type expected
         self._model = model
         self._is_cnn = any([isinstance(layer, Conv2D) for layer in self._model.layers])
 

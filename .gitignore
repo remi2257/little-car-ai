@@ -1,5 +1,5 @@
 .idea/
 dev/*
-uix/my_gui
+src/uix/my_gui
 src/test_dev.py
 results_training/

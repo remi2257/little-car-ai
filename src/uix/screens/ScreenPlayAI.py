@@ -1,4 +1,4 @@
-from uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
+from src.uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
 
 
 class ScreenPlayAI(ScreenPlaySolo):

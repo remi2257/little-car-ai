@@ -1,6 +1,6 @@
 import pygame.locals as pygame_const
 
-from uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
+from src.uix.screens.abstract.ScreenPlaySolo import ScreenPlaySolo
 from src.cars.CarHuman import CarHuman
 from src.cars.Car import CommandGas, CommandDir
 

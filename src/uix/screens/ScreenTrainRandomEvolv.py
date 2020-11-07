@@ -4,7 +4,7 @@ import pygame
 
 from src.const import *
 
-from uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
+from src.uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
 
 nbr_AI_per_gen = 25
 rate_survivors = 0.2
