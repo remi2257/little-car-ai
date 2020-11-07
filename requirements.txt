@@ -1,0 +1,10 @@
+numpy~=1.18.5
+matplotlib~=3.1.2
+
+tensorflow~=2.3.0
+silence_tensorflow~=1.1.1
+
+pygame~=1.9.6
+pygame-gui~=0.5.7
+
+PyYAML~=5.3.1
