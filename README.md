@@ -7,7 +7,7 @@ Hi, my name is Remi LUX. Currently engineer at Niryo, I code this project during
 The goal to my project is to teach a car to drive through Reinforcement Learning
 
 <p align="center">
-<img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/strong_evolv.png"  width="500"/>
+<img src="https://github.com/remi2257/little-car-ai/blob/master/src/uix/images/illustr/strong_evolv.png"  width="500"/>
 </p>
 
 
@@ -51,13 +51,13 @@ to generate the next generation, thanks to mutation
 
 | Version | GamePlay Render |
 :-------------------------:|:-------------------------:
-1.4 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/pygame_gui.png" width="400"/>
-1.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/menu1.png" width="400"/>
-1.1 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/draw_module.png" width="400"/>
-1.0 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/good_mutation_v1_0.png" width="400"/>
-0.6 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/First_Mutation.png" width="400"/>
-0.3 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/First_True_Design.png" width="400"/>
-0.2 | <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/First_LIDAR.png" width="400"/> |
+1.4 | ![1.4](src/uix/images/illustr/pygame_gui.png)
+1.2 | ![1.2](src/uix/images/illustr/menu1.png)
+1.1 | ![1.1](src/uix/images/illustr/draw_module.png)
+1.0 | ![1.0](src/uix/images/illustr/good_mutation_v1_0.png)
+0.6 | ![0.6](src/uix/images/illustr/First_Mutation.png)
+0.3 | ![0.3](src/uix/images/illustr/First_True_Design.png)
+0.2 | ![0.2](src/uix/images/illustr/First_LIDAR.png)
 
 ### Versions List
 
