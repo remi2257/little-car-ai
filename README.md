@@ -1,5 +1,6 @@
 # little-car-ai
 [![Build Status](https://travis-ci.com/remi2257/little-car-ai.svg?branch=master)](https://travis-ci.com/remi2257/little-car-ai)
+[![Coverage Status](https://coveralls.io/repos/github/remi2257/little-car-ai/badge.svg?branch=ci)](https://coveralls.io/github/remi2257/little-car-ai?branch=ci)
 
 Hi, my name is Remi LUX. Currently engineer at Niryo, I code this project during my free time.
 
