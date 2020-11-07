@@ -16,6 +16,7 @@ from tensorflow.keras.models import Model, load_model
 tf.compat.v1.disable_eager_execution()
 
 extra_params_dim = 1
+save_model_plot = False
 
 
 def interpret_layer(layer_type, *args):
@@ -71,11 +72,12 @@ def model_parser(model_path):
 
     model = Model(inputs=[lidar_model.input, extra_params_model.input], outputs=[output_dir, output_gas])
 
-    tf.keras.utils.plot_model(
-        model, to_file=model_path.replace('.net', '.png'),
-        show_shapes=True, show_layer_names=True,
-        rankdir='TB', expand_nested=True, dpi=96
-    )
+    if save_model_plot:
+        tf.keras.utils.plot_model(
+            model, to_file=model_path.replace('.net', '.png'),
+            show_shapes=True, show_layer_names=True,
+            rankdir='TB', expand_nested=True, dpi=96
+        )
     return model
 
 
@@ -165,7 +167,10 @@ class NeuralNet:
 
 
 if __name__ == '__main__':
+    save_model_plot = True
     nn = NeuralNet.from_path("models/raw/cnn_light.net")
+    nn.model.summary()
+
     # nn2 = NeuralNet.from_path("models/raw/cnn_light.net")
     # nn.mutate_model_from_query(nn2, 0.2)
     # input_1 = np.expand_dims([0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1.,
@@ -173,16 +178,3 @@ if __name__ == '__main__':
     # input_2 = np.expand_dims([0.], axis=0)
     # inputs_test = [input_1, input_2]
     # print(nn.test_predict(inputs_test))
-    nn.model.summary()
-    #
-    # nn2 = NeuralNet("raw_models/nn1_dual_layers.net")
-    # nn2.model.summary()
-    #
-    # nn_cnn = NeuralNet("raw_models/cnn_standard.net")
-    # nn_cnn.model.summary()
-    # nn2 = NeuralNet("raw_models/nn_tiny.net")
-
-    # nn2.mutate_model_from_query(nn, 0.9)
-    # print(nn2.model.summary())
-    # print(nn.model.get_weights())
-    # print(nn2.model.get_weights())
