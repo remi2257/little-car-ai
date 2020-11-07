@@ -12,8 +12,12 @@ def get_screen_infos_linux(ratio_screen_window):
     p.stdout.close()
 
     resolution_string, junk = p2.communicate()
-    resolution = resolution_string.split()[0].decode('utf8')
-    width, height = resolution.split('x')
+    try:
+        resolution = resolution_string.split()[0].decode('utf8')
+        width, height = resolution.split('x')
+    except IndexError:
+        width = 1200
+        height = 800
     # print(width,height)
     return int(int(width) // ratio_screen_window), int(int(height) // ratio_screen_window)
 
