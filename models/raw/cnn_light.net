@@ -1,0 +1,13 @@
+description: A CNN :D
+
+architectures:
+  lidar_layers:
+  - ["conv", 4, [3, 3], 1, "same"]
+  - ["max_pool", [2, 2], 1, "valid"]
+  - ["conv", 4, [2, 2], 1, "same"]
+  - ["max_pool", [2, 2], 1, "valid"]
+  - ["flatten"]
+  extra_params_layers:
+    - ["dense", 2]
+  concat_layers:
+    - ["dense", 16]

@@ -51,6 +51,9 @@ class CarAI(Car):
         self._neural_net.mutate_model_from_query(target_nn=parent.neural_net,
                                                  mutation_rate=mutation_rate)
 
+    def kill(self):
+        self._is_alive = False
+
     @property
     def is_alive(self):
         return self._is_alive

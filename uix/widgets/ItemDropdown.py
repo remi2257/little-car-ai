@@ -10,7 +10,9 @@ class ItemDropdown:
 
         self._dropdown = self.generate_dropdown(rect, manager)
         if text is not None:
-            self.generate_label(manager, rect, text)
+            self._label = self.generate_label(manager, rect, text)
+        else:
+            self._label = None
 
     def generate_dropdown(self, rect, manager):
         x_center, y_center, w, h = rect
@@ -37,7 +39,17 @@ class ItemDropdown:
         corrected_w = int(0.7 * w)
         new_y_center = y_center - 3 * h // 2
         label_rect = (x_center - corrected_w // 2, new_y_center,
-                         corrected_w, h)
+                      corrected_w, h)
         label_item = UILabel(relative_rect=pygame.Rect(*label_rect), text=text,
                              manager=manager)
         return label_item
+
+    def hide(self):
+        if self._label is not None:
+            self._label.visible = False
+        self._dropdown.hide()
+
+    def show(self):
+        if self._label is not None:
+            self._label.visible = True
+        self._dropdown.show()

@@ -6,8 +6,8 @@ from src.const import *
 
 from uix.screens.abstract.ScreenBaseTrain import ScreenBaseTrain
 
-nbr_AI_per_gen = 20
-rate_survivors = 0.25
+nbr_AI_per_gen = 25
+rate_survivors = 0.2
 
 nbr_survivors = int(nbr_AI_per_gen * rate_survivors)
 
@@ -64,12 +64,8 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
             new_car = CarAI(self._track, new_model)
             self._carsAI.append(new_car)
 
-        self.actualize()
-
-    def actualize(self, pos=None):
-        self._tick_clock()
-        # BACKGROUND
-        self._window.blit(self._background, (0, 0))
+    def actualize_screen(self, pos=None):
+        super(ScreenTrainRandomEvolv, self).actualize_screen(pos)
 
         # Start new generation if limit of time is reached for the actual generation
         if self._gen_duration >= self._gen_duration_limit_steps:
@@ -86,7 +82,7 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
 
             # Kill car that are bad
             if carAI.fitness < lower_bound_fitness:
-                carAI._is_alive = False
+                carAI.kill()
 
             # move_car
             carAI.move_car_and_refresh_lidar()
@@ -95,14 +91,6 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
             # carAI.refresh_fitness_v1()
             carAI.refresh_fitness_v2()
 
-        """
-        # Get infos on fitness
-        list_fitness = [c.fitness for c in self.carsAI if c.is_alive]
-        
-        # If every cars died
-        if not list_fitness: 
-            self.gen_duration = self.gen_duration_limit_steps
-        """
         # Get infos on fitness
         list_fitness = [c.fitness for c in self._carsAI]
 
@@ -116,7 +104,7 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         # -- DISPLAY--#
         # AI's CARS
         for carAI in self._carsAI:
-            if not carAI._is_alive:
+            if not carAI.is_alive:
                 continue
             if carAI.fitness == self._best_actual_fitness:
                 carAI.change_to_leader_img()
@@ -127,7 +115,6 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
 
         # REFRESH
         self.display_infos_fitness_n_fps()
-        pygame.display.flip()
 
     def start_new_gen(self):
         # Sort cars by fitness
@@ -252,17 +239,17 @@ class ScreenTrainRandomEvolv(ScreenBaseTrain):
         self._carsAI[0].is_best_ever = True
 
 
-def run_train(track_path, nn_file_path, save, **kwargs):
+def run_train(track_path, nn_file_path, save_train, **kwargs):
     screen = ScreenTrainRandomEvolv(track_path=track_path,
                                     nn_file_path=nn_file_path,
-                                    save=save,
+                                    save=save_train,
                                     **kwargs)
     screen.run()
 
 
 if __name__ == '__main__':
     run_train(
-        track_path="tracks/race_tiny.tra",
-        nn_file_path="raw_models/nn_tiny.net",
-        save=True,
+        track_path="tracks/tiny.tra",
+        nn_file_path="models/raw/cnn_light.net",
+        save_train=True,
     )

@@ -2,12 +2,15 @@ import random
 import yaml
 import numpy as np
 
+from src.cars.CarCommands import CommandDir, CommandGas
+from src.const import height_grid_LIDAR, width_grid_LIDAR
+
+# noinspection PyUnresolvedReferences
+import silence_tensorflow.auto
+
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Input, Conv2D, MaxPool2D, Flatten, Concatenate
 from tensorflow.keras.models import Model, load_model
-
-from src.cars.CarCommands import CommandDir, CommandGas
-from src.const import height_grid_LIDAR, width_grid_LIDAR
 
 # Todo : Utiliser des Tensors pour éviter ça
 tf.compat.v1.disable_eager_execution()
@@ -161,15 +164,15 @@ class NeuralNet:
 
 
 if __name__ == '__main__':
-    nn = NeuralNet.from_path("raw_models/nn_tiny.net")
-    nn2 = NeuralNet.from_path("raw_models/nn_tiny.net")
-    nn.mutate_model_from_query(nn2, 0.2)
+    nn = NeuralNet.from_path("models/raw/cnn_light.net")
+    # nn2 = NeuralNet.from_path("models/raw/cnn_light.net")
+    # nn.mutate_model_from_query(nn2, 0.2)
     # input_1 = np.expand_dims([0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1.,
     #                           1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1., 1., 1., 1.], axis=0)
     # input_2 = np.expand_dims([0.], axis=0)
     # inputs_test = [input_1, input_2]
     # print(nn.test_predict(inputs_test))
-    # nn.model.summary()
+    nn.model.summary()
     #
     # nn2 = NeuralNet("raw_models/nn1_dual_layers.net")
     # nn2.model.summary()

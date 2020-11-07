@@ -59,8 +59,8 @@ class ScreenBaseTrain(ScreenBasePlay):
 
         self.gen_background()
 
-    def actualize(self, pos=None):
-        raise NotImplementedError
+    def actualize_screen(self, pos=None):
+        super(ScreenBaseTrain, self).actualize_screen(pos)
 
     def _key_press_handle(self, key):
         if key == pygame_const.K_KP_PLUS:
@@ -89,7 +89,7 @@ class ScreenBaseTrain(ScreenBasePlay):
 
         surf = pygame.image.fromstring(raw_data, size, "RGB")
         # self.window.blit(surf, (self.track.im_w - 50, 400))
-        self._background.blit(surf, (self._track.im_w - 50, self._list_y_text[-1] + 50))
+        self._background.blit(surf, (self._track.im_w - 50, self._list_y_text[-1]))
 
     def save_gen_best_model(self):
         best_car = self._carsAI[0]
