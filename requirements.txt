@@ -9,5 +9,3 @@ pygame~=1.9.6
 pygame-gui~=0.5.7
 
 PyYAML~=5.3.1
-
-pytest~=6.1.2

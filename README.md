@@ -1,7 +1,9 @@
 # little-car-ai
-Hi, my name is Remi LUX. I'm currently in my final year of Computer Vision Degree in Grenoble INP - Phelma. Welcome to my project
+[![Build Status](https://travis-ci.com/remi2257/little-car-ai.svg?branch=master)](https://travis-ci.com/remi2257/little-car-ai)
 
-My algorithm aims to teach a car to drive through AI.
+Hi, my name is Remi LUX. Currently engineer at Niryo, I code this project during my free time.
+
+The goal to my project is to teach a car to drive through Reinforcement Learning
 
 <p align="center">
 <img src="https://github.com/remi2257/little-car-ai/blob/master/uix/images/illustr/strong_evolv.png"  width="500"/>
