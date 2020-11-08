@@ -14,6 +14,6 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
-  - pytest
+  - coverage run --source=src -m pytest tests/
 after_success:
   - coveralls # submit coverage

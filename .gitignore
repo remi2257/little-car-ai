@@ -1,5 +1,10 @@
-.idea/
-dev/*
-src/uix/my_gui
-src/test_dev.py
-results_training/
+# PyCharm
+/.idea/
+
+# Coverage Result
+/.pytest_cache/
+/.coverage
+
+# Dev Folder
+/dev/
+/results_training/
