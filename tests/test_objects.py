@@ -1,3 +1,5 @@
+import numpy as np
+
 from src.objects.LIDAR import LIDAR
 from src.objects.NeuralNet import NeuralNet
 from src.objects.Track import Track
@@ -12,6 +14,17 @@ def test_LIDAR():
     lidar.refresh_case(i=i_test, j=j_test, road_type="lr", is_practicable=True, true_pos=(40, 20))
 
     assert lidar.is_practicable(i=i_test, j=j_test)
+    assert lidar.get_true_pos(i=i_test, j=j_test) == (40, 20)
+
+    size_lidar = lidar.size
+    assert size_lidar[0] * size_lidar[1] > 1
+
+    new_filtered_map = np.random.choice(a=[False, True], size=size_lidar)
+    for i in range(size_lidar[0]):
+        for j in range(size_lidar[1]):
+            lidar.refresh_case(i=i, j=j, road_type="xx", is_practicable=new_filtered_map[i][j], true_pos=(40, 20))
+
+    assert (new_filtered_map == lidar.filtered_mat).all()
 
 
 def test_NeuralNet():

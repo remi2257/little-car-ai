@@ -23,3 +23,7 @@ class LIDAR:
     @property
     def filtered_mat(self):
         return self._filtered_mat
+
+    @property
+    def size(self):
+        return self._road_mat.shape
