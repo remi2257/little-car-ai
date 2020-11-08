@@ -11,6 +11,15 @@ def start_pygame():
     pygame.display.set_caption(game_name)
 
 
+def start_pygame_headless():
+    import os
+    os.environ["SDL_VIDEODRIVER"] = "dummy"
+
+    start_pygame()
+    pygame.display.set_mode((800, 600))
+    pygame.display.init()
+
+
 def should_stop_pygame(event):
     if event.type == pygame_const.QUIT:
         return True

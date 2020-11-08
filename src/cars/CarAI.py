@@ -4,10 +4,11 @@ from src.const import path_viper, path_car_survivor
 
 from src.cars.Car import Car
 from src.objects.NeuralNet import NeuralNet
+from src.objects.Track import Track
 
 
 class CarAI(Car):
-    def __init__(self, track, neural_net: NeuralNet):
+    def __init__(self, track: Track, neural_net: NeuralNet):
         super(CarAI, self).__init__(track)
         self._neural_net = neural_net
 

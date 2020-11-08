@@ -34,7 +34,7 @@ def get_screen_infos(ratio_screen_window):
 
 # -----ENV---- #
 game_name = "Little Car AI"
-images_path = "uix/images/"
+images_path = "src/uix/images/"
 background_path = os.path.join(images_path, "background.jpg")
 
 ratio_screen_window_ = 1.2
